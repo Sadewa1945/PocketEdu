@@ -19,6 +19,9 @@ return new class extends Migration
             $table->enum('role', ['admin', 'user']);
             $table->foreignId('class_id')->nullable()->constrained('classes')->nullOnDelete();
             $table->string('password');
+            $table->string('phone')->nullable();
+            $table->string('address')->nullable();
+            $table->enum('status', ['active', 'inactive', 'suspend']);
             $table->rememberToken();
             $table->timestamps();
         });

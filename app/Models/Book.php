@@ -20,17 +20,11 @@ class Book extends Model
         'category_id',
     ];
 
-    /**
-     * Get the category that the book belongs to.
-     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
 
-    /**
-     * Get all stocks for this book.
-     */
     public function stock()
     {
         return $this->hasMany(Stock::class, 'book_id');
@@ -38,18 +32,16 @@ class Book extends Model
 
     public function getTotalStockAttribute()
     {
-        return $this->stocks->sum('quantity') ?? 0;
+        return $this->stock->sum('total_stock') ?? 0;
     }
 
     public function getAvailableStockAttribute()
     {
-        return $this->stocks->where('status', 'Tersedia')->sum('quantity') ?? 0;
+        return $this->stock->sum('available_stock') ?? 0;
     }
 
     public function borrowings()
     {
         return $this->hasMany(borrowing::class, 'book_id');
     }
-
-    
 }

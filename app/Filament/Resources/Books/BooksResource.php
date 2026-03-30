@@ -7,14 +7,18 @@ use App\Filament\Resources\Books\Pages\EditBooks;
 use App\Filament\Resources\Books\Pages\ListBooks;
 use App\Models\Book;
 use BackedEnum;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -56,11 +60,14 @@ class BooksResource extends Resource
             TextInput::make('publisher')
             ->label('Publisher'),
             
-            TextInput::make('description')
+            Textarea::make('description')
             ->label('Description'),
             
             FileUpload::make('cover_image')
-            ->label('Cover Image'),
+            ->label('Cover Image')
+            ->image()
+            ->directory('books')
+            ->disk('public'),
 
             Select::make('category_id')
             ->relationship('category', 'name')
@@ -68,32 +75,34 @@ class BooksResource extends Resource
             ->label('Category'),
 
             Section::make('Stock Information')
-                ->schema([
-                    Repeater::make('stock')
-                        ->relationship()
-                        ->schema([
-                            TextInput::make('total_stock')
+            ->schema([
+                Repeater::make('stock')
+                    ->relationship('stock')
+                    ->schema([
+                        TextInput::make('total_stock')
                             ->label('Total Stock')
                             ->numeric()
                             ->required()
                             ->default(0)
                             ->live()
-                            ->afterStateUpdated(function ($state, callable $set){
-                                $set('available_stock', $state);
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                if (($get('available_stock') ?? 0) == 0) {
+                                    $set('available_stock', $state);
+                                }
                             }),
 
-                            TextInput::make('available_stock')
+                        TextInput::make('available_stock')
                             ->label('Available Stock')
                             ->numeric()
                             ->required()
-                            ->default(0)
-                        ])
-                        ->columns()
-                        ->defaultItems(1)
-                        ->addable(false)
-                        ->deletable(false)
-                        ->reorderable(false)
-                ]),
+                            ->default(0),
+                    ])
+                    ->columns(2)
+                    ->defaultItems(1)
+                    ->addable(false)
+                    ->deletable(false)
+                    ->reorderable(false),
+            ]),
 
         ]);
     }
@@ -122,11 +131,11 @@ class BooksResource extends Resource
                 ->sortable()
                 ->searchable(),
 
-                TextColumn::make('stock.total_stock')
+                TextColumn::make('total_stock')
                 ->label('Total Stock')
                 ->sortable(),
 
-                TextColumn::make('stock.available_stock')
+                TextColumn::make('available_stock')
                 ->label('Stock Tersedia')
                 ->sortable(),
 
@@ -138,10 +147,18 @@ class BooksResource extends Resource
                 TextColumn::make('published_date')
                 ->date(),
 
-                TextColumn::make('created_at')
-                ->date(),
+                BadgeColumn::make('stock.status')
+                    ->colors([
+                        'success' => 'available',
+                        'danger' => 'out_of_stock',
+                    ])
+                    ->label('Status'),
 
-            ])->filters([
+            ])->actions([
+            EditAction::make(),
+            DeleteAction::make(),
+            ])
+        ->filters([
                 SelectFilter::make('category_id')
                     ->label('Category')
                     ->relationship('category', 'name'),

@@ -7,6 +7,7 @@ use App\Filament\Resources\Majors\Pages\EditMajor;
 use App\Filament\Resources\Majors\Pages\ListMajors;
 use App\Models\Major;
 use BackedEnum;
+use Dom\Text;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
@@ -35,9 +36,12 @@ class MajorResource extends Resource
     {
         return $schema->schema([
             TextInput::make('name')
-            ->unique()
             ->required()
             ->label('Major Name'),
+
+            TextInput::make('code')
+            ->required()
+            ->label('Major Code'),
         ]);
     }
 
@@ -51,6 +55,11 @@ class MajorResource extends Resource
 
             TextColumn::make('name')
             ->label('Major Name')
+            ->searchable()
+            ->sortable(),
+
+            TextColumn::make('code')
+            ->label('Major Code')
             ->searchable()
             ->sortable(),
 

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('classes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedTinyInteger('grade');
+            $table->string('grade');
             $table->foreignId('major_id')->constrained('majors')->cascadeOnDelete();
             $table->unsignedTinyInteger('class_section');
             $table->timestamps();

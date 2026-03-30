@@ -8,10 +8,11 @@ class Stock extends Model
 {
     protected $table = 'book_stock';
 
-     protected $fillable = [
+    protected $fillable = [
         'book_id',
         'total_stock',
         'available_stock',
+        'status',
     ];
 
     public function book()
