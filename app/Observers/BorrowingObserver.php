@@ -14,8 +14,8 @@ class BorrowingObserver
     {
         $stock = Stock::where('book_id', $borrowing->book_id)->first();
         
-        if ($stock && $stock->quantity >= $borrowing->quantity) {
-            $stock->decrement('quantity', $borrowing->quantity);
+        if ($stock && $stock->available_stock >= $borrowing->quantity) {
+            $stock->decrement('available_stock', $borrowing->quantity);
         }
     }
 
@@ -27,7 +27,7 @@ class BorrowingObserver
          if ($borrowing->isDirty('status') && $borrowing->status === 'returned') {
             $stock = Stock::where('book_id', $borrowing->book_id)->first();
             if ($stock) {
-                $stock->increment('quantity', $borrowing->quantity);
+                $stock->increment('available_stock', $borrowing->available_stock);
             }
         }
     }
@@ -37,7 +37,11 @@ class BorrowingObserver
      */
     public function deleted(Borrowing $borrowing): void
     {
-        //
+        $stock = Stock::where('book_id', $borrowing->book_id)->first();
+        
+        if ($stock) {
+            $stock->increment('available_stock', $borrowing->quantity);
+        }
     }
 
     /**

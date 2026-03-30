@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('image')->nullable();
             $table->string('username')->unique();
-            $table->enum('role', ['admin', 'user']);
+            $table->enum('role', ['admin', 'member'])->default('member');
             $table->foreignId('class_id')->nullable()->constrained('classes')->nullOnDelete();
             $table->string('password');
             $table->string('phone')->nullable();

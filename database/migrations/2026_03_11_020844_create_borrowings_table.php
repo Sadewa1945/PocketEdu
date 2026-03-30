@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('book_id')->constrained('books')->cascadeOnDelete();
             $table->integer('quantity')->default(1);
-            $table->text('condition')->nullable();
+            $table->text('borrow_condition')->nullable();
             $table->dateTime('borrowed_at');
-            $table->dateTime('returned_at')->nullable();
-            $table->date('due_at')->nullable();
+            $table->date('due_at');
+            $table->text('notes')->nullable();
             $table->enum('status', ['pending', 'borrowed', 'returned'])->default('pending');
             $table->timestamps();
         });

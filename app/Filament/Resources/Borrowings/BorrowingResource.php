@@ -7,6 +7,7 @@ use App\Filament\Resources\Borrowings\Pages\EditBorrowing;
 use App\Filament\Resources\Borrowings\Pages\ListBorrowings;
 use App\Filament\Resources\Borrowings\Schemas\BorrowingForm;
 use App\Filament\Resources\Borrowings\Tables\BorrowingsTable;
+use App\Models\Book;
 use App\Models\Borrowing;
 use App\Models\User;
 use BackedEnum;
@@ -15,10 +16,12 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -49,27 +52,28 @@ class BorrowingResource extends Resource
 
             Select::make('book_id')
                 ->label('Book Borrowed')
-                ->options(\App\Models\Book::all()->pluck('title', 'id'))
+                ->options(Book::all()->pluck('title', 'id'))
                 ->searchable()
                 ->required(),
 
             TextInput::make('quantity')
                 ->label('Quantity')
                 ->numeric()
+                ->default(1)
                 ->required(),
 
-            TextInput::make('condition')
-                ->label('Condition'),
+            TextInput::make('borrow_condition')
+                ->label('Borrow Condition'),
 
             DateTimePicker::make('borrowed_at')
                 ->label('Borrowed At')
                 ->required(),
 
-            DateTimePicker::make('returned_at')
-                ->label('Returned At'),
-
             DatePicker::make('due_at')
                 ->label('Due At'),
+
+            Textarea::make('notes')
+                ->label('Notes'),
 
             Select::make('status')
                 ->label('Status')
@@ -87,18 +91,18 @@ class BorrowingResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('user.name')
+                TextColumn::make('borrowingsUser.name')
                     ->label('User')
                     ->searchable(),
 
-                TextColumn::make('book.title')
+                TextColumn::make('borrowingsBook.title')
                     ->label('Book')
                     ->searchable(),
 
                 TextColumn::make('quantity')
                     ->label('Quantity'),
 
-                TextColumn::make('condition')
+                TextColumn::make('borrow_condition')
                     ->label('Condition'),
 
                 TextColumn::make('borrowed_at')
@@ -113,8 +117,19 @@ class BorrowingResource extends Resource
                     ->label('Due At')
                     ->date(),
 
-                TextColumn::make('status')
-                    ->label('Status'),
+                BadgeColumn::make('status')
+                    ->label('Status')
+                    ->formatStateUsing(fn (string $state): string => match ($state){
+                        'pending' => 'Pending',
+                        'borrowed' => 'Borrowed',
+                        'returned' => 'Returned',
+                        default => $state,
+                    })
+                    ->colors([
+                        'warning' => 'Pending',
+                        'primary' => 'Borrowed',
+                        'success' => 'Returned',
+                    ])
             ])
 
             ->actions([

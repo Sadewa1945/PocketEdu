@@ -35,11 +35,11 @@ class AdminPanelProvider extends PanelProvider
             ])
              ->plugins([
             AuthUIEnhancerPlugin::make()
-                ->formPanelPosition('left') 
+                ->formPanelPosition('left')
+                ->mobileFormPanelPosition('bottom') 
                 ->formPanelWidth('40%')
                 ->emptyPanelBackgroundImageUrl(asset('images/image.jpg'))
                 ->emptyPanelBackgroundImageOpacity('70%')
-                ->showEmptyPanelOnMobile(false),
             ])
             
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
@@ -50,7 +50,6 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 UserStats::class,
-                // BookStats::class,
             ])
             ->middleware([
                 EncryptCookies::class,

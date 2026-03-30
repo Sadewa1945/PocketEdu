@@ -48,7 +48,7 @@ class UserResource extends Resource
             Select::make('role')
             ->options([
                 'admin' => 'Admin',
-                'user' => 'User',
+                'member' => 'Member',
             ])
             ->required()
             ->label('Role'),
@@ -114,7 +114,7 @@ class UserResource extends Resource
             SelectFilter::make('role')
                 ->options([
                     'admin' => 'Admin',
-                    'user' => 'User',
+                    'member' => 'Member',
                 ])
                 ->label('Role'),
         ]);
