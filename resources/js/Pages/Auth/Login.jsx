@@ -1,40 +1,165 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { User, Lock, Eye, EyeOff, BookOpen } from 'lucide-react';
 
 export default function Login({ setUser }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const currentYear = new Date().getFullYear();
+    const appName = import.meta.env.VITE_APP_NAME || 'PocketEdu';
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
+        setLoading(true);
 
         try {
             await axios.get('/sanctum/csrf-cookie');
-            
-            const response = await axios.post('/api/login', { username, password });
-           
+
+            const response = await axios.post('/api/login', {
+                username,
+                password
+            });
+
             setUser(response.data.user);
             navigate('/dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Gagal login.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div style={{ padding: '50px' }}>
-            <h2>Login</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            <form onSubmit={handleLogin}>
-                <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Username" required />
-                <br /><br />
-                <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required />
-                <br /><br />
-                <button type="submit">Login</button>
-            </form>
+        <div className="min-h-screen bg-gradient-to-br from-green-100 via-white to-emerald-100 flex items-center justify-center px-4 py-8">
+            <div className="w-full h-[41rem] max-w-6xl bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+                
+                
+                <div className="relative hidden md:block">
+                    <img
+                        src="/images/image.jpg"
+                        alt="PocketEdu Illustration"
+                        className="w-full h-full object-cover"
+                    />
+
+                    <div className="absolute inset-0 bg-black/15 flex flex-col justify-end p-10 text-white">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-sm">
+                                <BookOpen size={28} />
+                            </div>
+                            <h1 className="text-3xl font-bold">PocketEdu</h1>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div className="flex items-center justify-center p-8 md:p-12">
+                    <div className="w-full max-w-md">
+                        <div className="md:hidden text-center mb-8">
+                            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-green-100 text-green-700 mb-4">
+                                <BookOpen size={28} />
+                            </div>
+                            <h2 className="text-3xl font-bold text-gray-800">PocketEdu</h2>
+                            <p className="text-gray-500 mt-2">Silakan login ke akun Anda</p>
+                        </div>
+
+                        <div className="hidden md:block mb-8">
+                            <h2 className="text-3xl font-bold text-gray-800 text-center">Welcome</h2>
+                            <p className="text-gray-500 mt-2 text-center">Please login to continue</p>
+                        </div>
+
+                        {error && (
+                            <div className="mb-5 p-4 bg-red-100 border border-red-200 text-red-700 text-sm rounded-xl">
+                                {error}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleLogin} className="space-y-5">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Username
+                                </label>
+                                <div className="relative">
+                                    <User
+                                        size={20}
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                                    />
+                                    <input
+                                        type="text"
+                                        className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        placeholder="Enter your username"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Password
+                                </label>
+                                <div className="relative">
+                                    <Lock
+                                        size={20}
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                                    />
+
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="Enter password"
+                                        required
+                                    />
+
+                                    <button
+                                        type="button"
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                                    >
+                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between text-sm">
+                                <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
+                                    <input type="checkbox" className="rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                                    <span>Remember me</span>
+                                </label>
+
+                                <a href="#" className="text-green-600 hover:text-green-700 font-medium">
+                                    Forgot password
+                                </a>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className={`w-full py-3 rounded-xl font-semibold text-white transition duration-200 ${
+                                    loading
+                                        ? 'bg-green-400 cursor-not-allowed'
+                                        : 'bg-green-600 hover:bg-green-700 active:scale-[0.98]'
+                                }`}
+                            >
+                                {loading ? 'Memproses...' : 'Login'}
+                            </button>
+                        </form>
+
+                        <p className="text-center text-sm text-gray-500 mt-8">
+                            © {currentYear} {appName}. All rights reserved.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
