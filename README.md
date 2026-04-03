@@ -2,7 +2,7 @@
 
 **PocketEdu** is a digital library web application designed to make book browsing, borrowing, and management easier, faster, and more efficient.
 
-This project is built to support both **students** and **administrators** with a clean and user-friendly system for managing library activities.
+This project is built to support both **students** and **administrators** with a clean, simple, and user-friendly system for managing library activities.
 
 ---
 
@@ -12,7 +12,7 @@ This project is built to support both **students** and **administrators** with a
 - 📥 Borrow books online
 - 📚 Manage book data
 - 👨‍💼 Admin dashboard
-- 🔍 Simple and intuitive interface
+- 🔍 Search and organize books
 - 💻 Accessible on multiple devices
 
 ---
@@ -28,20 +28,31 @@ This project is built to support both **students** and **administrators** with a
 
 ## 🎯 Purpose
 
-PocketEdu was developed as a learning project and digital library solution to improve the efficiency of library management and book borrowing systems.
+PocketEdu was developed as a learning project and digital library solution to improve the efficiency of library management and simplify the book borrowing process.
 
 ---
 
-## 🚀 Future Improvements
+## ⚙️ Installation
 
-- User authentication & role management
-- Borrowing history
-- Search and filter books
-- Book return system
-- Responsive UI improvements
+Follow these steps to run the project locally:
 
----
+### 1. Clone the repository
+git clone https://github.com/Sadewa1945/PocketEdu.git
+cd PocketEdu
 
-## 👨‍💻 Developer
+### 2. Install backend dependencies
+composer install
 
-Developed by **Sadewa Aprillian**
+### 3. Install frontend dependencies
+npm install
+
+### 4. Configure environment
+cp .env.example .env
+php artisan key:generate
+
+### 5. Set up database
+php artisan migrate --seed
+
+### 6. Run the project
+php artisan serve
+npm run dev
