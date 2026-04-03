@@ -64,7 +64,7 @@ export default function Login({ setUser }) {
                             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-green-100 text-green-700 mb-4">
                                 <BookOpen size={28} />
                             </div>
-                            <h2 className="text-3xl font-bold text-gray-800">PocketEdu</h2>
+                            <h2 className="text-3xl font-bold text-gray-800">{appName}</h2>
                             <p className="text-gray-500 mt-2">Silakan login ke akun Anda</p>
                         </div>
 
@@ -112,7 +112,7 @@ export default function Login({ setUser }) {
 
                                     <input
                                         type={showPassword ? 'text' : 'password'}
-                                        className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"
+                                        className="hide-password-toggle w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder="Enter password"

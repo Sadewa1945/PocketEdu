@@ -12,3 +12,14 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@layer utilities{
+    .hide-password-toggle::-ms-reveal,
+    .hide-password-toggle::-ms-clear {
+        display: none;
+    }
+
+    .hide-password-toggle::-webkit-textfield-decoration-container{
+        display: none;
+    }
+}

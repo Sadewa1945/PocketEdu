@@ -12,3 +12,10 @@ Route::get('/login', function(){
     return Inertia::render('Auth/Login');
 })->name('login')->middleware('guest');
 
+Route::get('/dashboard', function(){
+    return Inertia::render('Dashboard');
+})->name('dashboard')->middleware('auth');
+
+Route::get('/books', function(){
+    return Inertia::render('BooksOverview');
+})->name('books')->middleware('auth');
