@@ -8,25 +8,41 @@ import {
     LogOut,
     Menu,
     X,
+    User,
+    ChevronDown,
+    Home,
+    Book,
+    RotateCw,
+    Undo2,
+    Layers,
 } from "lucide-react";
 
 export default function Dashboard({ user, setUser }) {
     const navigate = useNavigate();
     const [books, setBooks] = useState([]);
+    const [borrowingsCount, setBorrowingsCount] = useState(0);
+    const [categoriesCount, setCategoriesCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [menuOpen, setMenuOpen] = useState(false);
+    const [profileOpen, setProfileOpen] = useState(false);
 
     const appName = import.meta.env.VITE_APP_NAME || "PocketEdu";
     const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
     useEffect(() => {
-        fetchBooks();
+        const fetchAllData = async () => {
+            await Promise.all([
+                fetchBooks(),
+                fetchBorrowingsCount(),
+                fetchCategoriesCount(),
+            ]);
+        };
+        fetchAllData();
     }, []);
 
     const fetchBooks = async () => {
         try {
-            setLoading(true);
             const res = await axios.get("/api/books");
             const bookData = Array.isArray(res.data)
                 ? res.data
@@ -34,7 +50,27 @@ export default function Dashboard({ user, setUser }) {
             setBooks(bookData);
         } catch (err) {
             console.error("Fetch books error", err);
-            setError("Failed to fetch books. Please try again later.");
+        }
+    };
+
+    const fetchBorrowingsCount = async () => {
+        try {
+            const res = await axios.get("/api/borrowings/count");
+            setBorrowingsCount(res.data.data || 0);
+        } catch (err) {
+            console.error("Fetch borrowings count error", err);
+        }
+    };
+
+    const fetchCategoriesCount = async () => {
+        try {
+            const res = await axios.get("/api/categories");
+            const categories = Array.isArray(res.data)
+                ? res.data
+                : res.data.data || [];
+            setCategoriesCount(categories.length);
+        } catch (err) {
+            console.error("Fetch categories count error", err);
         } finally {
             setLoading(false);
         }
@@ -51,6 +87,8 @@ export default function Dashboard({ user, setUser }) {
         }
     };
 
+    const profileImage = user?.image ? `${apiUrl}/storage/${user.image}` : null;
+
     const latestBooks = [...books].slice(-4).reverse();
     const allBooks = [...books].slice(0, 20).reverse();
 
@@ -62,12 +100,12 @@ export default function Dashboard({ user, setUser }) {
         },
         {
             title: "Total Borrowed",
-            value: "-",
+            value: borrowingsCount,
             icon: <BookOpen size={28} className="text-green-500" />,
         },
         {
             title: "Total Categories",
-            value: "-",
+            value: categoriesCount,
             icon: <ClipboardList size={28} className="text-green-500" />,
         },
     ];
@@ -75,7 +113,7 @@ export default function Dashboard({ user, setUser }) {
     return (
         <div className="min-h-screen w-full bg-gradient-to-br from-green-100 via-white to-emerald-100">
             {/* Navbar */}
-             <div className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
+            <div className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
                     <div>
                         <h1 className="text-xl sm:text-2xl font-bold text-slate-800">
@@ -84,116 +122,255 @@ export default function Dashboard({ user, setUser }) {
                     </div>
 
                     {/* Desktop Menu */}
-                    <div className="hidden md:flex gap-6 items-center">
+                    <div className="hidden md:flex gap-6 items-center relative">
                         <Link
                             to="/dashboard"
                             className="text-green-600 font-semibold"
                         >
                             Dashboard
                         </Link>
+
                         <Link
                             to="/books"
                             className="text-slate-600 hover:text-green-700 transition-colors duration-300"
                         >
                             Books
                         </Link>
-                        <a
-                            href="#"
+
+                        <Link
+                            to="#"
                             className="text-slate-600 hover:text-green-700 transition-colors duration-300"
                         >
                             Borrowings
-                        </a>
-                        <a
-                            href="#"
+                        </Link>
+
+                        <Link
+                            to="#"
                             className="text-slate-600 hover:text-green-700 transition-colors duration-300"
                         >
                             Returns
-                        </a>
-                        <a
-                            href="#"
+                        </Link>
+
+                        <Link
+                            to="/categories"
                             className="text-slate-600 hover:text-green-700 transition-colors duration-300"
                         >
                             Categories
-                        </a>
+                        </Link>
 
-                        <button
-                            onClick={handleLogout}
-                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 transition-colors duration-300"
-                        >
-                            <LogOut size={18} />
-                            Logout
-                        </button>
+                        {/* Profile Dropdown */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setProfileOpen(!profileOpen)}
+                                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition"
+                            >
+                                {profileImage ? (
+                                    <img
+                                        src={profileImage}
+                                        alt="Profile"
+                                        className="w-10 h-10 rounded-full object-cover border border-slate-200"
+                                        onError={(e) => {
+                                            e.target.style.display = "none";
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
+                                        <User
+                                            size={20}
+                                            className="text-slate-600"
+                                        />
+                                    </div>
+                                )}
+
+                                <span className="text-slate-700 font-medium max-w-[120px] truncate">
+                                    {user?.name || "User"}
+                                </span>
+
+                                <ChevronDown
+                                    size={18}
+                                    className={`text-slate-500 transition-transform duration-300 ${
+                                        profileOpen ? "rotate-180" : ""
+                                    }`}
+                                />
+                            </button>
+
+                            {profileOpen && (
+                                <div className="absolute right-0 mt-3 w-52 bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden z-50">
+                                    <div className="px-4 py-3 border-b border-slate-100">
+                                        <p className="font-semibold text-slate-800">
+                                            {user?.name || "User"}
+                                        </p>
+                                        <p className="text-sm text-slate-500 truncate">
+                                            {user?.username ||
+                                                user?.email ||
+                                                "No info"}
+                                        </p>
+                                    </div>
+
+                                    <Link
+                                        to="/user/profile"
+                                        onClick={() => setProfileOpen(false)}
+                                        className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-green-50 hover:text-green-700 transition"
+                                    >
+                                        <User size={18} />
+                                        Profile
+                                    </Link>
+
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition"
+                                    >
+                                        <LogOut size={18} />
+                                        Logout
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    {/* Mobile Menu Button */}
-                    <button
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        className="md:hidden p-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 transition"
-                    >
-                        <div
-                            className={`transition-transform duration-300 ${
+                    {/* Mobile Right Actions */}
+                    <div className="md:hidden flex items-center gap-2">
+                        <button
+                            onClick={() => setMenuOpen(!menuOpen)}
+                            className={`p-2.5 rounded-2xl border transition-all duration-300 ${
                                 menuOpen
-                                    ? "rotate-180 scale-100"
-                                    : "rotate-0 scale-100"
+                                    ? "bg-green-500 border-green-500 text-white shadow-md"
+                                    : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                             }`}
                         >
-                            {menuOpen ? <X size={24} /> : <Menu size={24} />}
-                        </div>
-                    </button>
+                            <div
+                                className={`transition-transform duration-300 ${
+                                    menuOpen ? "rotate-180" : "rotate-0"
+                                }`}
+                            >
+                                {menuOpen ? (
+                                    <X size={22} />
+                                ) : (
+                                    <Menu size={22} />
+                                )}
+                            </div>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Mobile Menu */}
                 <div
                     className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
                         menuOpen
-                            ? "max-h-96 opacity-100 translate-y-0 border-t border-green-200"
+                            ? "max-h-[700px] opacity-100 translate-y-0 border-t border-slate-200"
                             : "max-h-0 opacity-0 -translate-y-2"
-                    } bg-white px-4 sm:px-6 shadow-sm`}
+                    } bg-white`}
                 >
-                    <div className="py-4 space-y-3">
-                        <Link
-                            to="/dashboard"
-                            onClick={() => setMenuOpen(false)}
-                            className="block text-green-600 font-semibold"
-                        >
-                            Dashboard
-                        </Link>
-                        <Link
-                            to="/books"
-                            onClick={() => setMenuOpen(false)}
-                            className="block text-slate-600 hover:text-green-700 transition-colors duration-300"
-                        >
-                            Books
-                        </Link>
-                        <a
-                            href="#"
-                            onClick={() => setMenuOpen(false)}
-                            className="block text-slate-600 hover:text-green-700 transition-colors duration-300"
-                        >
-                            Borrowings
-                        </a>
-                        <a
-                            href="#"
-                            onClick={() => setMenuOpen(false)}
-                            className="block text-slate-600 hover:text-green-700 transition-colors duration-300"
-                        >
-                            Returns
-                        </a>
-                        <a
-                            href="#"
-                            onClick={() => setMenuOpen(false)}
-                            className="block text-slate-600 hover:text-green-700 transition-colors duration-300"
-                        >
-                            Categories
-                        </a>
+                    <div className="px-4 py-4 space-y-4">
+                        {/* Profile Card */}
+                        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                            <div className="flex items-center gap-3">
+                                {profileImage ? (
+                                    <img
+                                        src={profileImage}
+                                        alt="Profile"
+                                        className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm"
+                                        onError={(e) => {
+                                            e.target.style.display = "none";
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center border-2 border-white shadow-sm">
+                                        <User
+                                            size={24}
+                                            className="text-green-700"
+                                        />
+                                    </div>
+                                )}
 
-                        <button
-                            onClick={handleLogout}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-500 text-white hover:bg-red-600 transition-colors duration-300"
-                        >
-                            <LogOut size={18} />
-                            Logout
-                        </button>
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-semibold text-slate-800 truncate">
+                                        {user?.name || "User"}
+                                    </p>
+                                    <p className="text-sm text-slate-500 truncate">
+                                        {user?.username ||
+                                            user?.email ||
+                                            "No info"}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 grid grid-cols-2 gap-3">
+                                <Link
+                                    to="/user/profile"
+                                    onClick={() => setMenuOpen(false)}
+                                    className="flex items-center justify-center gap-2 rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 transition"
+                                >
+                                    <User size={18} />
+                                    Profile
+                                </Link>
+
+                                <button
+                                    onClick={() => {
+                                        handleLogout();
+                                        setMenuOpen(false);
+                                    }}
+                                    className="flex items-center justify-center gap-2 rounded-2xl bg-red-500 px-4 py-3 text-sm font-medium text-white hover:bg-red-600 transition"
+                                >
+                                    <LogOut size={18} />
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Navigation */}
+                        <div className="rounded-3xl border border-slate-200 bg-white p-2 shadow-sm">
+                            <p className="px-3 pt-2 pb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                Navigation
+                            </p>
+
+                            <div className="space-y-1">
+                                <Link
+                                    to="/dashboard"
+                                    onClick={() => setMenuOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-green-50 text-green-700 font-semibold"
+                                >
+                                    <Home size={20} />
+                                    Dashboard
+                                </Link>
+
+                                <Link
+                                    to="/books"
+                                    onClick={() => setMenuOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-700 hover:bg-slate-50 hover:text-green-700 transition"
+                                >
+                                    <Book size={20} />
+                                    Books
+                                </Link>
+
+                                <Link
+                                    to="#"
+                                    onClick={() => setMenuOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-700 hover:bg-slate-50 hover:text-green-700 transition"
+                                >
+                                    <RotateCw size={20} />
+                                    Borrowings
+                                </Link>
+
+                                <Link
+                                    to="#"
+                                    onClick={() => setMenuOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-700 hover:bg-slate-50 hover:text-green-700 transition"
+                                >
+                                    <Undo2 size={20} />
+                                    Returns
+                                </Link>
+
+                                <Link
+                                    to="/categories"
+                                    onClick={() => setMenuOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-700 hover:bg-slate-50 hover:text-green-700 transition"
+                                >
+                                    <Layers size={20} />
+                                    Categories
+                                </Link>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

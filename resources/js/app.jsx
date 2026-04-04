@@ -10,6 +10,8 @@ import { BookOpen } from 'lucide-react';
 import Login from './Pages/Auth/Login';
 import Dashboard from './Pages/Dashboard';
 import BooksOverview from './Pages/BooksOverview';
+import Profile from './Pages/Profile';
+import Category from './Pages/Categories';
 
 function AppLoader() {
     const appName = import.meta.env.VITE_APP_NAME || 'PocketEdu';
@@ -98,6 +100,24 @@ function App() {
                     element={
                         <ProtectedRoute user={user}>
                             <BooksOverview user={user} setUser={setUser} />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="user/profile"
+                    element={
+                        <ProtectedRoute user={user}>
+                            <Profile user={user} setUser={setUser} />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/categories"
+                    element={
+                        <ProtectedRoute user={user}>
+                            <Category user={user} setUser={setUser} />
                         </ProtectedRoute>
                     }
                 />

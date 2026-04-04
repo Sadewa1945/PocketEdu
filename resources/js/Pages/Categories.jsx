@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import {
-    BookOpen,
     LogOut,
     Menu,
     X,
-    Search,
     User,
     ChevronDown,
     Home,
@@ -14,13 +12,14 @@ import {
     RotateCw,
     Undo2,
     Layers,
+    Loader2,
+    FolderOpen,
 } from "lucide-react";
 
-export default function BooksOverview({ user, setUser }) {
+export default function Category({ user, setUser }) {
     const navigate = useNavigate();
-    const [books, setBooks] = useState([]);
-    const [filteredBooks, setFilteredBooks] = useState([]);
-    const [search, setSearch] = useState("");
+
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [menuOpen, setMenuOpen] = useState(false);
@@ -28,39 +27,6 @@ export default function BooksOverview({ user, setUser }) {
 
     const appName = import.meta.env.VITE_APP_NAME || "PocketEdu";
     const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-     const profileImage = user?.image ? `${apiUrl}/storage/${user.image}` : null;
-
-    useEffect(() => {
-        fetchBooks();
-    }, []);
-
-    useEffect(() => {
-        const filtered = books.filter((book) =>
-            `${book.title} ${book.author} ${book.publisher}`
-                .toLowerCase()
-                .includes(search.toLowerCase())
-        );
-        setFilteredBooks(filtered);
-    }, [search, books]);
-
-    const fetchBooks = async () => {
-        try {
-            setLoading(true);
-            const res = await axios.get("/api/books");
-            const bookData = Array.isArray(res.data)
-                ? res.data
-                : res.data.data || [];
-
-            const sortedBooks = [...bookData].reverse();
-            setBooks(sortedBooks);
-            setFilteredBooks(sortedBooks);
-        } catch (err) {
-            console.error("Fetch books error", err);
-            setError("Failed to fetch books. Please try again later.");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleLogout = async () => {
         try {
@@ -68,11 +34,32 @@ export default function BooksOverview({ user, setUser }) {
         } catch (error) {
             console.error("Logout error", error);
         } finally {
-            localStorage.removeItem("user");
             setUser(null);
             navigate("/login");
         }
     };
+
+    const fetchCategories = async () => {
+        try {
+            setLoading(true);
+            setError("");
+
+            const response = await axios.get("/api/categories");
+
+            setCategories(response.data.data || response.data || []);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+            setError("Failed to load categories. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    const profileImage = user?.image ? `${apiUrl}/storage/${user.image}` : null;
 
     return (
         <div className="min-h-screen w-full bg-gradient-to-br from-green-100 via-white to-emerald-100">
@@ -167,7 +154,7 @@ export default function BooksOverview({ user, setUser }) {
                                     </div>
 
                                     <Link
-                                        to="/user/profile"
+                                        to="/profile"
                                         onClick={() => setProfileOpen(false)}
                                         className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-green-50 hover:text-green-700 transition"
                                     >
@@ -247,7 +234,7 @@ export default function BooksOverview({ user, setUser }) {
 
                             <div className="mt-4 grid grid-cols-2 gap-3">
                                 <Link
-                                    to="/user/profile"
+                                    to="/profile"
                                     onClick={() => setMenuOpen(false)}
                                     className="flex items-center justify-center gap-2 rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 transition"
                                 >
@@ -327,107 +314,61 @@ export default function BooksOverview({ user, setUser }) {
 
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-                    <div>
-                        <h2 className="text-2xl sm:text-3xl font-bold text-slate-800">
-                            Books Overview
-                        </h2>
-                        <p className="text-slate-500 mt-2">
-                            Explore all available books in your digital library.
-                        </p>
-                    </div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-800">
+                        Categories
+                    </h2>
 
-                    {/* Search */}
-                    <div className="relative w-full md:w-80">
-                        <Search
-                            size={18}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                        />
-                        <input
-                            type="text"
-                            placeholder="Search books..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                    </div>
+                    <button
+                        onClick={fetchCategories}
+                        className="inline-flex items-center gap-2 rounded-2xl bg-green-600 px-5 py-3 text-white font-medium hover:bg-green-700 transition w-fit"
+                    >
+                        <RotateCw size={18} />
+                        Refresh
+                    </button>
                 </div>
 
-                {/* Loading */}
-                {loading && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-                        {[...Array(8)].map((_, i) => (
-                            <div
-                                key={i}
-                                className="bg-white p-5 rounded-2xl border border-green-100 shadow-sm animate-pulse"
-                            >
-                                <div className="w-full h-56 bg-slate-200 rounded-xl mb-4"></div>
-                                <div className="h-5 bg-slate-200 rounded w-3/4 mb-3"></div>
-                                <div className="h-4 bg-slate-200 rounded w-1/2 mb-2"></div>
-                                <div className="h-4 bg-slate-200 rounded w-2/3 mb-5"></div>
-                                <div className="h-10 bg-slate-200 rounded-xl"></div>
-                            </div>
-                        ))}
+                {loading ? (
+                    <div className="bg-white rounded-3xl border border-slate-200 p-10 shadow-sm flex flex-col items-center justify-center text-slate-500">
+                        <Loader2 className="animate-spin mb-3" size={32} />
+                        <p>Loading categories...</p>
                     </div>
-                )}
-
-                {/* Error */}
-                {!loading && error && (
-                    <div className="bg-red-100 border border-red-200 text-red-700 px-5 py-4 rounded-2xl">
+                ) : error ? (
+                    <div className="bg-red-50 border border-red-200 text-red-600 rounded-3xl p-6 shadow-sm">
                         {error}
                     </div>
-                )}
-
-                {/* Empty */}
-                {!loading && !error && filteredBooks.length === 0 && (
-                    <div className="bg-white border border-green-100 shadow-sm rounded-3xl p-10 text-center">
-                        <BookOpen className="mx-auto w-12 h-12 text-green-500 mb-4" />
-                        <h3 className="text-xl font-bold text-slate-800">
-                            No books found
-                        </h3>
-                        <p className="text-slate-500 mt-2">
-                            Try searching with another keyword.
+                ) : categories.length === 0 ? (
+                    <div className="bg-white rounded-3xl border border-slate-200 p-10 shadow-sm flex flex-col items-center justify-center text-slate-500">
+                        <FolderOpen size={42} className="mb-3 text-slate-400" />
+                        <p className="text-lg font-medium">No categories found</p>
+                        <p className="text-sm text-slate-400 mt-1">
+                            Looks like nobody has organized anything. Shocking.
                         </p>
                     </div>
-                )}
-
-                {/* Books Grid */}
-                {!loading && !error && filteredBooks.length > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-                        {filteredBooks.map((book) => (
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {categories.map((category, index) => (
                             <div
-                                key={book.id}
-                                className="bg-white p-5 rounded-2xl border border-green-100 shadow-sm hover:shadow-md transition duration-300"
+                                key={category.id || index}
+                                className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 hover:shadow-md transition"
                             >
-                                <div className="w-full h-56 bg-slate-100 overflow-hidden rounded-xl">
-                                    <img
-                                        src={
-                                            book.cover_image
-                                                ? `${apiUrl}/storage/${book.cover_image}`
-                                                : "https://placehold.co/300x400?text=No+Cover"
-                                        }
-                                        alt={book.title}
-                                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                                        onError={(e) =>
-                                            (e.target.src =
-                                                "https://placehold.co/300x400?text=No+Cover")
-                                        }
-                                    />
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-green-100 flex items-center justify-center">
+                                        <Layers className="text-green-700" size={24} />
+                                    </div>
+
+                                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-600">
+                                        #{category.id || index + 1}
+                                    </span>
                                 </div>
 
-                                <h4 className="text-lg font-bold text-slate-800 line-clamp-2 mt-4">
-                                    {book.title}
-                                </h4>
-                                <p className="text-slate-500 mt-2 text-sm">
-                                    {book.author}
-                                </p>
-                                <p className="text-slate-400 text-sm mt-1">
-                                    {book.publisher}
-                                </p>
+                                <h3 className="text-xl font-bold text-slate-800 mb-2">
+                                    {category.name || category.category_name || "Unnamed Category"}
+                                </h3>
 
-                                <button className="mt-5 w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
-                                    Borrow
-                                </button>
+                                <p className="text-sm text-slate-500">
+                                    {category.description || "No description available."}
+                                </p>
                             </div>
                         ))}
                     </div>
