@@ -20,9 +20,10 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'image',
-        'username',
+        'email',
         'role',
-        'class_id',
+        'phone',
+        'address',
         'password',
     ];
 
@@ -44,23 +45,19 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'username_verified_at' => 'datetime',
+            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
 
     public function canAccessPanel(\Filament\Panel $panel): bool
     {
-        return $this->is_admin === true;
-    }
-
-    public function classes()
-    {
-        return $this->belongsTo(Classes::class, 'class_id');
+        return $this->role === 'admin';
     }
 
     public function borrowingsUser()
     {
         return $this->hasMany(borrowing::class, 'user_id');
     }
+
 }

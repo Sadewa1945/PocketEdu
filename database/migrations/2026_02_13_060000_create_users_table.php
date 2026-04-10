@@ -15,9 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('image')->nullable();
-            $table->string('username')->unique();
+            $table->string('email');
             $table->enum('role', ['admin', 'member'])->default('member');
-            $table->foreignId('class_id')->nullable()->constrained('classes')->nullOnDelete();
             $table->string('password');
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
@@ -27,7 +26,7 @@ return new class extends Migration
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('username')->primary();
+            $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });

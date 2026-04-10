@@ -1,0 +1,61 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Book;
+use App\Models\Borrowing;
+use App\Models\Stock;
+use Illuminate\Http\Request;
+
+
+class BorrowController extends Controller
+{
+    public function borrow(Request $request){
+        try{
+            $validated = $request->validate([
+                'book_id' => 'required|exists:books,id',
+                'quantity' => 'required|integer|min:1',
+                'borrowed_at' => 'required|datetime|after_or_equal:today',
+                'due_date' => 'required|date|after_or_equal:today',
+                'notes' => 'nullable|string|max:500'
+            ]);
+
+            $user = $request->user();
+            $book = Book::findOrFail($validated['book_id']);
+
+            $activeLoans = Borrowing::where('user_id', $user->id)
+                ->whereIn('status'. ['pending', 'prepared', 'ready_to_pickup', 'borrowed'])
+                ->count();
+
+            if ($activeLoans >= 5){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'your borrowing exceeds the limit'
+                ], 422);
+            }
+
+            $stock = Stock::where('book_id', $book->id)->first();
+
+            if(!$stock || $stock->available_stock < $validated['quantity']){
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Book stock is not available',
+                        'available' => $stock?->available_stock ?? 0
+                    ], 422);
+            }
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan pada server'
+            ], 500);
+        }
+    }
+
+}

@@ -231,9 +231,7 @@ export default function Profile({ user, setUser }) {
                                             {profile?.name || "User"}
                                         </p>
                                         <p className="text-sm text-slate-500 truncate">
-                                            {profile?.username ||
-                                                profile?.email ||
-                                                "No info"}
+                                            {profile?.email || "No info"}
                                         </p>
                                     </div>
 
@@ -318,9 +316,7 @@ export default function Profile({ user, setUser }) {
                                         {profile?.name || "User"}
                                     </p>
                                     <p className="text-sm text-slate-500 truncate">
-                                        {profile?.username ||
-                                            profile?.email ||
-                                            "No info"}
+                                        {profile?.email || "No info"}
                                     </p>
                                 </div>
                             </div>
@@ -458,7 +454,7 @@ export default function Profile({ user, setUser }) {
                                                     {profile?.name || "-"}
                                                 </h3>
                                                 <p className="text-slate-500 mt-1">
-                                                    @{profile?.username || "-"}
+                                                    @{profile?.email || "-"}
                                                 </p>
                                             </div>
                                             <button
@@ -496,31 +492,29 @@ export default function Profile({ user, setUser }) {
 
                                             <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4">
                                                 <p className="text-sm text-slate-500">
-                                                    Username
+                                                    Email
                                                 </p>
                                                 <p className="font-semibold text-slate-800 mt-1">
-                                                    {profile?.username || "-"}
+                                                    {profile?.email || "-"}
                                                 </p>
                                             </div>
 
                                             <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4">
                                                 <p className="text-sm text-slate-500">
-                                                    Class
-                                                </p>
-                                                <p className="font-semibold text-slate-800 mt-1">
-                                                    {profile?.classes
-                                                        ? `${profile.classes.grade} ${profile.classes.major?.name || ""} ${profile.classes.class_section}`
-                                                        : "-"}
-                                                </p>
-                                            </div>
-
-                                            <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4">
-                                                <p className="text-sm text-slate-500">
-                                                    Total Borrow
+                                                    Total Borrowings
                                                 </p>
                                                 <p className="font-semibold text-slate-800 mt-1 truncate">
                                                     {profile?.borrowings_user_count ||
                                                         0}
+                                                </p>
+                                            </div>
+
+                                            <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                                                <p className="text-sm text-slate-500">
+                                                    Role
+                                                </p>
+                                                <p className="font-semibold text-slate-800 mt-1">
+                                                    {profile?.role || "-"}
                                                 </p>
                                             </div>
                                         </div>

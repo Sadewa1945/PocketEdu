@@ -19,9 +19,11 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Nette\Utils\ImageColor;
 use UnitEnum;
 
 class BooksResource extends Resource
@@ -111,6 +113,10 @@ class BooksResource extends Resource
     {
         return $table->
             columns([
+                ImageColumn::make('cover_image')
+                ->label('Cover')
+                ->disk('public'),
+
                 TextColumn::make('id')
                 ->label('ID')
                 ->sortable(),

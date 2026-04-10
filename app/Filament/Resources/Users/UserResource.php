@@ -9,10 +9,13 @@ use App\Models\User;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Image;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -36,14 +39,20 @@ class UserResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
+            FileUpload::make('image')
+            ->label('Photo Profile')
+            ->image()
+            ->directory('profile')
+            ->disk('public'),
+
             TextInput::make('name')
             ->required()
             ->label('Name'),
 
-            TextInput::make('username')
+            TextInput::make('email')
             ->unique()
             ->required()
-            ->label('Username'),
+            ->label('Email'),
 
             Select::make('role')
             ->options([
@@ -53,14 +62,10 @@ class UserResource extends Resource
             ->required()
             ->label('Role'),
 
-            Select::make('class_id')
-            ->label('Class')
-            ->relationship('classes', 'grade')
-            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->grade} {$record->major->name} {$record->class_section}")
-            ->required(),
-
             TextInput::make('password')
-            ->required()
+            ->required(fn(string $context) => $context === 'create')
+            ->dehydrated(fn ($state) => filled($state))
+            ->dehydrateStateUsing(fn ($state) => bcrypt($state))
             ->label('Password')
             ->password(),
         ]);
@@ -70,25 +75,24 @@ class UserResource extends Resource
     {
       return $table
         ->columns([
+            ImageColumn::make('image')
+            ->label('Image')
+            ->disk('public'),
+
             TextColumn::make('name')
             ->label('Name')
             ->searchable(),
 
-            TextColumn::make('username')
-            ->label('Username')
+            TextColumn::make('email')
+            ->label('Email')
+            ->searchable(),
+
+            TextColumn::make('phone')
+            ->label('Phone')
             ->searchable(),
 
             TextColumn::make('role')
             ->label('Role'),
-
-            TextColumn::make('classes.grade')
-            ->label('Class'),
-
-            TextColumn::make('classes.major.name')
-            ->label('Major'),
-
-            TextColumn::make('classes.class_section')
-            ->label('Class Section'),
 
             TextColumn::make('created_at')
             ->label('Created At')
@@ -99,17 +103,6 @@ class UserResource extends Resource
             DeleteAction::make(),
         ])
         ->filters([
-            SelectFilter::make('class')
-                ->label('Class')
-                ->relationship('classes', 'grade'),
-            
-            SelectFilter::make('major')
-                ->label('Major')
-                ->relationship('classes.major', 'name'),
-
-            SelectFilter::make('class_section')
-                ->label('Class Section')
-                ->relationship('classes', 'class_section'),
 
             SelectFilter::make('role')
                 ->options([

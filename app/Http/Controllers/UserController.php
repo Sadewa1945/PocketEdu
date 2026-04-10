@@ -9,7 +9,6 @@ class UserController extends Controller
 {
     public function profile(Request $request){
         $user = $request->user()
-            ->load('classes.major')
             ->loadCount('borrowingsUser');
 
         return response()->json([

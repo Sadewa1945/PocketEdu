@@ -96,7 +96,7 @@ export default function BooksOverview({ user, setUser }) {
 
                         <Link
                             to="/books"
-                            className="text-slate-600 hover:text-green-700 transition-colors duration-300"
+                            className=" text-green-600 font-semibold"
                         >
                             Books
                         </Link>
@@ -117,7 +117,7 @@ export default function BooksOverview({ user, setUser }) {
 
                         <Link
                             to="/categories"
-                            className="text-green-600 font-semibold"
+                            className="text-slate-600 hover:text-green-700 transition-colors duration-300"
                         >
                             Categories
                         </Link>

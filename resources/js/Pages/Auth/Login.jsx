@@ -4,7 +4,7 @@ import axios from 'axios';
 import { User, Lock, Eye, EyeOff, BookOpen } from 'lucide-react';
 
 export default function Login({ setUser }) {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
@@ -22,7 +22,7 @@ export default function Login({ setUser }) {
             await axios.get('/sanctum/csrf-cookie');
 
             const response = await axios.post('/api/login', {
-                username,
+                email,
                 password
             });
 
@@ -47,14 +47,17 @@ export default function Login({ setUser }) {
                         className="w-full h-full object-cover"
                     />
 
-                    <div className="absolute inset-0 bg-black/15 flex flex-col justify-end p-10 text-white">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-sm">
-                                <BookOpen size={28} />
+                    <div className="absolute inset-0 bg-black/20 flex flex-col justify-end p-8 text-white">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="bg-white/20 p-2.5 rounded-2xl backdrop-blur-sm">
+                                 <BookOpen size={24} />
                             </div>
-                            <h1 className="text-3xl font-bold">PocketEdu</h1>
-                        </div>
-                    </div>
+                                <h1 className="text-2xl lg:text-3xl font-bold">{appName}</h1>
+                            </div>
+                                <p className="text-sm lg:text-base text-white/90 max-w-sm leading-relaxed">
+                                    Learning becomes easier, structured, and convenient in one platform.
+                                </p>
+                            </div>
                 </div>
 
                 
@@ -65,7 +68,7 @@ export default function Login({ setUser }) {
                                 <BookOpen size={28} />
                             </div>
                             <h2 className="text-3xl font-bold text-gray-800">{appName}</h2>
-                            <p className="text-gray-500 mt-2">Silakan login ke akun Anda</p>
+                            <p className="text-gray-500 mt-2">Please login to continue</p>
                         </div>
 
                         <div className="hidden md:block mb-8">
@@ -82,7 +85,7 @@ export default function Login({ setUser }) {
                         <form onSubmit={handleLogin} className="space-y-5">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Username
+                                    Email
                                 </label>
                                 <div className="relative">
                                     <User
@@ -92,9 +95,9 @@ export default function Login({ setUser }) {
                                     <input
                                         type="text"
                                         className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        placeholder="Enter your username"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="Enter your email"
                                         required
                                     />
                                 </div>
@@ -153,6 +156,12 @@ export default function Login({ setUser }) {
                                 {loading ? 'Memproses...' : 'Login'}
                             </button>
                         </form>
+                        <p className="text-center text-sm text-gray-500 mt-8">
+                            Don't have an account? {' '}
+                            <a href="/register" className="text-green-600 hover:text-green-700 font-medium">
+                                Register here
+                            </a>
+                        </p>
 
                         <p className="text-center text-sm text-gray-500 mt-8">
                             © {currentYear} {appName}. All rights reserved.

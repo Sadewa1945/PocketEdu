@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Observers\BorrowingObserver;
 use Illuminate\Database\Eloquent\Model;
 
-class borrowing extends Model
+class Borrowing extends Model
 {
     protected $table = 'borrowings';
 
@@ -15,7 +15,6 @@ class borrowing extends Model
         'quantity',
         'condition',
         'borrowed_at',
-        'returned_at',
         'due_at',
         'status',
     ];

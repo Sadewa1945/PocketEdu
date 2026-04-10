@@ -8,10 +8,16 @@ import axios from 'axios';
 import { BookOpen } from 'lucide-react';
 
 import Login from './Pages/Auth/Login';
+import Register from './Pages/Auth/Register';
 import Dashboard from './Pages/Dashboard';
 import BooksOverview from './Pages/BooksOverview';
 import Profile from './Pages/Profile';
 import Category from './Pages/Categories';
+
+// Axios config penting untuk Sanctum
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 function AppLoader() {
     const appName = import.meta.env.VITE_APP_NAME || 'PocketEdu';
@@ -64,6 +70,7 @@ function App() {
     useEffect(() => {
         const checkUser = async () => {
             try {
+                await axios.get('/sanctum/csrf-cookie');
                 const response = await axios.get('/api/user');
                 setUser(response.data);
             } catch (error) {
@@ -87,6 +94,15 @@ function App() {
                 />
 
                 <Route
+                    path="/register"
+                    element={
+                        <GuestRoute user={user}>
+                            <Register setUser={setUser} />
+                        </GuestRoute>
+                    }
+                />
+
+                <Route
                     path="/dashboard"
                     element={
                         <ProtectedRoute user={user}>
@@ -105,7 +121,7 @@ function App() {
                 />
 
                 <Route
-                    path="user/profile"
+                    path="/user/profile"
                     element={
                         <ProtectedRoute user={user}>
                             <Profile user={user} setUser={setUser} />
@@ -131,6 +147,11 @@ function App() {
                             <Navigate to={user ? '/dashboard' : '/login'} replace />
                         )
                     }
+                />
+
+                <Route
+                    path="*"
+                    element={<Navigate to="/" replace />}
                 />
             </Routes>
         </BrowserRouter>

@@ -15,7 +15,7 @@ class Login extends BaseLogin
     protected function getCredentialsFromFormData(array $data): array
     {
         return [
-            'username' => $data['username'],
+            'email' => $data['email'],
             'password' => $data['password'],
         ];
     }
@@ -29,9 +29,9 @@ class Login extends BaseLogin
     {
         return $schema->components([
 
-            TextInput::make('username')
+            TextInput::make('email')
                 ->required()
-                ->label('Username'),
+                ->label('Email'),
 
             TextInput::make('password')
                 ->password()
