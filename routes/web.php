@@ -16,6 +16,10 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('BooksOverview');
     })->name('books');
 
+    Route::get('/books/detail', function(){
+        return Inertia::render('BooksOverview');
+    })->name('books.detail');
+
     Route::get('/user/profile', function(){
         return Inertia::render('Profile');
     })->name('profile');

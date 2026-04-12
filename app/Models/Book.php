@@ -9,6 +9,8 @@ class Book extends Model
 {
     protected $table = 'books';
 
+    protected $appends = ['total_stock', 'available_stock'];
+
     protected $fillable = [
         'title',
         'author',

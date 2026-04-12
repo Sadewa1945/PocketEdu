@@ -138,7 +138,7 @@ export default function Dashboard({ user, setUser }) {
                         </Link>
 
                         <Link
-                            to="#"
+                            to="/books/detail"
                             className="text-slate-600 hover:text-green-700 transition-colors duration-300"
                         >
                             Borrowings
@@ -344,7 +344,7 @@ export default function Dashboard({ user, setUser }) {
                                 </Link>
 
                                 <Link
-                                    to="#"
+                                    to="/books/detail"
                                     onClick={() => setMenuOpen(false)}
                                     className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-700 hover:bg-slate-50 hover:text-green-700 transition"
                                 >

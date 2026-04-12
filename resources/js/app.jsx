@@ -13,6 +13,7 @@ import Dashboard from './Pages/Dashboard';
 import BooksOverview from './Pages/BooksOverview';
 import Profile from './Pages/Profile';
 import Category from './Pages/Categories';
+import BooksDetail from './Pages/BooksDetail';
 
 // Axios config penting untuk Sanctum
 axios.defaults.withCredentials = true;
@@ -116,6 +117,15 @@ function App() {
                     element={
                         <ProtectedRoute user={user}>
                             <BooksOverview user={user} setUser={setUser} />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/books/detail"
+                    element={
+                        <ProtectedRoute user={user}>
+                            <BooksDetail user={user} setUser={setUser} />
                         </ProtectedRoute>
                     }
                 />

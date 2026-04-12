@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class BookController extends Controller
 {
     public function index(){
-        $books = Book::all();
+        $books = Book::with('stock')->get();
 
         return response()->json([
             'message' => true,
