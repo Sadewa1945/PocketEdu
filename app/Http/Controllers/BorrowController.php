@@ -23,6 +23,15 @@ class BorrowController extends Controller
         ]);
     }
 
+    public function borrowingsCount(){
+        $count = borrowing::count();
+
+        return response()->json([
+            'message' => true,
+            'data' => $count
+        ], 200);
+    }
+
     public function borrow(Request $request){
     try{
         $validated = $request->validate([
@@ -65,8 +74,6 @@ class BorrowController extends Controller
             'due_at' => $validated['due_at'],
             'status' => 'pending',
         ]);
-
-        $stock->decrement('available_stock', $validated['quantity']);
 
         return response()->json([
             'success' => true,

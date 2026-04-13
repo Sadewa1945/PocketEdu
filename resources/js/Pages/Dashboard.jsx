@@ -159,7 +159,7 @@ export default function Dashboard({ user, setUser }) {
                                         </p>
                                     </div>
 
-                                    <button className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                    <button onClick={() => navigate(`/books/${book.id}`)} className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
                                         Borrow
                                     </button>
                                 </div>
@@ -220,7 +220,7 @@ export default function Dashboard({ user, setUser }) {
                                         </p>
                                     </div>
 
-                                    <button className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                    <button onClick={() => navigate(`/books/${book.id}`)} className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
                                         Borrow
                                     </button>
                                 </div>

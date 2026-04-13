@@ -24,6 +24,10 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('BooksOverview');
     })->name('borrowing');
 
+    Route::get('/books/{id}/borrow', function(){
+        return Inertia::render('BorrowForm');
+    })->name('borrow.create');
+
     Route::get('/user/profile', function(){
         return Inertia::render('Profile');
     })->name('profile');
@@ -41,10 +45,3 @@ Route::get('/login', function(){
 Route::get('/register', function(){
     return Inertia::render('Auth/Register');
 })->name('register');
-
-
-
-
-
-
-

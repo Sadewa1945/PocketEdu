@@ -32,13 +32,4 @@ class BookController extends Controller
             'data' => $book
         ], 200);
     }
-
-    public function borrowingsCount(){
-        $count = borrowing::count();
-
-        return response()->json([
-            'message' => true,
-            'data' => $count
-        ], 200);
-    }
 }

@@ -172,7 +172,9 @@ export default function BooksDetail() {
 
                                 </div>
 
-                                <button className="mt-5 w-full flex items-center justify-center gap-2 py-3.5 rounded-[14px] bg-green-600 text-white font-medium text-[15px] relative overflow-hidden
+                                <button 
+                                    onClick={() => navigate(`/books/${books.id}/borrow`)}
+                                    className="mt-5 w-full flex items-center justify-center gap-2 py-3.5 rounded-[14px] bg-green-600 text-white font-medium text-[15px] relative overflow-hidden
                                     hover:-translate-y-0.5 hover:bg-green-700 hover:ring-2 hover:ring-green-500/30 hover:ring-offset-1
                                     active:scale-[0.97] active:translate-y-0
                                     transition-all duration-150
