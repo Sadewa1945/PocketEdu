@@ -122,7 +122,7 @@ function App() {
                 />
 
                 <Route
-                    path="/books/detail"
+                    path="/books/:id"
                     element={
                         <ProtectedRoute user={user}>
                             <BooksDetail user={user} setUser={setUser} />

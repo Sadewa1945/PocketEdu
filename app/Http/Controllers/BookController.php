@@ -17,6 +17,22 @@ class BookController extends Controller
         ], 200);
     }
 
+    public function show($id){
+        $book = Book::with('stock')->find($id);
+
+        if(!$book){
+            return response()->json([
+                'message' => false,
+                'data' => null
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => true,
+            'data' => $book
+        ], 200);
+    }
+
     public function borrowingsCount(){
         $count = borrowing::count();
 

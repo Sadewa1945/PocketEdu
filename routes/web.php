@@ -16,7 +16,7 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('BooksOverview');
     })->name('books');
 
-    Route::get('/books/detail', function(){
+    Route::get('/books/{id}', function(){
         return Inertia::render('BooksOverview');
     })->name('books.detail');
 

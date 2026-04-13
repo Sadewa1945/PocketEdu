@@ -425,7 +425,7 @@ export default function BooksOverview({ user, setUser }) {
                                     {book.publisher}
                                 </p>
 
-                                <button onClick={() => navigate("/books/detail")} className="mt-5 w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                <button onClick={() => navigate(`/books/${book.id}`)} className="mt-5 w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
                                     Borrow
                                 </button>
                             </div>

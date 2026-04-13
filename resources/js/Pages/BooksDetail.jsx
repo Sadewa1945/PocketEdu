@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import axios from "axios";
 import {
-    BookOpen,
+    Book,
     LogOut,
     Menu,
     X,
-    Search,
     User,
     ChevronDown,
     Home,
-    Book,
     RotateCw,
     Undo2,
     Layers,
@@ -18,9 +16,8 @@ import {
 
 export default function BooksDetail({ user, setUser }) {
     const navigate = useNavigate();
-    const [books, setBooks] = useState([]);
-    const [filteredBooks, setFilteredBooks] = useState([]);
-    const [search, setSearch] = useState("");
+    const [books, setBooks] = useState(null);
+    const { id } = useParams();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [menuOpen, setMenuOpen] = useState(false);
@@ -32,31 +29,17 @@ export default function BooksDetail({ user, setUser }) {
 
     useEffect(() => {
         fetchBooks();
-    }, []);
-
-    useEffect(() => {
-        const filtered = books.filter((book) =>
-            `${book.title} ${book.author} ${book.publisher}`
-                .toLowerCase()
-                .includes(search.toLowerCase())
-        );
-        setFilteredBooks(filtered);
-    }, [search, books]);
+    }, [id]);
 
     const fetchBooks = async () => {
         try {
             setLoading(true);
-            const res = await axios.get("/api/books");
-            const bookData = Array.isArray(res.data)
-                ? res.data
-                : res.data.data || [];
+            const res = await axios.get(`/api/books/${id}`);
+            setBooks(res.data.data || res.data);
 
-            const sortedBooks = [...bookData].reverse();
-            setBooks(sortedBooks);
-            setFilteredBooks(sortedBooks);
         } catch (err) {
             console.error("Fetch books error", err);
-            setError("Failed to fetch books. Please try again later.");
+            setError("Failed to fetch books detail.");
         } finally {
             setLoading(false);
         }
@@ -331,20 +314,19 @@ export default function BooksDetail({ user, setUser }) {
                 {/* Loading */}
                 {loading && (
                 <div className="w-full max-w-7xl mx-auto px-8">
-                    {[...Array(1)].map((_, i) => (
+                    {books && (
                         <div
-                            key={i}
                             className="bg-white p-5 rounded-2xl border border-green-100 shadow-sm animate-pulse"
                         >
 
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                                 {/* LEFT */}
                                 <div className="flex flex-col">
 
-                                    <div className="w-full h-[550px] bg-slate-200 rounded-xl"></div>
+                                    <div className="w-full h-[300px] md:h-[550px] bg-slate-200 rounded-xl"></div>
 
-                                    <div className="flex items-center justify-between mt-4">
+                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mt-4">
                                         <div className="flex gap-2">
                                             <div className="w-20 h-4 bg-slate-200 rounded"></div>
                                             <div className="w-10 h-4 bg-slate-200 rounded"></div>
@@ -378,7 +360,7 @@ export default function BooksDetail({ user, setUser }) {
                             <div className="h-10 bg-slate-200 rounded-xl mt-5"></div>
 
                         </div>
-                    ))}
+                    )}
                 </div>
             )}
                 {/* Error */}
@@ -388,46 +370,28 @@ export default function BooksDetail({ user, setUser }) {
                     </div>
                 )}
 
-                {/* Empty */}
-                {!loading && !error && filteredBooks.length === 0 && (
-                    <div className="bg-white border border-green-100 shadow-sm rounded-3xl p-10 text-center">
-                        <BookOpen className="mx-auto w-12 h-12 text-green-500 mb-4" />
-                        <h3 className="text-xl font-bold text-slate-800">
-                            No books found
-                        </h3>
-                        <p className="text-slate-500 mt-2">
-                            Try searching with another keyword.
-                        </p>
-                    </div>
-                )}
-
-                
-                {!loading && !error && filteredBooks.length > 0 && (
-                    <div className="w-full max-w-7xl mx-auto px-8">
-                        {filteredBooks.map((book) => (
+                {!loading && !error && (
+                    <div className="w-full max-w-7xl mx-auto px-4 md:px-8">
+                        {books && (
                             <div
-                                key={book.id}
+                                key={books.id}
                                 className="bg-white p-5 rounded-2xl border border-green-100 shadow-sm hover:shadow-md transition duration-300"
                             >
 
-                                <div className="grid grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                                    <div class="flex flex-col">
+                                    <div className="flex flex-col">
   
-                                            <div className="w-full h-[550px] items-center bg-slate-100 overflow-hidden rounded-xl">
+                                            <div className="w-full aspect-[3/4] bg-slate-100 overflow-hidden rounded-xl shadow-sm">
                                                 <img
                                                     src={
-                                                        book.cover_image
-                                                            ? `${apiUrl}/storage/${book.cover_image}`
-                                                            : "https://placehold.co/300x400?text=No+Cover"
+                                                        books.cover_image
+                                                        ? `${apiUrl}/storage/${books.cover_image}`
+                                                        : "https://placehold.co/300x400?text=No+Cover"
                                                     }
-                                                    alt={book.title}
-                                                    className="w-full h-full hover:scale-105 transition-transform duration-500"
-                                                    onError={(e) =>
-                                                        (e.target.src =
-                                                            "https://placehold.co/300x400?text=No+Cover")
-                                                    }
-                                                />
+                                                    alt={books.title}
+                                                    className="w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-105"
+                                                    />
                                             </div>
                                         
                                         <div className="flex items-center justify-between mt-4">
@@ -446,37 +410,39 @@ export default function BooksDetail({ user, setUser }) {
                                     </div>
 
                                     <div className="flex flex-col">
-                                        <h4 className="text-2xl font-bold text-slate-800 line-clamp-2 mt-4">
-                                            {book.title}
+                                        <h4 className="text-lg md:text-2xl font-bold text-slate-800 mt-2">
+                                            {books.title}
                                         </h4>
-                                        <p className="text-slate-500 mt-2 text-sm">
-                                            {book.author}
+                                        <p className="text-slate-500 mt-1 text-sm">
+                                            {books.author}
                                         </p>
-                                        <p className="text-slate-400 text-sm mt-1">
-                                            {book.publisher}
+                                        <p className="text-slate-500 mt-1 text-sm">
+                                            {books.publisher}
                                         </p>
 
                                         <div className="flex gap-3 mt-3">
                                         {/* total stock */}
                                         <span className="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
-                                            Total: {book.total_stock}
+                                            Total: {books.total_stock}
                                         </span>
 
                                         {/* available stock */}
                                         <span className={`px-3 py-1 text-xs font-semibold rounded-full 
-                                            ${book.available_stock > 0 
+                                            ${books.available_stock > 0 
                                                 ? "bg-green-100 text-green-700" 
                                                 : "bg-red-100 text-red-700"}`}>
                                             
-                                            {book.available_stock > 0 
-                                                ? `Available: ${book.available_stock}` 
+                                            {books.available_stock > 0 
+                                                ? `Available: ${books.available_stock}` 
                                                 : "Out of Stock"}
                                         </span>
 
                                     </div>
-                                        <p className="text-slate-500 mt-2 text-sm">
-                                            {book.description}
-                                        </p>
+                                        <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
+                                            <p className="text-slate-600 text-sm leading-relaxed text-justify whitespace-pre-line max-h-[300px] overflow-y-auto pr-2">
+                                                {books.description}
+                                            </p>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -485,7 +451,7 @@ export default function BooksDetail({ user, setUser }) {
                                     Borrow
                                 </button>
                             </div>
-                        ))}
+                        )}
                     </div>
                 )}
             </div>

@@ -20,6 +20,8 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json($request->user());
     });
 
+    Route::get('/books/{id}', [BookController::class, 'show']);
+
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::get('user/profile', [UserController::class, 'profile']);

@@ -138,7 +138,7 @@ export default function Dashboard({ user, setUser }) {
                         </Link>
 
                         <Link
-                            to="/books/detail"
+                            to="#"
                             className="text-slate-600 hover:text-green-700 transition-colors duration-300"
                         >
                             Borrowings
