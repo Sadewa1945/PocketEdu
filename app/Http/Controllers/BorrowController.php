@@ -10,6 +10,19 @@ use Illuminate\Http\Request;
 
 class BorrowController extends Controller
 {
+    public function index(Request $request){
+        $user = $request->user();
+
+        $borrow = Borrowing::with('borrowingsBook')
+            ->where('user_id', $user->id)
+            ->get();
+
+        return response()->json([
+            'message' => true,
+            'data' => $borrow
+        ]);
+    }
+
     public function borrow(Request $request){
     try{
         $validated = $request->validate([

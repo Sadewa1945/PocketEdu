@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('quantity')->default(1);
             $table->text('borrow_condition')->nullable();
             $table->dateTime('borrowed_at');
-            $table->date('due_at');
+            $table->dateTime('due_at');
             $table->text('notes')->nullable();
             $table->enum('status', ['pending', 'prepared', 'ready_to_pickup', 'borrowed', 'returned'])->default('pending');
             $table->timestamps();

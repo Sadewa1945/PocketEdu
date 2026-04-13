@@ -138,7 +138,7 @@ export default function Dashboard({ user, setUser }) {
                         </Link>
 
                         <Link
-                            to="#"
+                            to="/borrowing"
                             className="text-slate-600 hover:text-green-700 transition-colors duration-300"
                         >
                             Borrowings
@@ -428,7 +428,7 @@ export default function Dashboard({ user, setUser }) {
                                                     : "https://placehold.co/300x400?text=No+Cover"
                                             }
                                             alt={book.title}
-                                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                            className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
                                             onError={(e) =>
                                                 (e.target.src =
                                                     "https://placehold.co/300x400?text=No+Cover")
@@ -483,7 +483,7 @@ export default function Dashboard({ user, setUser }) {
                                                     : "https://placehold.co/300x400?text=No+Cover"
                                             }
                                             alt={book.title}
-                                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                            className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
                                             onError={(e) =>
                                                 (e.target.src =
                                                     "https://placehold.co/300x400?text=No+Cover")

@@ -18,7 +18,7 @@ class BookController extends Controller
     }
 
     public function show($id){
-        $book = Book::with('stock')->find($id);
+        $book = Book::with('stock', 'category')->find($id);
 
         if(!$book){
             return response()->json([

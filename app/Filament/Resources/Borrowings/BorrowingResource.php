@@ -69,8 +69,9 @@ class BorrowingResource extends Resource
                 ->label('Borrowed At')
                 ->required(),
 
-            DatePicker::make('due_at')
-                ->label('Due At'),
+            DateTimePicker::make('due_at')
+                ->label('Due At')
+                ->required(),
 
             Textarea::make('notes')
                 ->label('Notes'),

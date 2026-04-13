@@ -69,7 +69,8 @@ class BooksResource extends Resource
             ->label('Cover Image')
             ->image()
             ->directory('books')
-            ->disk('public'),
+            ->disk('public')
+            ->visibility('public'),
 
             Select::make('category_id')
             ->relationship('category', 'name')
