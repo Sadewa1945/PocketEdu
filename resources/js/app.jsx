@@ -14,9 +14,9 @@ import BooksOverview from './Pages/BooksOverview';
 import Profile from './Pages/Profile';
 import Category from './Pages/Categories';
 import BooksDetail from './Pages/BooksDetail';
-import Borrowing from './Pages/Borrowing';
+import Borrowing from './Pages/Borrow/Borrowing';
+import MainLayout from './MainLayout';
 
-// Axios config penting untuk Sanctum
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -102,61 +102,21 @@ function App() {
                             <Register setUser={setUser} />
                         </GuestRoute>
                     }
+
                 />
 
-                <Route
-                    path="/dashboard"
-                    element={
-                        <ProtectedRoute user={user}>
-                            <Dashboard user={user} setUser={setUser} />
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/books"
-                    element={
-                        <ProtectedRoute user={user}>
-                            <BooksOverview user={user} setUser={setUser} />
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/books/:id"
-                    element={
-                        <ProtectedRoute user={user}>
-                            <BooksDetail user={user} setUser={setUser} />
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/borrowing"
-                    element={
-                        <ProtectedRoute user={user}>
-                            <Borrowing user={user} setUser={setUser} />
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/user/profile"
-                    element={
-                        <ProtectedRoute user={user}>
-                            <Profile user={user} setUser={setUser} />
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/categories"
-                    element={
-                        <ProtectedRoute user={user}>
-                            <Category user={user} setUser={setUser} />
-                        </ProtectedRoute>
-                    }
-                />
+                <Route element={
+                    <ProtectedRoute user={user}>
+                        <MainLayout user={user} setUser={setUser} />
+                    </ProtectedRoute>
+                }>  
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/books" element={<BooksOverview />} />
+                    <Route path="/books/:id" element={<BooksDetail />} />
+                    <Route path="/borrowing" element={<Borrowing />} />
+                    <Route path="/user/profile" element={<Profile />} />
+                    <Route path="/categories" element={<Category />} />
+                </Route>
 
                 <Route
                     path="/"

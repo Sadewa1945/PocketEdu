@@ -153,7 +153,7 @@ export default function Login({ setUser }) {
                                         : 'bg-green-600 hover:bg-green-700 active:scale-[0.98]'
                                 }`}
                             >
-                                {loading ? 'Memproses...' : 'Login'}
+                                {loading ? 'process...' : 'Login'}
                             </button>
                         </form>
                         <p className="text-center text-sm text-gray-500 mt-8">
