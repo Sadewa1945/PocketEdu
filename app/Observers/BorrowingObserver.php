@@ -26,8 +26,9 @@ class BorrowingObserver
     {
          if ($borrowing->isDirty('status') && $borrowing->status === 'returned') {
             $stock = Stock::where('book_id', $borrowing->book_id)->first();
+
             if ($stock) {
-                $stock->increment('available_stock', $borrowing->available_stock);
+                $stock->increment('available_stock', (int) $borrowing->quantity);
             }
         }
     }

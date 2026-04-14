@@ -37,9 +37,12 @@ class AuthController extends Controller
             'email' => ['required'],
             'password' => ['required'],
         ]);
+
+        $remember = $request->boolean('remember'); 
         
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+
             return response()->json([
                 'message' => 'Login successful',
                 'user' => Auth::user(),
@@ -47,7 +50,6 @@ class AuthController extends Controller
         }
         return response()->json([
             'message' => 'Invalid credentials',
-        
         ], 401);
     }
 

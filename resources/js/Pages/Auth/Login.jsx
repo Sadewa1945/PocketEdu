@@ -12,7 +12,7 @@ export default function Login({ setUser }) {
     const navigate = useNavigate();
     const currentYear = new Date().getFullYear();
     const appName = import.meta.env.VITE_APP_NAME || 'PocketEdu';
-
+    const [remember, setRemember] = useState(false);
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
@@ -23,7 +23,8 @@ export default function Login({ setUser }) {
 
             const response = await axios.post('/api/login', {
                 email,
-                password
+                password,
+                remember
             });
 
             setUser(response.data.user);
@@ -133,15 +134,24 @@ export default function Login({ setUser }) {
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between text-sm">
-                                <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
-                                    <input type="checkbox" className="rounded border-gray-300 text-green-600 focus:ring-green-500" />
-                                    <span>Remember me</span>
+                            <div className="flex items-center justify-between gap-3 text-sm flex-wrap">
+                                <label className="flex items-center gap-2 text-gray-600 cursor-pointer select-none">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={remember}
+                                        onChange={(e) => setRemember(e.target.checked)}
+                                        className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                                    />
+                                    <span className="whitespace-nowrap">Remember me</span>
                                 </label>
 
-                                <a href="#" className="text-green-600 hover:text-green-700 font-medium">
-                                    Forgot password
+                                <a 
+                                    href="#" 
+                                    className="text-green-600 hover:text-green-700 font-medium transition whitespace-nowrap"
+                                >
+                                    Forgot password?
                                 </a>
+
                             </div>
 
                             <button

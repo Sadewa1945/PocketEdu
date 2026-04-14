@@ -11,6 +11,8 @@ use App\Models\Book;
 use App\Models\Borrowing;
 use App\Models\User;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -62,9 +64,6 @@ class BorrowingResource extends Resource
                 ->default(1)
                 ->required(),
 
-            TextInput::make('borrow_condition')
-                ->label('Borrow Condition'),
-
             DateTimePicker::make('borrowed_at')
                 ->label('Borrowed At')
                 ->required(),
@@ -77,14 +76,22 @@ class BorrowingResource extends Resource
                 ->label('Notes'),
 
             Select::make('status')
-                ->label('Status')
-                ->options([
-                    'pending' => 'Pending',
-                    'prepared' => 'Prepared',
-                    'ready_to_pickup' => 'Ready to Pickup',
-                    'borrowed' => 'Borrowed',
-                    'overdue' => 'Overdue',
-                ])
+                ->options(function ($record) {
+
+                    if ($record?->status === 'returned') {
+                        return [
+                            'returned' => 'Returned',
+                        ];
+                    }
+
+                    return [
+                        'pending' => 'Pending',
+                        'prepared' => 'Prepared',
+                        'ready_to_pickup' => 'Ready to Pickup',
+                        'borrowed' => 'Borrowed',
+                    ];
+                })
+                ->disabled(fn ($record) => $record?->status === 'returned')
                 ->required(),
 
         ]);
@@ -104,9 +111,6 @@ class BorrowingResource extends Resource
 
                 TextColumn::make('quantity')
                     ->label('Quantity'),
-
-                TextColumn::make('borrow_condition')
-                    ->label('Condition'),
 
                 TextColumn::make('borrowed_at')
                     ->label('Borrowed At')
@@ -131,15 +135,43 @@ class BorrowingResource extends Resource
                         'pending', 'prepared', 'ready_to_pickup' => 'warning',
                         'borrowed' => 'primary',
                         'overdue' => 'danger',
-                        'returned' => 'success',
+                        'returned' => 'gray',
                         default => 'gray',
                     })
             ])
 
             ->actions([
-            EditAction::make(),
-            DeleteAction::make(),
-            
+                ActionGroup::make([
+                    
+                   Action::make('changeStatus')
+                    ->label('Change Status')
+                    ->icon('heroicon-o-adjustments-horizontal')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->status !== 'returned')
+                    ->form([
+                        Select::make('status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'prepared' => 'Prepared',
+                                'ready_to_pickup' => 'Ready to Pickup',
+                                'borrowed' => 'Borrowed',
+                                'overdue' => 'Overdue',
+                            ])
+                            ->required(),
+                    ])
+                    ->action(function ($record, array $data) {
+                        $record->update([
+                            'status' => $data['status'],
+                        ]);
+                    }),
+
+                    EditAction::make(),
+
+                    DeleteAction::make(),
+                ])
+                ->label('More')
+                ->icon('heroicon-o-ellipsis-vertical')
+                ->color('gray'),
             ]);
     }
 

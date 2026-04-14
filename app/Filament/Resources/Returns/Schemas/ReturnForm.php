@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\Stocks\Schemas;
+namespace App\Filament\Resources\Returns\Schemas;
 
 use Filament\Schemas\Schema;
 
-class StockForm
+class ReturnForm
 {
     public static function configure(Schema $schema): Schema
     {

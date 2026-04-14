@@ -20,7 +20,7 @@ class BorrowController extends Controller
         return response()->json([
             'message' => true,
             'data' => $borrow
-        ]);
+        ], 200);
     }
 
     public function borrowingsCount(){
@@ -80,7 +80,7 @@ class BorrowController extends Controller
             'success' => true,
             'message' => 'Book borrowed successfully',
             'data' => $borrowing
-        ]);
+        ], 200);
 
     } catch (\Illuminate\Validation\ValidationException $e) {
         return response()->json([

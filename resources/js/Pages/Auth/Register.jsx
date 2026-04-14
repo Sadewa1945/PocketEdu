@@ -261,15 +261,10 @@ export default function Register({ setUser }) {
                                         type="checkbox"
                                         className="rounded border-gray-300 text-green-600 focus:ring-green-500"
                                     />
-                                    <span>Remember me</span>
+                                    <span>I accept the terms of the agreement</span>
                                 </label>
 
-                                <a
-                                    href="#"
-                                    className="text-green-600 hover:text-green-700 font-medium"
-                                >
-                                    Forgot password
-                                </a>
+                               
                             </div>
 
                             <button

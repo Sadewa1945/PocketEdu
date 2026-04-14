@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Stocks\Tables;
+namespace App\Filament\Resources\Returns\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 
-class StocksTable
+class ReturnsTable
 {
     public static function configure(Table $table): Table
     {

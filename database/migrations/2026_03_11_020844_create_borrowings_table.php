@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('book_id')->constrained('books')->cascadeOnDelete();
             $table->integer('quantity')->default(1);
-            $table->text('borrow_condition')->nullable();
             $table->dateTime('borrowed_at');
             $table->dateTime('due_at');
             $table->text('notes')->nullable();
