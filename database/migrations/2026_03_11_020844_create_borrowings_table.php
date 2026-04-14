@@ -20,7 +20,7 @@ return new class extends Migration
             $table->dateTime('borrowed_at');
             $table->dateTime('due_at');
             $table->text('notes')->nullable();
-            $table->enum('status', ['pending', 'prepared', 'ready_to_pickup', 'borrowed', 'returned'])->default('pending');
+            $table->enum('status', ['pending', 'prepared', 'ready_to_pickup', 'borrowed', 'returned', 'overdue'])->default('pending');
             $table->timestamps();
         });
     }

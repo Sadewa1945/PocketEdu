@@ -72,6 +72,7 @@ class BorrowController extends Controller
             'quantity' => $validated['quantity'],
             'borrowed_at' => $validated['borrowed_at'],
             'due_at' => $validated['due_at'],
+            'notes' => $validated['notes'],
             'status' => 'pending',
         ]);
 

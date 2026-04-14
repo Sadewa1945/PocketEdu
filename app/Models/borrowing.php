@@ -16,6 +16,7 @@ class Borrowing extends Model
         'condition',
         'borrowed_at',
         'due_at',
+        'notes',
         'status',
     ];
 

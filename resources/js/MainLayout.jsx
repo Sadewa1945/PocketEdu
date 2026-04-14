@@ -264,7 +264,7 @@ export default function MainLayout({ user, setUser }) {
                                 <Link
                                     to="/categories"
                                     onClick={() => setMenuOpen(false)}
-                                    className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-green-50 text-green-700 font-semibold"
+                                    className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-700 hover:bg-slate-50 hover:text-green-700 transition"
                                 >
                                     <Layers size={20} />
                                     Categories

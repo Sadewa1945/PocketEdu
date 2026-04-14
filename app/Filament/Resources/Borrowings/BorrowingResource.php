@@ -80,8 +80,10 @@ class BorrowingResource extends Resource
                 ->label('Status')
                 ->options([
                     'pending' => 'Pending',
+                    'prepared' => 'Prepared',
+                    'ready_to_pickup' => 'Ready to Pickup',
                     'borrowed' => 'Borrowed',
-                    'returned' => 'Returned',
+                    'overdue' => 'Overdue',
                 ])
                 ->required(),
 
@@ -110,10 +112,6 @@ class BorrowingResource extends Resource
                     ->label('Borrowed At')
                     ->dateTime(),
 
-                TextColumn::make('returned_at')
-                    ->label('Returned At')
-                    ->dateTime(),
-
                 TextColumn::make('due_at')
                     ->label('Due At')
                     ->date(),
@@ -123,14 +121,19 @@ class BorrowingResource extends Resource
                     ->formatStateUsing(fn (string $state): string => match ($state){
                         'pending' => 'Pending',
                         'borrowed' => 'Borrowed',
+                        'prepared' => 'Prepared',
+                        'ready_to_pickup' => 'Ready to Pickup',
+                        'overdue' => 'Overdue',
                         'returned' => 'Returned',
                         default => $state,
                     })
-                    ->colors([
-                        'warning' => 'Pending',
-                        'primary' => 'Borrowed',
-                        'success' => 'Returned',
-                    ])
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending', 'prepared', 'ready_to_pickup' => 'warning',
+                        'borrowed' => 'primary',
+                        'overdue' => 'danger',
+                        'returned' => 'success',
+                        default => 'gray',
+                    })
             ])
 
             ->actions([
