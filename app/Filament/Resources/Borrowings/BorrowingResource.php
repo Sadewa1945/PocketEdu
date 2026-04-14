@@ -118,7 +118,7 @@ class BorrowingResource extends Resource
 
                 TextColumn::make('due_at')
                     ->label('Due At')
-                    ->date(),
+                    ->dateTime(),
 
                 BadgeColumn::make('status')
                     ->label('Status')

@@ -20,6 +20,11 @@ class Borrowing extends Model
         'status',
     ];
 
+    protected $casts = [
+    'borrowed_at' => 'datetime',
+    'due_at' => 'datetime',
+];
+
     protected static function boot(): void
     {
         parent::boot();

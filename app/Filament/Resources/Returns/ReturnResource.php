@@ -7,11 +7,15 @@ use App\Filament\Resources\Returns\Pages\EditReturn;
 use App\Filament\Resources\Returns\Pages\ListReturns;
 use App\Filament\Resources\Returns\Schemas\ReturnForm;
 use App\Filament\Resources\Returns\Tables\ReturnsTable;
+use App\Models\Book;
 use App\Models\Borrowing;
 use App\Models\ReturnBook;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -19,6 +23,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -53,7 +58,7 @@ class ReturnResource extends Resource
                 ->options(function (Get $get) {
 
                     $query = Borrowing::with('borrowingsBook', 'borrowingsUser')
-                        ->where('status', 'borrowed');
+                        ->whereIn('status', ['borrowed', 'overdue']);
 
                     if ($get('user_filter')) {
                         $query->where('user_id', $get('user_filter'));
@@ -109,43 +114,68 @@ class ReturnResource extends Resource
                 ->label('Notes')
                 ->limit(20),
 
-            TextColumn::make('status')
-                ->badge()
-                ->color(fn (string $state) => match ($state) {
-                    'pending' => 'warning',
-                    'accepted' => 'success',
-                    'rejected' => 'danger',
-                }),
+            BadgeColumn::make('status')
+                    ->label('Status')
+                    ->formatStateUsing(fn (string $state): string => match ($state){
+                        'pending' => 'Pending',
+                        'accepted' => 'Accepted',
+                        'rejected' => 'Rejected',
+                        default => $state,
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'accepted' => 'success',
+                        'rejected' => 'danger',
+                        default => 'gray',
+                    })
         ])
+            ->actions([
+                ActionGroup::make([
+                    
+                   Action::make('changeStatus')
+                    ->label('Change Status')
+                    ->icon('heroicon-o-adjustments-horizontal')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->status !== 'accepted')
+                    ->form([
+                        Select::make('status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'accepted' => 'Accepted',
+                                'rejected' => 'Rejected',
+                            ])
+                            ->required(),
+                    ])
+                    ->action(function ($record, array $data) {
 
-        ->actions([
-            
-            Action::make('accept')
-                ->label('Accept')
-                ->color('success')
-                ->action(function ($record) {
-                    $record->update([
-                        'status' => 'accepted',
-                    ]);
+                        $record->update([
+                            'status' => $data['status'],
+                        ]);
 
-                    $record->borrowing->update([
-                        'status' => 'returned',
-                    ]);
-                })
-                ->visible(fn ($record) => $record->status === 'pending'),
+                        if ($data['status'] !== 'accepted') {
+                            return;
+                        }
 
-            Action::make('reject')
-                ->label('Reject')
-                ->color('danger')
-                ->action(function ($record) {
-                    $record->update([
-                        'status' => 'rejected',
-                    ]);
-                })
-                ->visible(fn ($record) => $record->status === 'pending'),
-        ])
+                        $borrowing = Borrowing::find($record->borrowing_id);
 
-        ->defaultSort('created_at', 'desc');
+                        if (!$borrowing) return;
+
+                        $borrowing->update([
+                            'status' => 'returned',
+                        ]);
+
+                       
+                
+                    }),
+
+                    EditAction::make(),
+
+                    DeleteAction::make(),
+                ])
+                ->label('More')
+                ->icon('heroicon-o-ellipsis-vertical')
+                ->color('gray'),
+            ]);
     }
 
     public static function getRelations(): array
