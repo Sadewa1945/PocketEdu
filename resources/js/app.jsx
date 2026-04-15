@@ -17,6 +17,7 @@ import BooksDetail from './Pages/BooksDetail';
 import Borrowing from './Pages/Borrow/Borrowing';
 import MainLayout from './MainLayout';
 import BorrowForm from './Pages/Borrow/BorrowForm';
+import Return from './Pages/Returns/Return';
 
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
@@ -118,6 +119,7 @@ function AppLoader() {
                         <Route path="/user/profile" element={<Profile />} />
                         <Route path="/categories" element={<Category />} />
                         <Route path="/books/:id/borrow" element={<BorrowForm />} />
+                        <Route path="/return" element={<Return />} />
                     </Route>
 
                     <Route

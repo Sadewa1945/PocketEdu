@@ -10,18 +10,18 @@ use Illuminate\Http\Request;
 
 class ReturnController extends Controller
 {
-    public function show(Request $request)
+    public function index(Request $request)
     {
-        $userId = auth()->id();
+        $user = $request->user();
 
-        $data = ReturnBook::with(['borrowing.book'])
-            ->whereHas('borrowing', function ($q) use ($userId) {
-                $q->where('user_id', $userId);
+        $data = ReturnBook::with(['borrowing.borrowingsBook']) 
+            ->whereHas('borrowing', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
             })
             ->get();
 
         return response()->json([
-            'message' => true,
+            'success' => true,
             'data' => $data
         ], 200);
     }

@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\BorrowController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/borrowing', [BorrowController::class, 'index']);
     Route::post('/borrow', [BorrowController::class, 'borrow']);
+
+    Route::get('/return', [ReturnController::class, 'index']);
 
     Route::get('/books/{id}', [BookController::class, 'show']);
 

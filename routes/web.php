@@ -17,12 +17,16 @@ Route::middleware('auth')->group(function () {
     })->name('books');
 
     Route::get('/books/{id}', function(){
-        return Inertia::render('BooksOverview');
+        return Inertia::render('BooksDetail');
     })->name('books.detail');
 
     Route::get('/borrowing', function(){
-        return Inertia::render('BooksOverview');
+        return Inertia::render('Borrowing');
     })->name('borrowing');
+
+    Route::get('/return', function(){
+        return Inertia::render('Return');
+    })->name('return');
 
     Route::get('/books/{id}/borrow', function(){
         return Inertia::render('BorrowForm');

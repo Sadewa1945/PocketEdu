@@ -227,6 +227,9 @@ export default function Borrowing() {
                         const overdue = isOverdue(item);
                         const returned = isReturned(item);
                         const borrowed = isBorrowed(item);
+                        const pending = isPending(item);
+                        const prepare = isPrepared(item);
+                        const ready_to_pickup = isReadytoPickup(item);
 
                         return (
                             <div
