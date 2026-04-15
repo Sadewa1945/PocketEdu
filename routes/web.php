@@ -28,6 +28,10 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Return');
     })->name('return');
 
+    Route::get('/borrowing/${id}/returns', function(){
+        return Inertia::render('ReturnForm');
+    })->name('return.create');
+
     Route::get('/books/{id}/borrow', function(){
         return Inertia::render('BorrowForm');
     })->name('borrow.create');

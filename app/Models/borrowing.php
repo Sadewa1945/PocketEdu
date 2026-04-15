@@ -35,9 +35,9 @@ class Borrowing extends Model
         return $this->belongsTo(Book::class, 'book_id');
     }
 
-    public function return()
+    public function returnBook()
     {
-        return $this->hasOne(ReturnBook::class, 'borrowing_id');
+        return $this->hasOne(ReturnBook::class, 'borrowing_id')->latest();
     }
 
 }

@@ -47,6 +47,8 @@ export default function Borrowing() {
                 filtered = filtered.filter((item) => item.status === "overdue");
             } else if (activeTab === "returned") {
                 filtered = filtered.filter((item) => item.status === "returned");
+            } else if (activeTab === "waiting_to_be_returned") {
+                filtered = filtered.filter((item) => item.status === "waiting_to_be_returned");
             }
 
             setFilteredBorrowings(filtered);
@@ -59,6 +61,7 @@ export default function Borrowing() {
                 setError("");
 
                 const res = await axios.get("/api/borrowing");
+                
                 setBorrowings(res.data.data);
                 setFilteredBorrowings(res.data.data);
 
@@ -91,6 +94,7 @@ export default function Borrowing() {
     const isPending = (item) => item.status === "pending";
     const isPrepared = (item) => item.status === "prepared";
     const isReadytoPickup = (item) => item.status === "ready_to_pickup";
+    const isWaitingToBeReturned = (item) => item.status === "waiting_to_be_returned";
 
     const stats = {
         borrowed: borrowings.filter((b) => b.status === "borrowed").length,
@@ -106,6 +110,8 @@ export default function Borrowing() {
                 return <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-600">Overdue</span>;
             case "returned":
                 return <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">Returned</span>;
+            case "waiting_to_be_returned":
+                return <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">Waiting to be Returned</span>;
             case "pending":
                 return <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-600">Pending</span>;
             case "prepared":
@@ -149,8 +155,8 @@ export default function Borrowing() {
             {!loading && !error && (
                 <div className="grid grid-cols-3 gap-3 mb-5">
                     <div className="bg-slate-50 rounded-xl p-3">
-                        <p className="text-xs text-slate-500">Active</p>
-                        <p className="text-xl font-semibold text-slate-800 mt-0.5">{stats.active}</p>
+                        <p className="text-xs text-slate-500">Borrowed</p>
+                        <p className="text-xl font-semibold text-slate-800 mt-0.5">{stats.borrowed}</p>
                     </div>
                     <div className="bg-red-50 rounded-xl p-3">
                         <p className="text-xs text-red-400">Overdue</p>
@@ -173,6 +179,7 @@ export default function Borrowing() {
                     { key: "borrowed", label: "Borrowed" },
                     { key: "overdue", label: "Overdue" },
                     { key: "returned", label: "Returned" },
+                    { key: "waiting_to_be_returned", label: "Waiting to be Return" },
                 ].map((tab) => (
                     <button
                         key={tab.key}
@@ -230,6 +237,7 @@ export default function Borrowing() {
                         const pending = isPending(item);
                         const prepare = isPrepared(item);
                         const ready_to_pickup = isReadytoPickup(item);
+                        const waiting_to_be_returned = isWaitingToBeReturned(item);
 
                         return (
                             <div
@@ -277,7 +285,9 @@ export default function Borrowing() {
                                     </div>
                                     {(borrowed || overdue) && (
                                         <div className="flex flex-col gap-1.5 mt-3">
-                                            <button className="px-4 py-1.5 rounded-lg bg-green-500 text-white text-xs font-medium hover:bg-green-600 transition flex items-center gap-1.5">
+                                            <button
+                                             onClick={() => navigate(`/borrowing/${item.id}/returns`)}
+                                             className="px-4 py-1.5 rounded-lg bg-green-500 text-white text-xs font-medium hover:bg-green-600 transition flex items-center gap-1.5">
                                                 <RotateCcw size={12} /> Return
                                             </button>
                                             {borrowed && (

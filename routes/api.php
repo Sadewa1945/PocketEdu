@@ -24,8 +24,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/borrowing', [BorrowController::class, 'index']);
     Route::post('/borrow', [BorrowController::class, 'borrow']);
+    Route::get('/borrowing/{id}', [BorrowController::class, 'show']);
 
     Route::get('/return', [ReturnController::class, 'index']);
+    Route::post ('/borrowing/{id}/returns', [ReturnController::class, 'storeReturn']);
 
     Route::get('/books/{id}', [BookController::class, 'show']);
 

@@ -7,6 +7,7 @@ use App\Models\ReturnBook;
 use App\Models\Stock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ReturnController extends Controller
 {
@@ -30,7 +31,12 @@ class ReturnController extends Controller
     {
         $borrowing = Borrowing::findOrFail($id);
 
-        // Pastikan statusnya valid
+        if ($borrowing->user_id !== auth()->id()){
+            return response()->json([
+                'message' => 'Unauthorized. You do not own this borrowing record.',
+            ], 403);
+        }
+
         if (!in_array($borrowing->status, ['borrowed', 'overdue'])) {
             return response()->json([
                 'message' => 'This book is not currently on loan or has been returned.',
@@ -39,11 +45,10 @@ class ReturnController extends Controller
 
         $request->validate([
             'quantity_returned' => 'required|integer|min:1',
-            'return_condition' => 'required|string',
+            'return_condition' => 'nullable|string',
             'notes' => 'nullable|string'
         ]);
 
-        // Hitung total buku yang sudah diajukan pengembaliannya agar user tidak mengembalikan lebih dari yang dipinjam
         $totalAlreadyReturned = ReturnBook::where('borrowing_id', $borrowing->id)
             ->whereIn('status', ['pending', 'accepted'])
             ->sum('quantity_returned');
@@ -63,6 +68,10 @@ class ReturnController extends Controller
             'status' => 'pending'
         ]);
 
+        $borrowing->updated([
+            'status' => 'waiting_to_be_returned'
+        ]);
+
         return response()->json([
             'message' => 'Return request submitted',
             'data' => $return
@@ -70,7 +79,7 @@ class ReturnController extends Controller
     }
 
     public function approveReturn($id)
-{
+    {
     $return = ReturnBook::with('borrowing')->findOrFail($id);
 
     if ($return->status !== 'pending') {
@@ -80,6 +89,10 @@ class ReturnController extends Controller
     $return->update([
         'status' => 'accepted',
         'returned_at' => \Carbon\Carbon::now(),
+    ]);
+
+    $return->borrowing->update([
+        'status' => 'returned'
     ]);
 
     return response()->json([
@@ -102,19 +115,14 @@ class ReturnController extends Controller
             'status' => 'rejected'
         ]);
 
+        $isOverdue = \Carbon\Carbon::now()->isAfter($return->borrowing->due_at);
+
+        $return->borrowing->update([
+        'status' => $isOverdue ? 'overdue' : 'borrowed'
+        ]);
+
         return response()->json([
             'message' => 'Return rejected successfully'
         ]);
-    }
-
-    public function getMyReturns()
-    {
-        $data = ReturnBook::with(['borrowing.book'])
-            ->whereHas('borrowing', function ($q) {
-                $q->where('user_id', auth()->id());
-            })
-            ->get();
-
-        return response()->json($data);
     }
 }

@@ -23,8 +23,24 @@ class BorrowController extends Controller
         ], 200);
     }
 
+    public function show($id){
+        $borrowingsBook = Borrowing::with('borrowingsBook')->find($id);
+
+        if(!$borrowingsBook){
+            return response()->json([
+                'message' => false,
+                'data' => null
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => true,
+            'data' => $borrowingsBook
+        ], 200);
+    }
+
     public function borrowingsCount(){
-        $count = borrowing::count();
+        $count = borrowing::where('status', 'borrowed')->count();
 
         return response()->json([
             'message' => true,

@@ -44,6 +44,6 @@ class Book extends Model
 
     public function borrowings()
     {
-        return $this->hasMany(borrowing::class, 'book_id');
+        return $this->hasMany(Borrowing::class, 'book_id');
     }
 }
