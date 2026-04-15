@@ -54,5 +54,5 @@ php artisan key:generate
 php artisan migrate --seed
 
 ### 6. Run the project
-php artisan serve
+php artisan serve and
 npm run dev
