@@ -59,14 +59,12 @@ export default function Returns() {
         setFilteredReturns(filtered);
     }, [search, returns, activeTab]);
 
-    // 3. Menghitung Statistik
     const stats = {
         pending: returns.filter((b) => b.status === "pending").length,
         accepted: returns.filter((b) => b.status === "accepted").length,
         rejected: returns.filter((b) => b.status === "rejected").length,
     };
 
-    // 4. Komponen Badge
     const getBadge = (status) => {
         switch (status) {
             case "accepted":

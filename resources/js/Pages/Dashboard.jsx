@@ -90,7 +90,42 @@ export default function Dashboard({ user, setUser }) {
                     Dashboard
                 </h2>
 
-                {loading && <p className="text-slate-600">Loading...</p>}
+                {loading && (
+                    <div className="animate-pulse">
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10">
+                            {[...Array(3)].map((_, i) => (
+                                <div key={i} className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-green-100">
+                                    <div className="flex items-center justify-between">
+                                        <div className="w-full">
+                                            <div className="h-4 bg-slate-200 rounded w-1/2 mb-4"></div>
+                                            <div className="h-8 bg-slate-200 rounded w-1/3"></div>
+                                        </div>
+                                        <div className="w-10 h-10 bg-slate-200 rounded-full shrink-0"></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div>
+                            <div className="h-8 bg-slate-200 rounded w-48 mb-6"></div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+                                {[...Array(4)].map((_, i) => (
+                                    <div key={i} className="gap-5 bg-white p-5 rounded-2xl border border-green-100 shadow-sm flex flex-col h-full">
+                                        <div className="w-full h-56 bg-slate-200 rounded-xl mb-4"></div>
+                                        <div className="flex-1 flex flex-col">
+                                            <div className="h-5 bg-slate-200 rounded w-3/4 mb-3"></div>
+                                            <div className="h-4 bg-slate-200 rounded w-1/2 mb-2"></div>
+                                            <div className="h-4 bg-slate-200 rounded w-2/3 mb-5"></div>
+                                        </div>
+                                        <div className="mt-auto w-full h-10 rounded-xl bg-slate-200"></div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {error && <p className="text-red-500">{error}</p>}
 
                 {!loading && !error && (
@@ -159,9 +194,20 @@ export default function Dashboard({ user, setUser }) {
                                         </p>
                                     </div>
 
-                                    <button onClick={() => navigate(`/books/${book.id}`)} className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                    {book.available_stock > 0 ?(
+                                        <button 
+                                            onClick={() => navigate(`/books/${book.id}`)} 
+                                            className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
                                         Borrow
                                     </button>
+                                    ):(
+                                        <button 
+                                            disabled
+                                            className="mt-auto w-full py-2 rounded-xl bg-slate-300 text-slate-500 cursor-not-allowed transition-colors duration-300 font-medium"
+                                        >
+                                        Out of Stock
+                                    </button>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -220,9 +266,20 @@ export default function Dashboard({ user, setUser }) {
                                         </p>
                                     </div>
 
-                                    <button onClick={() => navigate(`/books/${book.id}`)} className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                    {book.available_stock > 0 ?(
+                                        <button 
+                                            onClick={() => navigate(`/books/${book.id}`)} 
+                                            className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
                                         Borrow
                                     </button>
+                                    ) : (
+                                        <button 
+                                            disabled
+                                            className="mt-auto w-full py-2 rounded-xl bg-slate-300 text-slate-500 cursor-not-allowed transition-colors duration-300 font-medium"
+                                        >
+                                        Out of Stock
+                                    </button>
+                                    )}
                                 </div>
                             ))}
                         </div>

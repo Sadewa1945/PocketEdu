@@ -143,7 +143,7 @@ class BooksResource extends Resource
                 ->sortable(),
 
                 TextColumn::make('available_stock')
-                ->label('Stock Tersedia')
+                ->label('Available Stock')
                 ->sortable(),
 
                 TextColumn::make('category.name')
@@ -155,11 +155,17 @@ class BooksResource extends Resource
                 ->date(),
 
                 BadgeColumn::make('stock.status')
-                    ->colors([
-                        'success' => 'available',
-                        'danger' => 'out_of_stock',
-                    ])
-                    ->label('Status'),
+                    ->label('Status')
+                    ->formatStateUsing(fn (string $state): string => match ($state){
+                        'available' => 'Available',
+                        'out_of_stock' => 'Out of Stock',
+                        default => $state,
+                    })
+                    ->color(fn (string $state): string => match ($state){
+                        'available' => 'success',
+                        'out_of_stock' => 'danger',
+                        default => 'gray',
+                    }),
 
             ])->actions([
             EditAction::make(),

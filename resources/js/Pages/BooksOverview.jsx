@@ -152,9 +152,21 @@ export default function BooksOverview() {
                                         </p>
                                     </div>
 
-                                    <button onClick={() => navigate(`/books/${book.id}`)} className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
-                                        Borrow
-                                    </button>
+                                    {book.available_stock > 0 ? (
+                                        <button 
+                                            onClick={() => navigate(`/books/${book.id}`)} 
+                                            className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300"
+                                        >
+                                            Borrow
+                                        </button>
+                                    ) : (
+                                        <button 
+                                            disabled
+                                            className="mt-auto w-full py-2 rounded-xl bg-slate-300 text-slate-500 cursor-not-allowed transition-colors duration-300 font-medium"
+                                        >
+                                            Out of Stock
+                                        </button>
+                                    )}
                                 </div>
                             ))}
                         </div>
