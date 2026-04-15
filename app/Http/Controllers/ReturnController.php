@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Borrowing;
 use App\Models\ReturnBook;
+use App\Models\Stock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -29,28 +30,34 @@ class ReturnController extends Controller
     {
         $borrowing = Borrowing::findOrFail($id);
 
-        if($borrowing -> status !== 'borrowed'){
+        // Pastikan statusnya valid
+        if (!in_array($borrowing->status, ['borrowed', 'overdue'])) {
             return response()->json([
-                'message' => 'The book is not being borrowed or has already been returned',
+                'message' => 'This book is not currently on loan or has been returned.',
             ], 400);
         }
 
         $request->validate([
+            'quantity_returned' => 'required|integer|min:1',
             'return_condition' => 'required|string',
             'notes' => 'nullable|string'
         ]);
 
-        $alreadyReturned = ReturnBook::where('borrowing_id', $borrowing->id)->exists();
+        // Hitung total buku yang sudah diajukan pengembaliannya agar user tidak mengembalikan lebih dari yang dipinjam
+        $totalAlreadyReturned = ReturnBook::where('borrowing_id', $borrowing->id)
+            ->whereIn('status', ['pending', 'accepted'])
+            ->sum('quantity_returned');
 
-        if ($alreadyReturned){
+        if (($totalAlreadyReturned + $request->quantity_returned) > $borrowing->quantity) {
             return response()->json([
-                'message' => 'Return data already exists',
+                'message' => 'The number of books returned exceeds the number borrowed.',
             ], 400);
         }
 
         $return = ReturnBook::create([
             'borrowing_id' => $borrowing->id,
-            'returned_at' => now(),
+            'returned_at' => now()->startOfDay(),
+            'quantity_returned' => $request->quantity_returned,
             'return_condition' => $request->return_condition,
             'notes' => $request->notes,
             'status' => 'pending'
@@ -62,31 +69,26 @@ class ReturnController extends Controller
         ], 200);
     }
 
-    public function approveReturn($id){
+    public function approveReturn($id)
+{
+    $return = ReturnBook::with('borrowing')->findOrFail($id);
 
-        $return = ReturnBook::findOrFail($id);
-
-        if ($return->status !== 'pending'){
-            return response()->json([
-                'message' => 'Return is not pending'
-            ], 400);
-        }
-
-        $return->update([
-            'status' => 'accepted',
-            'returned_at' => Carbon::now()
-        ]);
-
-        $return->borrowing->update([
-            'status' => 'returned',
-        ]);
-
-        return response()->json([
-            'message' => 'Return approved successfully'
-        ], 200);
+    if ($return->status !== 'pending') {
+        return response()->json(['message' => 'Return is not pending'], 400);
     }
 
-    public function rejectRetuns($id)
+    $return->update([
+        'status' => 'accepted',
+        'returned_at' => \Carbon\Carbon::now(),
+    ]);
+
+    return response()->json([
+        'message' => 'Return approved successfully',
+        'data' => $return
+    ], 200);
+}
+
+    public function rejectReturn($id)
     {
         $return = ReturnBook::findOrFail($id);
 

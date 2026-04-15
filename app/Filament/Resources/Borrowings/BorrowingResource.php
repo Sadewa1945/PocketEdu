@@ -64,11 +64,10 @@ class BorrowingResource extends Resource
                 ->default(1)
                 ->required(),
 
-            DateTimePicker::make('borrowed_at')
-                ->label('Borrowed At')
-                ->required(),
+            DatePicker::make('borrowed_at')
+                ->label('Borrowed At'),
 
-            DateTimePicker::make('due_at')
+            DatePicker::make('due_at')
                 ->label('Due At')
                 ->required(),
 

@@ -25,12 +25,6 @@ class Borrowing extends Model
     'due_at' => 'datetime',
 ];
 
-    protected static function boot(): void
-    {
-        parent::boot();
-        static::observe(BorrowingObserver::class);
-    }
-
     public function borrowingsUser()
     {
         return $this->belongsTo(User::class, 'user_id');

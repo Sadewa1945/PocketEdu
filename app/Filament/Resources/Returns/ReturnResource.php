@@ -12,6 +12,7 @@ use App\Models\Borrowing;
 use App\Models\ReturnBook;
 use App\Models\User;
 use BackedEnum;
+use Dom\Text;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
@@ -19,6 +20,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
@@ -75,6 +77,38 @@ class ReturnResource extends Resource
                 ->searchable()
                 ->required(),
 
+            TextInput::make('quantity_returned')
+                ->label('Quantity Returned')
+                ->numeric() // Memaksa input harus angka
+                ->default(1)
+                ->minValue(1)
+                ->required()
+                ->rules([
+                    function (Get $get, ?\Illuminate\Database\Eloquent\Model $record) {
+                        return function (string $attribute, $value, \Closure $fail) use ($get, $record) {
+                            $borrowingId = $get('borrowing_id');
+                            if (!$borrowingId) return;
+
+                            $borrowing = Borrowing::find($borrowingId);
+                            if (!$borrowing) return;
+
+                            $query = ReturnBook::where('borrowing_id', $borrowingId)
+                                ->whereIn('status', ['pending', 'accepted']);
+
+                            if ($record) {
+                                $query->where('id', '!=', $record->id);
+                            }
+
+                            $alreadyReturned = $query->sum('quantity_returned');
+
+                            if (($alreadyReturned + $value) > $borrowing->quantity) {
+                                $sisa = $borrowing->quantity - $alreadyReturned;
+                                $fail("The quantity has exceeded the limit. The remaining books that have not been returned are only {$sisa} books.");
+                            }
+                        };
+                    }
+                ]),
+
             Textarea::make('return_condition')
                 ->label('Retun Condition'),
             
@@ -91,6 +125,9 @@ class ReturnResource extends Resource
         return $table
             ->columns([
 
+            TextColumn::make('id')
+                ->label('ID'),
+
             TextColumn::make('borrowing.borrowingsBook.title')
                 ->label('Book')
                 ->searchable()
@@ -105,14 +142,9 @@ class ReturnResource extends Resource
                 ->label('Returned At')
                 ->dateTime()
                 ->sortable(),
-
-            TextColumn::make('return_condition')
-                ->label('Condition')
-                ->limit(20),
-
-            TextColumn::make('notes')
-                ->label('Notes')
-                ->limit(20),
+            
+            TextColumn::make('quantity_returned')
+                ->label('Quantity Returned'),
 
             BadgeColumn::make('status')
                     ->label('Status')
@@ -147,25 +179,9 @@ class ReturnResource extends Resource
                             ->required(),
                     ])
                     ->action(function ($record, array $data) {
-
                         $record->update([
                             'status' => $data['status'],
                         ]);
-
-                        if ($data['status'] !== 'accepted') {
-                            return;
-                        }
-
-                        $borrowing = Borrowing::find($record->borrowing_id);
-
-                        if (!$borrowing) return;
-
-                        $borrowing->update([
-                            'status' => 'returned',
-                        ]);
-
-                       
-                
                     }),
 
                     EditAction::make(),

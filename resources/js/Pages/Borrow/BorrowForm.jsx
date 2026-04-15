@@ -9,18 +9,18 @@ export default function BorrowForm() {
     const navigate = useNavigate();
     const { user } = useOutletContext();
 
-    const formatDateTimeLocal = (dateObj) => {
+    const formatDateLocal = (dateObj) => {
         const offset = dateObj.getTimezoneOffset() * 60000;
-        const localISOTime = (new Date(dateObj - offset)).toISOString().slice(0, 16);
+        const localISOTime = (new Date(dateObj - offset)).toISOString().slice('T')[0];
         return localISOTime;
     };
 
     const today = new Date();
-    const todayStr = formatDateTimeLocal(today);
+    const todayStr = formatDateLocal(today);
     
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 7); 
-    const tomorrowStr = formatDateTimeLocal(tomorrow);
+    const tomorrowStr = formatDateLocal(tomorrow);
 
     const [formData, setFormData] = useState({
         quantity: 1,
@@ -171,7 +171,7 @@ export default function BorrowForm() {
                                 <div className="relative">
                                     <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                                     <input
-                                        type="datetime-local" 
+                                        type="date" 
                                         name="borrowed_at"
                                         min={todayStr}
                                         value={formData.borrowed_at}
@@ -188,7 +188,7 @@ export default function BorrowForm() {
                                 <div className="relative">
                                     <CalendarClock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                                     <input
-                                        type="datetime-local"
+                                        type="date"
                                         name="due_at"
                                         min={formData.borrowed_at} 
                                         value={formData.due_at}

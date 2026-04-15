@@ -35,13 +35,15 @@ export default function Borrowing() {
                     .includes(search.toLowerCase())
             );
 
-            if (activeTab === "active") {
+            if (activeTab === "borrowed") {
                 filtered = filtered.filter((item) => item.status === "borrowed");
-            } else if (activeTab === "pending") {
-                filtered = filtered.filter((item) =>
-                    ["pending", "prepared", "ready_to_pickup"].includes(item.status)
-                );
-            } else if (activeTab === "overdue") {
+            }else if (activeTab === "pending") {
+                filtered = filtered.filter((item) => item.status === "pending");
+            }else if (activeTab === "prepared") {
+                filtered = filtered.filter((item) => item.status === "prepared");
+            }else if (activeTab === "ready_to_pickup") {
+                filtered = filtered.filter((item) => item.status === "ready_to_pickup");
+            }else if (activeTab === "overdue") {
                 filtered = filtered.filter((item) => item.status === "overdue");
             } else if (activeTab === "returned") {
                 filtered = filtered.filter((item) => item.status === "returned");
@@ -85,11 +87,13 @@ export default function Borrowing() {
 
     const isOverdue = (item) => item.status === "overdue";
     const isReturned = (item) => item.status === "returned";
-    const isActive = (item) => item.status === "borrowed";
-    const isPending = (item) => ["pending", "prepared", "ready_to_pickup"].includes(item.status);
+    const isBorrowed = (item) => item.status === "borrowed";
+    const isPending = (item) => item.status === "pending";
+    const isPrepared = (item) => item.status === "prepared";
+    const isReadytoPickup = (item) => item.status === "ready_to_pickup";
 
     const stats = {
-        active: borrowings.filter((b) => b.status === "borrowed").length,
+        borrowed: borrowings.filter((b) => b.status === "borrowed").length,
         overdue: borrowings.filter((b) => b.status === "overdue").length,
         returned: borrowings.filter((b) => b.status === "returned").length,
     };
@@ -97,7 +101,7 @@ export default function Borrowing() {
     const getBadge = (item) => {
         switch (item.status) {
             case "borrowed":
-                return <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Active</span>;
+                return <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Borrowed</span>;
             case "overdue":
                 return <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-600">Overdue</span>;
             case "returned":
@@ -164,7 +168,9 @@ export default function Borrowing() {
                 {[
                     { key: "all", label: "All" },
                     { key: "pending", label: "Pending" },
-                    { key: "active", label: "Active" },
+                    { key: "prepared", label: "Prepared" },
+                    { key: "ready_to_pickup", label: "Ready to Pickup" },
+                    { key: "borrowed", label: "Borrowed" },
                     { key: "overdue", label: "Overdue" },
                     { key: "returned", label: "Returned" },
                 ].map((tab) => (
@@ -220,7 +226,7 @@ export default function Borrowing() {
                     {filteredBorrowings.map((item) => {
                         const overdue = isOverdue(item);
                         const returned = isReturned(item);
-                        const active = isActive(item);
+                        const borrowed = isBorrowed(item);
 
                         return (
                             <div
@@ -247,7 +253,7 @@ export default function Borrowing() {
                                             {item.borrowings_book?.author}
                                         </p>
                                         <div className="mt-2">{getBadge(item)}</div>
-                                        {(active || overdue) && (
+                                        {(borrowed || overdue) && (
                                             <p className={`text-xs mt-1 font-medium ${overdue ? "text-red-500" : "text-blue-500"}`}>
                                                 {getCountdown(item.due_at)}
                                             </p>
@@ -266,12 +272,12 @@ export default function Borrowing() {
                                             })}
                                         </p>
                                     </div>
-                                    {(active || overdue) && (
+                                    {(borrowed || overdue) && (
                                         <div className="flex flex-col gap-1.5 mt-3">
                                             <button className="px-4 py-1.5 rounded-lg bg-green-500 text-white text-xs font-medium hover:bg-green-600 transition flex items-center gap-1.5">
                                                 <RotateCcw size={12} /> Return
                                             </button>
-                                            {active && (
+                                            {borrowed && (
                                                 <button className="px-4 py-1.5 rounded-lg border border-blue-400 text-blue-500 text-xs font-medium hover:bg-blue-50 transition flex items-center gap-1.5">
                                                     <RefreshCw size={12} /> Renew
                                                 </button>

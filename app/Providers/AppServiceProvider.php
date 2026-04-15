@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Borrowing;
+use App\Models\ReturnBook;
+use App\Observers\BorrowingObserver;
+use App\Observers\ReturnBookObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Borrowing::observe(BorrowingObserver::class);
+        ReturnBook::observe(ReturnBookObserver::class);
     }
 }
