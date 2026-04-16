@@ -16,9 +16,7 @@ return new class extends Migration
             $table->foreignId('borrowing_id')->constrained('borrowings')->cascadeOnDelete();
             $table->dateTime('returned_at');
             $table->integer('quantity_returned')->default(1);
-            $table->integer('late_days')->default(0);
-            $table->decimal('fine', 10, 2)->default(0);
-            $table->text('return_condition')->nullable();
+            $table->enum('return_condition', ['good', 'damaged', 'lost'])->default('good');
             $table->text('notes')->nullable();
             $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
             $table->timestamps();

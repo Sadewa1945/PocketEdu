@@ -5,14 +5,11 @@ namespace App\Filament\Resources\Returns;
 use App\Filament\Resources\Returns\Pages\CreateReturn;
 use App\Filament\Resources\Returns\Pages\EditReturn;
 use App\Filament\Resources\Returns\Pages\ListReturns;
-use App\Filament\Resources\Returns\Schemas\ReturnForm;
-use App\Filament\Resources\Returns\Tables\ReturnsTable;
 use App\Models\Book;
 use App\Models\Borrowing;
 use App\Models\ReturnBook;
 use App\Models\User;
 use BackedEnum;
-use Dom\Text;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
@@ -24,11 +21,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
+use Carbon\Carbon;
 
 class ReturnResource extends Resource
 {
@@ -79,7 +76,7 @@ class ReturnResource extends Resource
 
             TextInput::make('quantity_returned')
                 ->label('Quantity Returned')
-                ->numeric() // Memaksa input harus angka
+                ->numeric()
                 ->default(1)
                 ->minValue(1)
                 ->required()
@@ -109,11 +106,19 @@ class ReturnResource extends Resource
                     }
                 ]),
 
-            Textarea::make('return_condition')
-                ->label('Retun Condition'),
+            // 1. DIUBAH MENJADI SELECT (ENUM)
+            Select::make('return_condition')
+                ->label('Return Condition')
+                ->options([
+                    'good' => 'Good / Normal',
+                    'damaged' => 'Damaged',
+                    'lost' => 'Lost'
+                ])
+                ->default('good')
+                ->required(),
             
             Textarea::make('notes')
-                ->label('notes'),
+                ->label('Notes'),
 
             Hidden::make('returned_at')
                 ->default(now()),
@@ -179,9 +184,20 @@ class ReturnResource extends Resource
                             ->required(),
                     ])
                     ->action(function ($record, array $data) {
+                        // 2. TAMBAHKAN LOGIKA UPDATE PEMINJAMAN DI SINI
                         $record->update([
                             'status' => $data['status'],
                         ]);
+
+                        if ($data['status'] === 'accepted') {
+                            $record->update(['returned_at' => now()]);
+                            $record->borrowing->update(['status' => 'returned']);
+                        } elseif ($data['status'] === 'rejected') {
+                            $isOverdue = Carbon::now()->isAfter($record->borrowing->due_at);
+                            $record->borrowing->update([
+                                'status' => $isOverdue ? 'overdue' : 'borrowed'
+                            ]);
+                        }
                     }),
 
                     EditAction::make(),
@@ -196,9 +212,7 @@ class ReturnResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

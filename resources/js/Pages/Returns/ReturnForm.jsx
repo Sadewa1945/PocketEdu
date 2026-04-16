@@ -8,10 +8,10 @@ export default function ReturnForm() {
     const { id } = useParams(); 
     const navigate = useNavigate();
     const { user } = useOutletContext();
-
+    const [fineData, setFineData] = useState({ lateDays: 0, rates: null });
     const [formData, setFormData] = useState({
         quantity_returned: 1,
-        return_condition: "",
+        return_condition: "good",
         notes: "",
     });
 
@@ -27,6 +27,13 @@ export default function ReturnForm() {
             try {
                 const res = await axios.get(`/api/borrowing/${id}`);
                 setReturnForm(res.data.data || res.data);
+
+                if (res.data.fine_rates) {
+                    setFineData({
+                        lateDays: res.data.late_days || 0,
+                        rates: res.data.fine_rates
+                    });
+                }
             } catch (err) {
                 setError("Failed to load return book data. Ensure loan is available..");
             } finally {
@@ -42,6 +49,22 @@ export default function ReturnForm() {
     };
 
     const bookData = returnForm?.borrowings_book || returnForm || {};
+
+    const calculateTotalFine = () => {
+        if (!fineData.rates) return 0;
+        
+        let total = fineData.lateDays * fineData.rates.late_fine;
+        
+        if (formData.return_condition === 'damaged') {
+            total += fineData.rates.damage_fine;
+        } else if (formData.return_condition === 'lost') {
+            total += fineData.rates.lost_fine;
+        }
+        
+        return total;
+    };
+
+    const totalFineAmount = calculateTotalFine();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -153,19 +176,20 @@ export default function ReturnForm() {
 
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Return Conditions (Optional)
+                                Return Conditions
                             </label>
                             <div className="relative">
-                                <StickyNote size={18} className="absolute left-4 top-4 text-slate-400" />
-                                <textarea
+                                <select
                                     name="return_condition"
-                                    rows="3"
-                                    maxLength="500"
                                     value={formData.return_condition}
                                     onChange={handleChange}
-                                    placeholder="write the condition of the book when it is returned"
-                                    className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition resize-none"
-                                ></textarea>
+                                    className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition bg-white"
+                                    required
+                                >
+                                    <option value="good">Good / Normal</option>
+                                    <option value="damaged">Damaged (Torn pages, wet, etc.)</option>
+                                    <option value="lost">Lost</option>
+                                </select>
                             </div>
                         </div>
 
@@ -186,6 +210,36 @@ export default function ReturnForm() {
                                 ></textarea>
                             </div>
                         </div>
+
+                        {totalFineAmount > 0 && (
+                            <div className="p-4 bg-red-50 border border-red-200 rounded-2xl mb-4">
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-sm font-medium text-red-800">Late Fine ({fineData.lateDays} days)</span>
+                                    <span className="text-sm text-red-600">
+                                        Rp {(fineData.lateDays * fineData.rates?.late_fine).toLocaleString('id-ID')}
+                                    </span>
+                                </div>
+                                
+                                {formData.return_condition !== 'good' && (
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-sm font-medium text-red-800">Condition Fine ({formData.return_condition})</span>
+                                        <span className="text-sm text-red-600">
+                                            Rp {(formData.return_condition === 'damaged' ? fineData.rates?.damage_fine : fineData.rates?.lost_fine).toLocaleString('id-ID')}
+                                        </span>
+                                    </div>
+                                )}
+                                
+                                <div className="border-t border-red-200 mt-2 pt-2 flex justify-between items-center">
+                                    <span className="font-bold text-red-900">Total Estimated Fine</span>
+                                    <span className="font-bold text-red-700 text-lg">
+                                        Rp {totalFineAmount.toLocaleString('id-ID')}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-red-500 mt-2 italic">
+                                    *Fines must be paid directly to the librarian upon returning the physical book.
+                                </p>
+                            </div>
+                        )}
 
                         <div className="pt-2 flex gap-3">
                             <button

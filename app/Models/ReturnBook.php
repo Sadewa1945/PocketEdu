@@ -11,8 +11,6 @@ class ReturnBook extends Model
     protected $fillable = [
         'borrowing_id',
         'returned_at',
-        'late_days',
-        'fine',
         'return_condition',
         'quantity_returned',
         'notes',
@@ -25,5 +23,10 @@ class ReturnBook extends Model
 
     public function borrowing(){
         return $this->belongsTo(Borrowing::class, 'borrowing_id');
+    }
+
+    public function fines()
+    {
+        return $this->hasMany(Fine::class, 'return_book_id');
     }
 }

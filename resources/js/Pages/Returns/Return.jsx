@@ -8,6 +8,7 @@ import {
     Clock,
     XCircle,
     Info,
+    Receipt
 } from "lucide-react";
 
 export default function Returns() {
@@ -169,54 +170,74 @@ export default function Returns() {
                 </div>
             ) : (
                 <div className="space-y-3">
-                    {filteredReturns.map((item) => (
-                        <div
-                            key={item.id}
-                            className="bg-white w-full rounded-xl border border-slate-100 flex justify-between p-4 hover:shadow-sm transition"
-                        >
-                            <div className="flex gap-4 min-w-0">
-                                <img
-                                   
-                                    src={`${apiUrl}/storage/${item.borrowing?.borrowings_book?.cover_image}`}
-                                    alt={item.borrowing?.borrowings_book?.title}
-                                    className="w-14 h-20 object-cover rounded-lg flex-shrink-0 bg-slate-100"
-                                />
-                                <div className="min-w-0">
-                                    <h3 className="font-semibold text-slate-800 truncate">
-                                        {item.borrowing?.borrowings_book?.title || "Unknown Book"} 
-                                    </h3>
-                                    <p className="text-xs text-slate-400 mt-0.5">
-                                        Qty: {item.quantity_returned}
-                                    </p>
-                                    <div className="mt-2">{getBadge(item.status)}</div>
-                                    {item.notes && (
-                                        <p className="text-[10px] text-slate-400 mt-2 italic bg-slate-50 p-1 px-2 rounded">
-                                            "{item.notes}"
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
+                    {filteredReturns.map((item) => {
+                        const fines = item.fines || [];
+                        const totalFine = fines.reduce((sum, fine) => sum + Number(fine.amount), 0);
+                        const isUnpaid = fines.some(fine => fine.status === 'unpaid');
 
-                            <div className="flex flex-col items-end justify-between ml-4 flex-shrink-0">
-                                <div className="text-right">
-                                    <p className="text-xs text-slate-400">Returned at</p>
-                                    <p className="text-xs font-semibold mt-0.5 text-slate-700">
-                                        {item.returned_at ? new Date(item.returned_at).toLocaleDateString("en-US", {
-                                            day: "numeric",
-                                            month: "short",
-                                            year: "numeric",
-                                        }) : "-"}
-                                    </p>
-                                    <p className="text-[10px] text-slate-400">
-                                        {item.returned_at ? new Date(item.returned_at).toLocaleTimeString("en-GB", {
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        }) : ""}
-                                    </p>
+                        return (
+                            <div
+                                key={item.id}
+                                className="bg-white w-full rounded-xl border border-slate-100 flex justify-between p-4 hover:shadow-sm transition"
+                            >
+                                <div className="flex gap-4 min-w-0 w-full">
+                                    <img
+                                        src={`${apiUrl}/storage/${item.borrowing?.borrowings_book?.cover_image}`}
+                                        alt={item.borrowing?.borrowings_book?.title}
+                                        className="w-14 h-20 object-cover rounded-lg flex-shrink-0 bg-slate-100"
+                                    />
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="font-semibold text-slate-800 truncate">
+                                            {item.borrowing?.borrowings_book?.title || "Unknown Book"} 
+                                        </h3>
+                                        <p className="text-xs text-slate-400 mt-0.5">
+                                            Qty: {item.quantity_returned}
+                                        </p>
+                                        <div className="mt-2">{getBadge(item.status)}</div>
+                                        
+                                        {totalFine > 0 && (
+                                            <div className={`mt-3 p-2.5 rounded-lg border flex items-center justify-between max-w-sm ${isUnpaid ? 'bg-red-50 border-red-100' : 'bg-green-50 border-green-100'}`}>
+                                                <div className="flex items-center gap-2">
+                                                    <Receipt size={14} className={isUnpaid ? "text-red-500" : "text-green-500"} />
+                                                    <span className={`text-xs font-medium ${isUnpaid ? "text-red-700" : "text-green-700"}`}>
+                                                        Fine: Rp {totalFine.toLocaleString('id-ID')}
+                                                    </span>
+                                                </div>
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${isUnpaid ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                                                    {isUnpaid ? 'Unpaid' : 'Paid'}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {item.notes && (
+                                            <p className="text-[10px] text-slate-400 mt-2 italic bg-slate-50 p-1 px-2 rounded w-fit">
+                                                "{item.notes}"
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col items-end justify-between ml-4 flex-shrink-0">
+                                    <div className="text-right">
+                                        <p className="text-xs text-slate-400">Returned at</p>
+                                        <p className="text-xs font-semibold mt-0.5 text-slate-700">
+                                            {item.returned_at ? new Date(item.returned_at).toLocaleDateString("en-US", {
+                                                day: "numeric",
+                                                month: "short",
+                                                year: "numeric",
+                                            }) : "-"}
+                                        </p>
+                                        <p className="text-[10px] text-slate-400">
+                                            {item.returned_at ? new Date(item.returned_at).toLocaleTimeString("en-GB", {
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            }) : ""}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             )}
         </div>
