@@ -4,6 +4,10 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Widgets\BookStats;
+use App\Filament\Widgets\DashboardStats;
+use App\Filament\Widgets\LatestBorrowings;
+use App\Filament\Widgets\TopBooksStats;
+use App\Filament\Widgets\TopBorrowedBooks;
 use App\Filament\Widgets\UserStats;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -51,6 +55,9 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 UserStats::class,
+                DashboardStats::class,
+                LatestBorrowings::class,
+                TopBooksStats::class,
             ])
             ->middleware([
                 EncryptCookies::class,

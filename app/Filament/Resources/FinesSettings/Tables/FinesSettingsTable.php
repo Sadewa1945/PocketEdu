@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Settings\Tables;
+namespace App\Filament\Resources\FinesSettings\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 
-class SettingsTable
+class FinesSettingsTable
 {
     public static function configure(Table $table): Table
     {

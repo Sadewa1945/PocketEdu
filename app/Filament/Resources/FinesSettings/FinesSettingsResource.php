@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Settings;
+namespace App\Filament\Resources\FinesSettings;
 
-use App\Filament\Resources\Settings\Pages\CreateSetting;
-use App\Filament\Resources\Settings\Pages\EditSetting;
-use App\Filament\Resources\Settings\Pages\ListSettings;
-use App\Filament\Resources\Settings\Schemas\SettingForm;
-use App\Filament\Resources\Settings\Tables\SettingsTable;
-use App\Models\Setting;
+use App\Filament\Resources\FinesSettings\Pages\CreateFinesSettings;
+use App\Filament\Resources\FinesSettings\Pages\EditFinesSettings;
+use App\Filament\Resources\FinesSettings\Pages\ListFinesSettings;
+use App\Filament\Resources\FinesSettings\Schemas\FinesSettingsForm;
+use App\Filament\Resources\FinesSettings\Tables\FinesSettingsTable;
+use App\Models\FinesSettings;
 use BackedEnum;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
@@ -18,12 +18,17 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use UnitEnum;
 
-class SettingResource extends Resource
+class FinesSettingsResource extends Resource
 {
-    protected static ?string $model = Setting::class;
+    protected static ?string $model = FinesSettings::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+
+    protected static string|UnitEnum|null $navigationGroup = 'System';
+
+    protected static ?int $navigationSort = 999;
 
     public static function form(Schema $schema): Schema
     {
@@ -54,7 +59,7 @@ class SettingResource extends Resource
                 ->money('idr')
                 ->sortable(),
         ])->actions([
-                ActionGroup::make([
+                    ActionGroup::make([
                     EditAction::make(),
                     DeleteAction::make(),
                 ])
@@ -74,9 +79,9 @@ class SettingResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListSettings::route('/'),
-            'create' => CreateSetting::route('/create'),
-            'edit' => EditSetting::route('/{record}/edit'),
+            'index' => ListFinesSettings::route('/'),
+            'create' => CreateFinesSettings::route('/create'),
+            'edit' => EditFinesSettings::route('/{record}/edit'),
         ];
     }
 }

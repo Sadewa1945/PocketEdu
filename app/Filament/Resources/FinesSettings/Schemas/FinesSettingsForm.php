@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\Settings\Schemas;
+namespace App\Filament\Resources\FinesSettings\Schemas;
 
 use Filament\Schemas\Schema;
 
-class SettingForm
+class FinesSettingsForm
 {
     public static function configure(Schema $schema): Schema
     {

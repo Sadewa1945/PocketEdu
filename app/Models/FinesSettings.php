@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Setting extends Model
+class FinesSettings extends Model
 {
-    protected $table = 'settings';
+    protected $table = 'fines_settings';
 
     protected $fillable = [
         'key',
