@@ -1,7 +1,21 @@
 import React, { useState } from "react";
 import { Link, useNavigate, Outlet } from "react-router-dom";
 import axios from "axios";
-import { LogOut, Menu, X, User, Home, Book, RotateCw, Undo2, Layers, ChevronDown } from "lucide-react";
+import { 
+    LogOut, 
+    Menu, 
+    X, 
+    User, 
+    Home, 
+    Book, 
+    RotateCw, 
+    Undo2, 
+    Layers, 
+    ChevronDown,
+    Mail,
+    Phone,
+    MapPin,
+    } from "lucide-react";
 
 export default function MainLayout({ user, setUser }) {
     const navigate = useNavigate();
@@ -25,7 +39,7 @@ export default function MainLayout({ user, setUser }) {
     };
 
     return (
-        <div className="min-h-screen w-full bg-gradient-to-br from-green-100 via-white to-emerald-100">
+        <div className="min-h-screen flex flex-col w-full bg-gradient-to-br from-green-100 via-white to-emerald-100">
             {/* Navbar (Copy semua kode Navbar kamu ke sini) */}
             <div className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
@@ -275,10 +289,67 @@ export default function MainLayout({ user, setUser }) {
                 </div>
             </div>
 
-            {/* AREA KONTEN DINAMIS (Ini adalah pengganti @yield('content') dari Blade) */}
-            <main>
+            <main className="flex-grow">
                 <Outlet context={{ user, setUser }} /> 
             </main>
+
+            <footer className="bg-white border-t border-slate-200 mt-auto">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                        <div className="col-span-1 md:col-span-1">
+                            <h2 className="text-2xl font-bold text-green-700 mb-4">
+                                {appName}
+                            </h2>
+                            <p className="text-slate-500 text-sm leading-relaxed">
+                                A modern digital library solution for easier, faster, and more accessible knowledge anywhere.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h3 className="font-semibold text-slate-800 mb-4">
+                                Service
+                            </h3>
+                            <ul className="space-y-2 text-sm text-slate-600">
+                                <li><Link to="/books" className="hover:text-green-600 transition">Books</Link></li>
+                                <li><Link to="/categories" className="hover:text-green-600 transition">Categories</Link></li>
+                                <li><Link to="/borrowing" className="hover:text-green-600 transition">Borrowing</Link></li>
+                                <li><Link to="/return" className="hover:text-green-600 transition">Return</Link></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 className="font-semibold text-slate-800 mb-4">
+                                Contact Us
+                            </h3>
+
+                            <ul className="space-y-3 text-sm text-slate-600">
+                                    <li className="flex items-center gap-2">
+                                        <Mail size={16} className="text-green-600" />
+                                        support@pocketedu.id
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <Phone size={16} className="text-green-600" />
+                                        +62 857 189 44257
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <MapPin size={16} className="text-green-600 mt-1" />
+                                        Alamat
+                                    </li>
+                                </ul>
+                        </div>
+                    </div>
+
+                    <div className="border-t border-slate-100 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p className="text-sm text-slate-400">
+                            © {new Date().getFullYear()} {appName}. All rights reserved.
+                        </p>
+                        <div className="flex gap-6 text-sm text-slate-400">
+                            <a href="#" className="hover:text-slate-600 transition">Privacy Policy</a>
+                            <a href="#" className="hover:text-slate-600 transition">Terms of Service</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 }

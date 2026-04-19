@@ -25,7 +25,7 @@ export default function ReturnForm() {
     useEffect(() => {
         const fetchReturn = async () => {
             try {
-                const res = await axios.get(`/api/borrowing/${id}`);
+                const res = await axios.get(`/api/borrowing/${id}/returns/setup`);
                 setReturnForm(res.data.data || res.data);
 
                 if (res.data.fine_rates) {

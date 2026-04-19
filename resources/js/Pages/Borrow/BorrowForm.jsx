@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useOutletContext } from "react-router-dom";
-import { Calendar, CalendarClock, BookOpen, AlertCircle, Loader2, StickyNote, Hash } from "lucide-react";
+import { Calendar, 
+         CalendarClock, 
+         BookOpen, 
+         AlertCircle, 
+         Loader2, 
+         StickyNote,
+         Hash 
+        } from "lucide-react";
 
 export default function BorrowForm() {
     const { id } = useParams(); 
@@ -16,18 +23,20 @@ export default function BorrowForm() {
     };
 
     const today = new Date();
-    const todayStr = formatDateLocal(today);
-    
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 7); 
-    const tomorrowStr = formatDateLocal(tomorrow);
+    const todayStr = today.toISOString().split('T')[0];
 
     const [formData, setFormData] = useState({
-        quantity: 1,
-        borrowed_at: todayStr,
-        due_at: tomorrowStr,
-        notes: "",
+    borrowed_at: todayStr,
+    due_at: "", 
+    notes: "",
     });
+
+    const getMaxDueDate = (startDate) => {
+    if (!startDate) return "";
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + 7);
+    return date.toISOString().split('T')[0];
+    };
 
     const [bookDetail, setBookDetail] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -42,7 +51,7 @@ export default function BorrowForm() {
                 const res = await axios.get(`/api/books/${id}`);
                 setBookDetail(res.data.data || res.data);
             } catch (err) {
-                setError("Gagal memuat data buku. Pastikan buku tersedia.");
+                setError("Failed to load book data. Make sure the book is available.");
             } finally {
                 setPageLoading(false);
             }
@@ -63,7 +72,6 @@ export default function BorrowForm() {
         try {
             const response = await axios.post("/api/borrow", {
                 book_id: id,
-                quantity: formData.quantity,
                 borrowed_at: formData.borrowed_at,
                 due_at: formData.due_at,
                 notes: formData.notes,
@@ -84,7 +92,7 @@ export default function BorrowForm() {
                 
                 setError(errorMsg);
             } else {
-                setError("Terjadi kesalahan saat memproses pinjaman.");
+                setError("An error occurred while processing the borrow.");
             }
         } finally {
             setLoading(false);
@@ -127,9 +135,9 @@ export default function BorrowForm() {
                     </p>
                     
                     <div className="mt-6 w-full p-4 bg-green-50 rounded-2xl border border-green-100">
-                        <p className="text-sm text-green-800 font-medium">Stok Tersedia</p>
+                        <p className="text-sm text-green-800 font-medium">Available Stock</p>
                         <p className="text-2xl font-bold text-green-600 mt-1">
-                            {bookDetail.available_stock ?? "-"}
+                            {bookDetail.stock ?? "-"}
                         </p>
                     </div>
                 </div>
@@ -143,25 +151,6 @@ export default function BorrowForm() {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Number of Books
-                            </label>
-                            <div className="relative">
-                                <Hash size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                <input
-                                    type="number"
-                                    name="quantity"
-                                    min="1"
-                                    max={bookDetail?.stock?.available_stock || 1}
-                                    value={formData.quantity}
-                                    onChange={handleChange}
-                                    className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition"
-                                    required
-                                />
-                            </div>
-                        </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div>
@@ -171,11 +160,18 @@ export default function BorrowForm() {
                                 <div className="relative">
                                     <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                                     <input
-                                        type="date" 
+                                        type="date"
                                         name="borrowed_at"
                                         min={todayStr}
                                         value={formData.borrowed_at}
-                                        onChange={handleChange}
+                                        onChange={(e) => {
+                                            const newBorrowedAt = e.target.value;
+                                            setFormData({
+                                                ...formData,
+                                                borrowed_at: newBorrowedAt,
+                                                due_at: ""
+                                            });
+                                        }}
                                         className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition"
                                         required
                                     />
@@ -190,7 +186,9 @@ export default function BorrowForm() {
                                     <input
                                         type="date"
                                         name="due_at"
+                                        disabled={!formData.borrowed_at} 
                                         min={formData.borrowed_at} 
+                                        max={getMaxDueDate(formData.borrowed_at)} 
                                         value={formData.due_at}
                                         onChange={handleChange}
                                         className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition"
@@ -212,7 +210,7 @@ export default function BorrowForm() {
                                     maxLength="500"
                                     value={formData.notes}
                                     onChange={handleChange}
-                                    placeholder="Ada catatan khusus untuk pustakawan?"
+                                    placeholder="Any special notes for librarians?"
                                     className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition resize-none"
                                 ></textarea>
                             </div>

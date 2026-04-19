@@ -8,6 +8,12 @@
     
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+
+    <script
+        type="text/javascript"
+        src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="Mid-client-QdQzdZmbypb2JGWX"
+    ></script>
 </head>
 <body>
     <div id="react-app"></div>

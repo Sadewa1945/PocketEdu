@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Borrowing;
 use App\Models\Fine;
+use App\Models\FinesSettings;
 use App\Models\ReturnBook;
-use App\Models\Setting;
-use App\Models\Stock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +25,40 @@ class ReturnController extends Controller
         return response()->json([
             'success' => true,
             'data' => $data
+        ], 200);
+    }
+
+    public function show($id)
+    {
+    
+        $borrowingsBook = Borrowing::with('borrowingsBook')->find($id);
+
+        if (!$borrowingsBook) {
+            return response()->json([
+                'message' => false,
+                'data' => null
+            ], 404);
+        }
+
+        $lateDays = 0;
+        $dueDate = Carbon::parse($borrowingsBook->due_at)->startOfDay();
+        $today = Carbon::now()->startOfDay();
+        
+        if ($today->gt($dueDate)) {
+            $lateDays = (int) $dueDate->diffInDays($today); // Selisih absolut ke masa depan
+        }
+
+        $rates = [
+            'late_fine' => FinesSettings::getValue('late_fine', 2000),
+            'damage_fine' => FinesSettings::getValue('damage_fine', 50000),
+            'lost_fine' => FinesSettings::getValue('lost_fine', 100000),
+        ];
+
+        return response()->json([
+            'message' => true,
+            'data' => $borrowingsBook,
+            'late_days' => $lateDays,
+            'fine_rates' => $rates
         ], 200);
     }
 
@@ -88,24 +121,24 @@ class ReturnController extends Controller
         $returnId = $return->id;
 
         $dueDate = Carbon::parse($borrowing->due_at)->startOfDay();
-        $returnedDate = now()->startOfDay();
+        $returnedDate = Carbon::now()->startOfDay();
 
-        if ($returnedDate->isAfter($dueDate)) {
-            $lateDays = $returnedDate->diffInDays($dueDate);
-            $rateLateFine = Setting::getValue('late_fine', 2000);
+        if ($returnedDate->gt($dueDate)) {
+            $lateDays = (int) $dueDate->diffInDays($returnedDate);
+            $rateLateFine = FinesSettings::getValue('late_fine', 2000);
             
             Fine::create([
                 'return_book_id' => $returnId,
                 'user_id' => $userId,
                 'fine_type' => 'late',
-                'amount' => $lateDays * $rateLateFine,
+                'amount' => $lateDays * $rateLateFine, 
                 'status' => 'unpaid'
             ]);
         }
 
         if ($condition === 'damaged' || $condition === 'lost') {
             $fineType = $condition === 'damaged' ? 'damage' : 'lost';
-            $rateConditionFine = Setting::getValue($fineType . '_fine', $condition === 'damaged' ? 50000 : 100000);
+            $rateConditionFine = FinesSettings::getValue($fineType . '_fine', $condition === 'damaged' ? 50000 : 100000);
 
             Fine::create([
                 'return_book_id' => $returnId,
@@ -117,51 +150,4 @@ class ReturnController extends Controller
         }
     }
 
-    public function approveReturn($id)
-    {
-    $return = ReturnBook::with('borrowing')->findOrFail($id);
-
-    if ($return->status !== 'pending') {
-        return response()->json(['message' => 'Return is not pending'], 400);
-    }
-
-    $return->update([
-        'status' => 'accepted',
-        'returned_at' => \Carbon\Carbon::now(),
-    ]);
-
-    $return->borrowing->update([
-        'status' => 'returned'
-    ]);
-
-    return response()->json([
-        'message' => 'Return approved successfully',
-        'data' => $return
-    ], 200);
-}
-
-    public function rejectReturn($id)
-    {
-        $return = ReturnBook::findOrFail($id);
-
-        if ($return->status !== 'pending') {
-            return response()->json([
-                'message' => 'Return is not pending'
-            ], 400);
-        }
-
-        $return->update([
-            'status' => 'rejected'
-        ]);
-
-        $isOverdue = \Carbon\Carbon::now()->isAfter($return->borrowing->due_at);
-
-        $return->borrowing->update([
-        'status' => $isOverdue ? 'overdue' : 'borrowed'
-        ]);
-
-        return response()->json([
-            'message' => 'Return rejected successfully'
-        ]);
-    }
 }

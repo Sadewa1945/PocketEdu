@@ -48,7 +48,7 @@ export default function BooksDetail() {
 
                                 <div className="flex flex-col">
                                     <div className="w-full h-[300px] md:h-[550px] bg-slate-200 rounded-xl"></div>
-
+                                    
                                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mt-4">
                                         <div className="flex gap-2">
                                             <div className="w-20 h-4 bg-slate-200 rounded"></div>
@@ -57,7 +57,6 @@ export default function BooksDetail() {
 
                                         <div className="w-24 h-8 bg-slate-200 rounded-xl"></div>
                                     </div>
-
                                 </div>
 
                                 <div className="flex flex-col mt-4">
@@ -76,11 +75,8 @@ export default function BooksDetail() {
                                     <div className="h-4 bg-slate-200 rounded w-5/6"></div>
 
                                 </div>
-
                             </div>
-
                             <div className="h-10 bg-slate-200 rounded-xl mt-5"></div>
-
                         </div>
                     )}
                 </div>
@@ -101,9 +97,7 @@ export default function BooksDetail() {
                             >
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                                     <div className="flex flex-col">
-  
                                             <div className="w-full aspect-[3/4] bg-slate-100 overflow-hidden rounded-xl shadow-sm">
                                                 <img
                                                     src={
@@ -117,7 +111,6 @@ export default function BooksDetail() {
                                             </div>
                                         
                                         <div className="flex items-center justify-between mt-4">
-
                                             <div className="flex items-center gap-2">
                                                 <div className="text-yellow-400 text-lg">★★★★☆</div>
                                                 <span className="text-sm text-gray-500">(120)</span>
@@ -127,9 +120,7 @@ export default function BooksDetail() {
                                                 <MessageCircle size={18} />
                                                 Comment
                                             </button>
-
                                         </div>
-                                        
                                     </div>
 
                                     <div className="flex flex-col">
@@ -147,18 +138,14 @@ export default function BooksDetail() {
                                         </p>
 
                                         <div className="flex gap-3 mt-3">
-                
-                                        <span className="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
-                                            Total: {books.total_stock}
-                                        </span>
 
                                         <span className={`px-3 py-1 text-xs font-semibold rounded-full 
-                                            ${books.available_stock > 0 
+                                            ${books.stock > 0 
                                                 ? "bg-green-100 text-green-700" 
                                                 : "bg-red-100 text-red-700"}`}>
                                             
-                                            {books.available_stock > 0 
-                                                ? `Available: ${books.available_stock}` 
+                                            {books.stock > 0 
+                                                ? `Available: ${books.stock}` 
                                                 : "Out of Stock"}
                                         </span>
 
@@ -169,7 +156,6 @@ export default function BooksDetail() {
                                             </p>
                                         </div>
                                     </div>
-
                                 </div>
 
                                 <button 
@@ -181,8 +167,7 @@ export default function BooksDetail() {
                                     [&:hover_svg]:rotate-[-8deg] [&:hover_svg]:scale-110 [&_svg]:transition-transform [&_svg]:duration-200">
                                     <BookOpen size={17} />
                                     Borrow
-                                    </button>
-                                
+                                </button>
                             </div>
                         )}
                     </div>

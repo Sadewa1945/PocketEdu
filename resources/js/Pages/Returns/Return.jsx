@@ -22,6 +22,32 @@ export default function Returns() {
 
     const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
+    const handlePayment = async (returnId) => {
+        try {
+            const response = await axios.post(`/api/payment/token/${returnId}`);
+            const token = response.data.token;
+
+            window.snap.pay(token, {
+                onSuccess: function(result){
+                    alert("Payment successful!");
+                    window.location.reload();
+                },
+                onPending: function(result){
+                    alert("Waiting for your payment!");
+                },
+                onError: function(result){
+                    alert("Payment failed!")
+                },
+                onClose: function(result){
+                    console.log('User closes popup without paying');
+                }
+            });
+        } catch (err) {
+            console.error("Payment error:", err);
+            alert("Failed to initiate payment. Ensure the backend is running properly.")
+        }
+    };
+
     useEffect(() => {
         const fetchReturns = async () => {
             try {
@@ -196,12 +222,14 @@ export default function Returns() {
                                         <div className="mt-2">{getBadge(item.status)}</div>
                                         
                                         {totalFine > 0 && (
-                                            <div className={`mt-3 p-2.5 rounded-lg border flex items-center justify-between max-w-sm ${isUnpaid ? 'bg-red-50 border-red-100' : 'bg-green-50 border-green-100'}`}>
-                                                <div className="flex items-center gap-2">
-                                                    <Receipt size={14} className={isUnpaid ? "text-red-500" : "text-green-500"} />
-                                                    <span className={`text-xs font-medium ${isUnpaid ? "text-red-700" : "text-green-700"}`}>
-                                                        Fine: Rp {totalFine.toLocaleString('id-ID')}
-                                                    </span>
+                                            <div className={`mt-3 p-2.5 rounded-lg border flex flex-col max-w-sm ${isUnpaid ? 'bg-red-50 border-red-100' : 'bg-green-50 border-green-100'}`}>
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-2">
+                                                        <Receipt size={14} className={isUnpaid ? "text-red-500" : "text-green-500"} />
+                                                        <span className={`text-xs font-medium ${isUnpaid ? "text-red-700" : "text-green-700"}`}>
+                                                            Fine: Rp {totalFine.toLocaleString('id-ID')}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${isUnpaid ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
                                                     {isUnpaid ? 'Unpaid' : 'Paid'}
@@ -213,6 +241,14 @@ export default function Returns() {
                                             <p className="text-[10px] text-slate-400 mt-2 italic bg-slate-50 p-1 px-2 rounded w-fit">
                                                 "{item.notes}"
                                             </p>
+                                        )}
+
+                                        {isUnpaid && item.status !== 'rejected' && item.status !== 'pending' &&(
+                                            <button 
+                                            onClick={() => handlePayment(item.id)}
+                                            className="mt-3 w-full py-1.5 cursor-pointer bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-md transition shadow-sm">
+                                                Pay Now
+                                            </button>
                                         )}
                                     </div>
                                 </div>

@@ -290,11 +290,7 @@ export default function Borrowing() {
                                              className="px-4 py-1.5 rounded-lg bg-green-500 text-white text-xs font-medium hover:bg-green-600 transition flex items-center gap-1.5">
                                                 <RotateCcw size={12} /> Return
                                             </button>
-                                            {borrowed && (
-                                                <button className="px-4 py-1.5 rounded-lg border border-blue-400 text-blue-500 text-xs font-medium hover:bg-blue-50 transition flex items-center gap-1.5">
-                                                    <RefreshCw size={12} /> Renew
-                                                </button>
-                                            )}
+                                            
                                         </div>
                                     )}
                                 </div>

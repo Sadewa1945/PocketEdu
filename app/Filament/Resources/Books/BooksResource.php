@@ -77,35 +77,9 @@ class BooksResource extends Resource
             ->required()
             ->label('Category'),
 
-            Section::make('Stock Information')
-            ->schema([
-                Repeater::make('stock')
-                    ->relationship('stock')
-                    ->schema([
-                        TextInput::make('total_stock')
-                            ->label('Total Stock')
-                            ->numeric()
-                            ->required()
-                            ->default(0)
-                            ->live()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                if (($get('available_stock') ?? 0) == 0) {
-                                    $set('available_stock', $state);
-                                }
-                            }),
-
-                        TextInput::make('available_stock')
-                            ->label('Available Stock')
-                            ->numeric()
-                            ->required()
-                            ->default(0),
-                    ])
-                    ->columns(2)
-                    ->defaultItems(1)
-                    ->addable(false)
-                    ->deletable(false)
-                    ->reorderable(false),
-            ]),
+            TextInput::make('stock')
+            ->label('Stock')
+            ->numeric()
 
         ]);
     }
@@ -114,58 +88,53 @@ class BooksResource extends Resource
     {
         return $table->
             columns([
-                ImageColumn::make('cover_image')
-                ->label('Cover')
-                ->disk('public'),
-
                 TextColumn::make('id')
                 ->label('ID')
                 ->sortable(),
 
+                ImageColumn::make('cover_image')
+                ->label('Cover')
+                ->disk('public'),
+
                 TextColumn::make('title')
+                ->label('Book Title')
                 ->sortable()
                 ->searchable(),
-
-                TextColumn::make('author')
-                ->sortable()
-                ->searchable(),
-
-                TextColumn::make('isbn')
-                ->sortable()
-                ->searchable(),
-
-                TextColumn::make('publisher')
-                ->sortable()
-                ->searchable(),
-
-                TextColumn::make('total_stock')
-                ->label('Total Stock')
-                ->sortable(),
-
-                TextColumn::make('available_stock')
-                ->label('Available Stock')
-                ->sortable(),
 
                 TextColumn::make('category.name')
                 ->label('Category')
                 ->sortable()
                 ->searchable(),
 
+                TextColumn::make('author')
+                ->label('Author')
+                ->sortable()
+                ->searchable(),
+
+                TextColumn::make('isbn')
+                ->label('ISBN')
+                ->sortable()
+                ->searchable(),
+
+                TextColumn::make('publisher')
+                ->label('Publisher')
+                ->sortable()
+                ->searchable(),
+
+                TextColumn::make('stock')
+                ->label('Stock'),
+
                 TextColumn::make('published_date')
+                ->label('Published Date')
                 ->date(),
 
-                BadgeColumn::make('stock.status')
-                    ->label('Status')
-                    ->formatStateUsing(fn (string $state): string => match ($state){
-                        'available' => 'Available',
-                        'out_of_stock' => 'Out of Stock',
-                        default => $state,
-                    })
-                    ->color(fn (string $state): string => match ($state){
-                        'available' => 'success',
-                        'out_of_stock' => 'danger',
-                        default => 'gray',
-                    }),
+                BadgeColumn::make('status')
+                ->label('Status')
+                ->getStateUsing(fn (Book $record): string => $record->stock > 0 ? 'Available' : 'Out of Stock')
+                ->colors([
+                    'success' => 'Available',
+                    'danger' => 'Out of Stock' 
+                ])
 
             ])->actions([
             EditAction::make(),

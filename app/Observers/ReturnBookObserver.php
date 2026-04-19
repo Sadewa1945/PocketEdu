@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
+use App\Models\Book;
 use App\Models\ReturnBook;
-use App\Models\Stock;
 use Carbon\Carbon;
 
 class ReturnBookObserver
@@ -19,10 +19,8 @@ class ReturnBookObserver
     public function creating(ReturnBook $returnBook): void
     {
         if ($returnBook->status === 'accepted') {
-            // Jika admin buat langsung accepted, kasih jam sekarang
             $returnBook->returned_at = now();
         } else {
-            // Jika status pending, paksa jam ke 00:00:00 sebelum save
             $returnBook->returned_at = Carbon::parse($returnBook->returned_at)->startOfDay();
         }
     }
@@ -33,25 +31,23 @@ class ReturnBookObserver
     public function updated(ReturnBook $returnBook): void
     {
     
-    // Logika jam saat perubahan status dari pending ke accepted
         if ($returnBook->wasChanged('status') && $returnBook->status === 'accepted') {
             
-            // Update jam ke waktu sekarang jika sebelumnya masih 00:00:00
             if (Carbon::parse($returnBook->returned_at)->format('H:i:s') === '00:00:00') {
                 $returnBook->updateQuietly([
                     'returned_at' => now()
                 ]);
             }
 
-            // --- Logika Stok & Status Peminjaman ---
             $borrowing = $returnBook->borrowing;
             if ($borrowing) {
-                $stock = \App\Models\Stock::where('book_id', $borrowing->book_id)->first();
-                if ($stock) {
-                    $stock->increment('available_stock', $returnBook->quantity_returned);
-                }
+               $book = Book::find($borrowing->book_id);
 
-                $totalAccepted = \App\Models\ReturnBook::where('borrowing_id', $borrowing->id)
+               if ($book){
+                $book->increment('stock', $returnBook->quantity_returned);
+               }
+
+                $totalAccepted = ReturnBook::where('borrowing_id', $borrowing->id)
                     ->where('status', 'accepted')
                     ->sum('quantity_returned');
 

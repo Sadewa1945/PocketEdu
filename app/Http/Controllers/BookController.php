@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use App\Models\borrowing;
+use App\Models\Borrowing;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
     public function index(){
-        $books = Book::with('stock')->get();
+        $books = Book::with('category')->latest()->get();
 
         return response()->json([
             'message' => true,
@@ -18,7 +18,7 @@ class BookController extends Controller
     }
 
     public function show($id){
-        $book = Book::with('stock', 'category')->find($id);
+        $book = Book::with('category')->find($id);
 
         if(!$book){
             return response()->json([

@@ -2,10 +2,10 @@
 
 namespace App\Observers;
 
+use App\Models\Book;
 use App\Models\Borrowing;
-use App\Models\ReturnBook;
-use App\Models\Stock;
 use Carbon\Carbon;
+
 
 class BorrowingObserver
 {
@@ -57,10 +57,10 @@ class BorrowingObserver
     {
          if ($borrowing->isDirty('status') && $borrowing->status === 'borrowed'){
             if ($borrowing->getOriginal('status') !== 'borrowed'){
-                $stock = Stock::where('book_id', $borrowing->book_id)->first();
+                $book = Book::find($borrowing->book_id);
 
-                if ($stock && $stock->available_stock >= $borrowing->quantity) {
-                $stock->decrement('available_stock', $borrowing->quantity);
+                if ($book && $book->stock >= $borrowing->quantity) {
+                $book->decrement('stock', $borrowing->quantity);
                 }
             }
          }
@@ -71,10 +71,10 @@ class BorrowingObserver
      */
     public function deleted(Borrowing $borrowing): void
     {
-        $stock = Stock::where('book_id', $borrowing->book_id)->first();
+        $book = Book::find($borrowing->book_id);
         
-        if ($stock) {
-            $stock->increment('available_stock', $borrowing->quantity);
+        if ($book && $borrowing->status === 'borrowed') {
+            $book->increment('stock', $borrowing->quantity);
         }
     }
 

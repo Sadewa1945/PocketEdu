@@ -152,7 +152,7 @@ export default function BooksOverview() {
                                         </p>
                                     </div>
 
-                                    {book.available_stock > 0 ? (
+                                    {book.stock > 0 ? (
                                         <button 
                                             onClick={() => navigate(`/books/${book.id}`)} 
                                             className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300"

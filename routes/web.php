@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return redirect('/admin/login');
+    return redirect('/login');
 });
 
 Route::middleware('auth')->group(function () {
@@ -28,7 +28,7 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Return');
     })->name('return');
 
-    Route::get('/borrowing/${id}/returns', function(){
+    Route::get('/borrowing/{id}/returns', function(){
         return Inertia::render('ReturnForm');
     })->name('return.create');
 

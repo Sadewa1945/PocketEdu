@@ -276,7 +276,7 @@ export default function Register({ setUser }) {
                                         : "bg-green-600 hover:bg-green-700 active:scale-[0.98]"
                                 }`}
                             >
-                                {loading ? "Memproses..." : "Register"}
+                                {loading ? "process..." : "Register"}
                             </button>
                         </form>
 

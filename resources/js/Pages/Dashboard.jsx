@@ -5,13 +5,14 @@ import {
     BookOpen,
     Library,
     ClipboardList,
+    AlertCircle,
 } from "lucide-react";
 
 export default function Dashboard({ user, setUser }) {
     const navigate = useNavigate();
     const [books, setBooks] = useState([]);
     const [borrowingsCount, setBorrowingsCount] = useState(0);
-    const [categoriesCount, setCategoriesCount] = useState(0);
+    const [overdueCount, setOverdueCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     
@@ -23,6 +24,7 @@ export default function Dashboard({ user, setUser }) {
                 fetchBooks(),
                 fetchBorrowingsCount(),
                 fetchCategoriesCount(),
+                fetchOverdueCount(),
             ]);
         };
         fetchAllData();
@@ -49,6 +51,15 @@ export default function Dashboard({ user, setUser }) {
         }
     };
 
+    const fetchOverdueCount = async () => {
+        try {
+            const res = await axios.get("/api/borrowings/overdue/count");
+            setOverdueCount(res.data.data || 0);
+        } catch (err) {
+            console.error("Fetch overdue count error", err);
+        }
+    };
+
     const fetchCategoriesCount = async () => {
         try {
             const res = await axios.get("/api/categories");
@@ -68,20 +79,18 @@ export default function Dashboard({ user, setUser }) {
 
     const stats = [
         {
-            title: "Total Books",
-            value: books.length,
-            icon: <Library size={28} className="text-green-500" />,
-        },
-        {
             title: "Total Borrowed",
             value: borrowingsCount,
+            valueColor: "text-green-500", 
             icon: <BookOpen size={28} className="text-green-500" />,
         },
         {
-            title: "Total Categories",
-            value: categoriesCount,
-            icon: <ClipboardList size={28} className="text-green-500" />,
+            title: "Overdue",
+            value: overdueCount,
+            valueColor: overdueCount > 0 ? "text-red-500" : "text-slate-400", 
+            icon: <AlertCircle size={28} className={overdueCount > 0 ? "text-red-500 animate-pulse" : "text-slate-400"} />,
         },
+        
     ];
 
     return (
@@ -140,7 +149,7 @@ export default function Dashboard({ user, setUser }) {
                                         <p className="text-slate-500 text-sm">
                                             {item.title}
                                         </p>
-                                        <h3 className="text-2xl sm:text-3xl mt-4 text-green-500 font-bold">
+                                        <h3 className={`text-2xl sm:text-3xl mt-4 font-bold ${item.valueColor}`}>
                                             {item.value}
                                         </h3>
                                     </div>
@@ -194,7 +203,7 @@ export default function Dashboard({ user, setUser }) {
                                         </p>
                                     </div>
 
-                                    {book.available_stock > 0 ?(
+                                    {book.stock > 0 ?(
                                         <button 
                                             onClick={() => navigate(`/books/${book.id}`)} 
                                             className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
@@ -208,6 +217,7 @@ export default function Dashboard({ user, setUser }) {
                                         Out of Stock
                                     </button>
                                     )}
+
                                 </div>
                             ))}
                         </div>
@@ -266,7 +276,7 @@ export default function Dashboard({ user, setUser }) {
                                         </p>
                                     </div>
 
-                                    {book.available_stock > 0 ?(
+                                    {book.stock > 0 ?(
                                         <button 
                                             onClick={() => navigate(`/books/${book.id}`)} 
                                             className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
