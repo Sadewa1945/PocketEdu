@@ -16,6 +16,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -202,7 +204,10 @@ class ReturnResource extends Resource
                 ->label('More')
                 ->icon('heroicon-o-ellipsis-vertical')
                 ->color('gray'),
-            ]);
+            ])
+            ->headerActions([
+                ExportAction::make()->label('Export Excel'),
+        ]);
     }
 
     public static function getRelations(): array

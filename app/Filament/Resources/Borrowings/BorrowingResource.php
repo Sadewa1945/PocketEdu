@@ -26,8 +26,8 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
-
-
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 
 class BorrowingResource extends Resource
 {
@@ -187,7 +187,11 @@ class BorrowingResource extends Resource
                 ->label('More')
                 ->icon('heroicon-o-ellipsis-vertical')
                 ->color('gray'),
-            ]);
+            ])
+
+            ->headerActions([
+            ExportAction::make()->label('Export Excel'),
+        ]);
     }
 
     public static function getRelations(): array

@@ -9,6 +9,8 @@ use App\Models\Category;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -54,6 +56,9 @@ class CategoriesResource extends Resource
             DeleteAction::make()
                 ->modalHeading('Delete Book')
                 ->modalDescription('This action cannot be undone. Are you sure?'),
+        ])
+        ->headerActions([
+            ExportAction::make()->label('Export Excel'),
         ]);
     }
 

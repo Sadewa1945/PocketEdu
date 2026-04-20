@@ -27,6 +27,6 @@ class Fine extends Model
 
     public function fineSetting()
     {
-        return $this->belongsTo(FinesSettings::class, 'fine_type');
+        return $this->belongsTo(FinesSettings::class, 'fine_type_id');
     }
 }

@@ -7,6 +7,8 @@ use App\Filament\Resources\Fines\Pages\EditFine;
 use App\Filament\Resources\Fines\Pages\ListFines;
 use App\Filament\Resources\Fines\Schemas\FineForm;
 use App\Filament\Resources\Fines\Tables\FinesTable;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use App\Models\Fine;
 use App\Models\FinesSettings;
 use App\Models\ReturnBook;
@@ -21,6 +23,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 
@@ -162,7 +165,15 @@ class FineResource extends Resource
                 DeleteAction::make()
                     ->modalHeading('Delete Fine')
                     ->modalDescription('This action cannot be undone. Are you sure?'),
-            ]);
+            ])
+            ->filters([
+                SelectFilter::make('fine_type_id')
+                    ->label('Fine Type')
+                    ->relationship('fineSetting', 'label'),
+            ])
+            ->headerActions([
+            ExportAction::make()->label('Export Excel'),
+        ]);
     }
 
     public static function getRelations(): array

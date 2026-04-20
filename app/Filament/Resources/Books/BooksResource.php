@@ -18,6 +18,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -148,7 +150,10 @@ class BooksResource extends Resource
                 SelectFilter::make('category_id')
                     ->label('Category')
                     ->relationship('category', 'name'),
-            ]);
+            ])
+        ->headerActions([
+            ExportAction::make()->label('Export Excel'),
+        ]);
     }
 
     public static function getRelations(): array

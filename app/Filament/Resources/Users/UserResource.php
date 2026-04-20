@@ -12,6 +12,8 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Image;
 use Filament\Schemas\Schema;
@@ -118,13 +120,15 @@ class UserResource extends Resource
             
         ])
         ->filters([
-
             SelectFilter::make('role')
                 ->options([
                     'admin' => 'Admin',
                     'member' => 'Member',
                 ])
                 ->label('Role'),
+        ])
+        ->headerActions([
+            ExportAction::make()->label('Export Excel'),
         ]);
     }
 
