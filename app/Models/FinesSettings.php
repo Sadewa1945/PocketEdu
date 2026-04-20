@@ -19,4 +19,5 @@ class FinesSettings extends Model
         $setting = self::where('key', $key)->first();
         return $setting ? (int) $setting->value : $default;
     }
+
 }

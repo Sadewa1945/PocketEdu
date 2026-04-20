@@ -8,6 +8,8 @@ use App\Filament\Resources\Fines\Pages\ListFines;
 use App\Filament\Resources\Fines\Schemas\FineForm;
 use App\Filament\Resources\Fines\Tables\FinesTable;
 use App\Models\Fine;
+use App\Models\FinesSettings;
+use App\Models\ReturnBook;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -36,7 +38,7 @@ class FineResource extends Resource
     return $schema->schema([
         Select::make('return_book_id')
             ->relationship('returnBook', 'id')
-            ->label('Return ID / Data Pengembalian')
+            ->label('Return ID')
             ->getOptionLabelFromRecordUsing(fn ($record) => "ID: {$record->id} - Buku: {$record->borrowing->borrowingsBook->title} ({$record->borrowing->borrowingsUser->name})")
             ->searchable()
             ->required()
@@ -44,7 +46,7 @@ class FineResource extends Resource
             ->afterStateUpdated(function ($state, callable $set) {
                 if ($state) {
         
-                    $returnBook = \App\Models\ReturnBook::with('borrowing.borrowingsUser')->find($state);
+                    $returnBook = ReturnBook::with('borrowing.borrowingsUser')->find($state);
                     
                     if ($returnBook && $returnBook->borrowing) {
                         
@@ -57,25 +59,28 @@ class FineResource extends Resource
                 }
             }),
 
-        TextInput::make('borrower_name')
-            ->label('Nama Peminjam')
-            ->disabled() 
-            ->dehydrated(false), 
-
         Select::make('user_id')
             ->relationship('user', 'name')
-            ->label('User ID')
+            ->label('Borrower')
             ->required()
             ->disabled() 
             ->dehydrated(), 
 
         Select::make('fine_type')
-            ->options([
-                'late' => 'Late Fine',
-                'damage' => 'Damage Fine',
-                'lost' => 'Lost Fine',
-            ])
-            ->required(),
+            ->label('Fine Type')
+            ->options(FinesSettings::all()->pluck('label', 'id')) 
+            ->required()
+            ->live() 
+            ->afterStateUpdated(function ($state, callable $set) {
+                if ($state) {
+                    $setting = FinesSettings::find($state);
+                    if ($setting) {
+                        $set('amount', $setting->value);
+                    }
+                } else {
+                    $set('amount', null);
+                }
+            }),
 
         TextInput::make('amount')
             ->numeric()
@@ -112,14 +117,9 @@ class FineResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('fine_type')
-                    ->label('Type')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'late' => 'Late',
-                        'damage' => 'Damage',
-                        'lost' => 'Lost',
-                        default => $state,
-                    }),
+                TextColumn::make('fineSetting.label') 
+                    ->label('Fine Type')
+                    ->sortable(),
 
                 TextColumn::make('amount')
                     ->label('Amount')
@@ -142,12 +142,12 @@ class FineResource extends Resource
             ])
             ->actions([
                 Action::make('pay')
-                    ->label('Lunasi')
+                    ->label('Pay off')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi Pembayaran')
-                    ->modalDescription('Pastikan Anda sudah menerima uang tunai dari peminjam sebelum melanjutkan.')
+                    ->modalHeading('Payment Confirmation')
+                    ->modalDescription('Make sure you have received cash from the borrower before proceeding.')
                     ->action(function (Fine $record) {
                         $record->update([
                             'status' => 'paid',

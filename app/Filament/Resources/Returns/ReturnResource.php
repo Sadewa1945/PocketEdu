@@ -72,6 +72,7 @@ class ReturnResource extends Resource
             TextInput::make('borrower_name')
                 ->label('Borrower Name')
                 ->disabled() 
+                ->required()
                 ->dehydrated(false), 
 
             TextInput::make('quantity_returned')

@@ -34,9 +34,10 @@ class FinesSettingsResource extends Resource
     {
         return $schema->schema([
             TextInput::make('label')
-                ->disabled()
-                ->required()
-                ->columnSpanFull(),
+                ->required(),
+            
+            TextInput::make('key')  
+                ->required(),
                 
             TextInput::make('value')
                 ->label('Nominal (Rp)')
@@ -53,6 +54,8 @@ class FinesSettingsResource extends Resource
             TextColumn::make('id')
                 ->label('Id')
                 ->sortable(),
+            TextColumn::make('key')
+                ->label('Key'),
             TextColumn::make('label')
                 ->searchable(),
             TextColumn::make('value')

@@ -24,4 +24,9 @@ class Fine extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function fineSetting()
+    {
+        return $this->belongsTo(FinesSettings::class, 'fine_type');
+    }
 }

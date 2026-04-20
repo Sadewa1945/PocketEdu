@@ -16,17 +16,18 @@ use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Carbon;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
+
+
 
 class BorrowingResource extends Resource
 {
@@ -62,13 +63,25 @@ class BorrowingResource extends Resource
                 ->label('Quantity')
                 ->numeric()
                 ->default(1)
-                ->required(),
+                ->required()
+                ->disabled(),
 
-            DatePicker::make('borrowed_at')
-                ->label('Borrowed At'),
+           DatePicker::make('borrowed_at')
+                ->label('Borrowed At')
+                ->default(Carbon::today()) 
+                ->minDate(Carbon::today()) 
+                ->live()
+                ->afterStateUpdated(function ($set, $state) {
+                    if ($state) {
+                        $set('due_at', Carbon::parse($state)->addWeek()->toDateString());
+                    }
+                })
+                ->required(),
 
             DatePicker::make('due_at')
                 ->label('Due At')
+                ->minDate(fn ($get) => $get('borrowed_at') ? Carbon::parse($get('borrowed_at'))->toDateString() : Carbon::now()) 
+                ->maxDate(fn ($get) => $get('borrowed_at') ? Carbon::parse($get('borrowed_at'))->addWeek()->toDateString() : null)
                 ->required(),
 
             Textarea::make('notes')
