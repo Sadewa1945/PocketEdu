@@ -70,7 +70,9 @@ class BooksResource extends Resource
             ->image()
             ->directory('books')
             ->disk('public')
-            ->visibility('public'),
+            ->visibility('public')
+            ->maxSize(2048)
+            ->helperText('Upload profile photo (Max. 2MB)'),
 
             Select::make('category_id')
             ->relationship('category', 'name')
@@ -138,7 +140,9 @@ class BooksResource extends Resource
 
             ])->actions([
             EditAction::make(),
-            DeleteAction::make(),
+            DeleteAction::make()
+            ->modalHeading('Delete Book')
+            ->modalDescription('This action cannot be undone. Are you sure?'),
             ])
         ->filters([
                 SelectFilter::make('category_id')

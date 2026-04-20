@@ -43,22 +43,33 @@ class UserResource extends Resource
             ->label('Photo Profile')
             ->image()
             ->directory('profile')
-            ->disk('public'),
+            ->disk('public')
+            ->maxSize(2048)
+            ->helperText('Upload profile photo (Max. 2MB)'),
 
             TextInput::make('name')
             ->required()
+            ->minLength(4)
             ->label('Name'),
 
             TextInput::make('email')
             ->unique()
             ->required()
+            ->email()
             ->label('Email'),
+
+            TextInput::make('phone')
+            ->required()
+            ->minLength(10)
+            ->label('Phone')
+            ->numeric(),
 
             Select::make('role')
             ->options([
                 'admin' => 'Admin',
                 'member' => 'Member',
             ])
+            ->default('member')
             ->required()
             ->label('Role'),
 
@@ -67,7 +78,8 @@ class UserResource extends Resource
             ->dehydrated(fn ($state) => filled($state))
             ->dehydrateStateUsing(fn ($state) => bcrypt($state))
             ->label('Password')
-            ->password(),
+            ->password()
+            ->minLength(8),
         ]);
     }
 
