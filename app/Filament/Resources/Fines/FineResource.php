@@ -12,6 +12,7 @@ use App\Models\FinesSettings;
 use App\Models\ReturnBook;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -157,6 +158,10 @@ class FineResource extends Resource
                     ->hidden(fn (Fine $record) => $record->status === 'paid'),
 
                 EditAction::make(),
+
+                DeleteAction::make()
+                    ->modalHeading('Delete Fine')
+                    ->modalDescription('This action cannot be undone. Are you sure?'),
             ]);
     }
 

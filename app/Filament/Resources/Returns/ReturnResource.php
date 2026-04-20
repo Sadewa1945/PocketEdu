@@ -177,7 +177,6 @@ class ReturnResource extends Resource
                             ->required(),
                     ])
                     ->action(function ($record, array $data) {
-                        // 2. TAMBAHKAN LOGIKA UPDATE PEMINJAMAN DI SINI
                         $record->update([
                             'status' => $data['status'],
                         ]);
@@ -195,7 +194,10 @@ class ReturnResource extends Resource
 
                     EditAction::make(),
 
-                    DeleteAction::make(),
+                    DeleteAction::make()
+                        ->modalHeading('Delete Return')
+                        ->modalDescription('This action cannot be undone. Are you sure?'),
+            
                 ])
                 ->label('More')
                 ->icon('heroicon-o-ellipsis-vertical')

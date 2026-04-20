@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Users\Pages;
 
 use App\Filament\Resources\Users\UserResource;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -15,5 +16,19 @@ class EditUser extends EditRecord
         return [
             DeleteAction::make(),
         ];
+    }
+
+    protected function getSaveFormAction(): Action
+    {
+        return Action::make('save')
+            ->label('Save Changes') 
+            ->requiresConfirmation()
+            ->modalHeading('Confirm Changes')
+            ->modalDescription('Are you sure you want to update this user data?')
+            ->modalSubmitActionLabel('Yes, Update Data')
+            ->modalIcon('heroicon-o-exclamation-triangle')
+            ->modalIconColor('warning')
+            ->color('primary')
+            ->action(fn () => $this->save());
     }
 }

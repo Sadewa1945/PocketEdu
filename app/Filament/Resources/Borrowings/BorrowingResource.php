@@ -179,7 +179,10 @@ class BorrowingResource extends Resource
 
                     EditAction::make(),
 
-                    DeleteAction::make(),
+                    DeleteAction::make()
+                        ->modalHeading('Delete Book')
+                        ->modalDescription('This action cannot be undone. Are you sure?'),
+            
                 ])
                 ->label('More')
                 ->icon('heroicon-o-ellipsis-vertical')

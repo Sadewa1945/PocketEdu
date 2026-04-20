@@ -62,14 +62,17 @@ class FinesSettingsResource extends Resource
                 ->money('idr')
                 ->sortable(),
         ])->actions([
-                    ActionGroup::make([
-                    EditAction::make(),
-                    DeleteAction::make(),
+                ActionGroup::make([
+                EditAction::make(),
+                DeleteAction::make()
+                    ->modalHeading('Delete Fine Settings')
+                    ->modalDescription('This action cannot be undone. Are you sure?'),
+            
                 ])
                 ->label('More')
                 ->icon('heroicon-o-ellipsis-vertical')
                 ->color('gray'),
-            ]);;
+        ]);
     }
 
     public static function getRelations(): array

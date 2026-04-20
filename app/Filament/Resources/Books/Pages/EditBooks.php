@@ -24,7 +24,7 @@ class EditBooks extends EditRecord
             ->label('Save Changes') 
             ->requiresConfirmation()
             ->modalHeading('Confirm Changes')
-            ->modalDescription('Are you sure you want to update this books data?')
+            ->modalDescription('Are you sure you want to update this book data?')
             ->modalSubmitActionLabel('Yes, Update Data')
             ->modalIcon('heroicon-o-exclamation-triangle')
             ->modalIconColor('warning')

@@ -112,7 +112,10 @@ class UserResource extends Resource
         ])
         ->actions([
             EditAction::make(),
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->modalHeading('Delete User')
+                ->modalDescription('This action cannot be undone. Are you sure?'),
+            
         ])
         ->filters([
 
