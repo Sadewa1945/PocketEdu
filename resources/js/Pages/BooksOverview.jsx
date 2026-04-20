@@ -1,51 +1,95 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import {
     BookOpen,
     Search,
+    Filter
 } from "lucide-react";
 
 export default function BooksOverview() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [books, setBooks] = useState([]);
     const [filteredBooks, setFilteredBooks] = useState([]);
     const [search, setSearch] = useState("");
+
+    const [selectedCategory, setSelectedCategory] = useState(location.state?.categoryFromNav || "All");
+    const [categories, setCategories] = useState(["All"]);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
     const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
+    const getCategoryName = (category) => {
+        if (!category) return "Uncategorized";
+        if (typeof category === "object") return category.name || "Uncategorized";
+        if (typeof category === "string") return category;
+        return "Uncategorized";
+    };
+
     useEffect(() => {
-        fetchBooks();
+        fetchAllData();
     }, []);
 
     useEffect(() => {
-        const filtered = books.filter((book) =>
-            `${book.title} ${book.author} ${book.publisher}`
-                .toLowerCase()
-                .includes(search.toLowerCase())
-        );
-        setFilteredBooks(filtered);
-    }, [search, books]);
+        const filtered = books.filter((book) => {
+            const searchString = `${book.title || ''} ${book.author || ''} ${book.publisher || ''}`.toLowerCase();
+            const matchesSearch = searchString.includes(search.toLowerCase());
 
-    const fetchBooks = async () => {
+            const bookCategory = getCategoryName(book.category);
+            const matchesCategory = selectedCategory === "All" || bookCategory === selectedCategory;
+
+            return matchesSearch && matchesCategory;
+        });
+        setFilteredBooks(filtered);
+    }, [search, selectedCategory, books]);
+
+    const fetchAllData = async () => {
         try {
             setLoading(true);
-            const res = await axios.get("/api/books");
-            const bookData = Array.isArray(res.data)
-                ? res.data
-                : res.data.data || [];
+
+            const booksRes = await axios.get("/api/books");
+            const bookData = Array.isArray(booksRes.data) 
+                ? booksRes.data 
+                : booksRes.data.data || [];
 
             const sortedBooks = [...bookData].reverse();
             setBooks(sortedBooks);
             setFilteredBooks(sortedBooks);
+
+            try {
+                const catRes = await axios.get("/api/categories");
+                const catData = Array.isArray(catRes.data) 
+                    ? catRes.data 
+                    : catRes.data.data || [];
+
+                if (catData.length > 0) {
+                    const catNames = catData.map(c => c.name);
+                    setCategories(["All", ...catNames]);
+                } else {
+                    extractCategoriesFromBooks(bookData);
+                }
+            } catch (catErr) {
+                console.warn("API Kategori tidak ditemukan, menggunakan fallback.", catErr);
+                extractCategoriesFromBooks(bookData);
+            }
+
         } catch (err) {
             console.error("Fetch books error", err);
             setError("Failed to fetch books. Please try again later.");
         } finally {
             setLoading(false);
         }
+    };
+
+    const extractCategoriesFromBooks = (dataBuku) => {
+        const uniqueCategories = [
+            "All",
+            ...new Set(dataBuku.map(book => getCategoryName(book.category)))
+        ];
+        setCategories(uniqueCategories);
     };
 
     return (
@@ -60,19 +104,41 @@ export default function BooksOverview() {
                         </p>
                     </div>
 
-                    {/* Search */}
-                    <div className="relative w-full md:w-80">
-                        <Search
-                            size={18}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                        />
-                        <input
-                            type="text"
-                            placeholder="Search books..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
+                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        
+                        {/* Dropdown Filter */}
+                        <div className="relative w-full sm:w-48 text-slate-700">
+                            <select
+                                value={selectedCategory}
+                                onChange={(e) => setSelectedCategory(e.target.value)}
+                                className="w-full appearance-none pl-4 pr-10 py-3 rounded-2xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
+                            >
+                                {categories.map((cat, index) => (
+                                    <option key={index} value={cat}>
+                                        {cat}
+                                    </option>
+                                ))}
+                            </select>
+                            <Filter 
+                                size={16} 
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                            />
+                        </div>
+
+                        {/* Search */}
+                        <div className="relative w-full md:w-80">
+                            <Search
+                                size={18}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Search books..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            />
+                        </div>
                     </div>
                 </div>
 

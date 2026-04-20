@@ -46,6 +46,11 @@ export default function Category({ user, setUser }) {
         fetchCategories();
     }, []);
 
+    const handleCategoryClick = (categoryData) => {
+        const categoryName = categoryData.name || categoryData.category_name;
+        navigate('/books', { state: { categoryFromNav: categoryName } });
+    };
+
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -78,17 +83,12 @@ export default function Category({ user, setUser }) {
             {loading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {[...Array(6)].map((_, i) => (
-                        <div
-                            key={i}
-                            className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 animate-pulse"
-                        >
+                        <div key={i} className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 animate-pulse">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="w-12 h-12 rounded-2xl bg-slate-200"></div>
                                 <div className="w-12 h-6 rounded-full bg-slate-200"></div>
                             </div>
-
                             <div className="h-6 bg-slate-200 rounded-md w-1/2 mb-3"></div>
-
                             <div className="h-4 bg-slate-200 rounded-md w-full mb-2"></div>
                             <div className="h-4 bg-slate-200 rounded-md w-3/4"></div>
                         </div>
@@ -111,7 +111,8 @@ export default function Category({ user, setUser }) {
                     {filteredCategories.map((category, index) => (
                         <div
                             key={category.id || index}
-                            className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 hover:shadow-md transition"
+                            onClick={() => handleCategoryClick(category)}
+                            className="cursor-pointer bg-white rounded-3xl border border-slate-200 shadow-sm p-6 hover:shadow-lg hover:border-green-300 transition-all duration-300 transform hover:-translate-y-1" // <-- Tambah cursor-pointer dan efek hover
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <div className="w-12 h-12 rounded-2xl bg-green-100 flex items-center justify-center">
@@ -126,10 +127,6 @@ export default function Category({ user, setUser }) {
                             <h3 className="text-xl font-bold text-slate-800 mb-2">
                                 {category.name || category.category_name || "Unnamed Category"}
                             </h3>
-
-                            <p className="text-sm text-slate-500">
-                                {category.description || "No description available."}
-                            </p>
                         </div>
                     ))}
                 </div>
