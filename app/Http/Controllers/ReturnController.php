@@ -45,7 +45,7 @@ class ReturnController extends Controller
         $today = Carbon::now()->startOfDay();
         
         if ($today->gt($dueDate)) {
-            $lateDays = (int) $dueDate->diffInDays($today); // Selisih absolut ke masa depan
+            $lateDays = (int) $dueDate->diffInDays($today);
         }
 
         $rates = [

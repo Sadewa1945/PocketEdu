@@ -60,7 +60,7 @@ class BorrowController extends Controller
         $user = $request->user();
 
         $count = Borrowing::where('user_id', $user->id)
-            ->whereIn('status', ['borrowed', 'returned']) 
+            ->whereIn('status', 'borrowed') 
             ->count();
 
         return response()->json([

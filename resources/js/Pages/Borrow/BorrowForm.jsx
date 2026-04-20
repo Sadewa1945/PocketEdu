@@ -131,6 +131,9 @@ export default function BorrowForm() {
                         {bookDetail?.title || "Judul Buku"}
                     </h3>
                     <p className="text-slate-500 mt-1 text-sm">
+                        {bookDetail?.publisher || "Publisher"}
+                    </p>
+                    <p className="text-slate-500 mt-1 text-sm">
                         {bookDetail?.author || "Penulis"}
                     </p>
                     

@@ -13,7 +13,7 @@ class ReturnBookObserver
      */
     public function created(ReturnBook $returnBook): void
     {
-        
+       // 
     }
 
     public function creating(ReturnBook $returnBook): void
@@ -30,22 +30,23 @@ class ReturnBookObserver
      */
     public function updated(ReturnBook $returnBook): void
     {
-    
         if ($returnBook->wasChanged('status') && $returnBook->status === 'accepted') {
             
-            if (Carbon::parse($returnBook->returned_at)->format('H:i:s') === '00:00:00') {
+            if ($returnBook->returned_at && Carbon::parse($returnBook->returned_at)->format('H:i:s') === '00:00:00') {
                 $returnBook->updateQuietly([
                     'returned_at' => now()
                 ]);
             }
 
             $borrowing = $returnBook->borrowing;
+            
             if ($borrowing) {
-               $book = Book::find($borrowing->book_id);
+                
+                $book = $borrowing->borrowingsBook; 
 
-               if ($book){
-                $book->increment('stock', $returnBook->quantity_returned);
-               }
+                if ($book) {
+                    $book->increment('stock', $returnBook->quantity_returned);
+                }
 
                 $totalAccepted = ReturnBook::where('borrowing_id', $borrowing->id)
                     ->where('status', 'accepted')

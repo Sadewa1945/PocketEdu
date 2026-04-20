@@ -197,15 +197,12 @@ export default function Borrowing() {
 
             {/* Loading */}
             {loading && (
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {[...Array(4)].map((_, i) => (
-                        <div key={i} className="bg-white p-4 rounded-xl border border-slate-100 animate-pulse flex gap-4">
-                            <div className="w-14 h-20 bg-slate-200 rounded-lg flex-shrink-0" />
-                            <div className="flex-1 space-y-2 py-1">
-                                <div className="w-2/3 h-4 bg-slate-200 rounded" />
-                                <div className="w-1/3 h-3 bg-slate-200 rounded" />
-                                <div className="w-1/4 h-3 bg-slate-200 rounded" />
-                            </div>
+                        <div key={i} className="bg-white p-4 rounded-2xl border border-slate-100 animate-pulse">
+                            <div className="aspect-[3/4] bg-slate-200 rounded-xl mb-4" />
+                            <div className="h-4 bg-slate-200 rounded w-2/3 mb-2" />
+                            <div className="h-3 bg-slate-200 rounded w-1/3" />
                         </div>
                     ))}
                 </div>
@@ -229,7 +226,7 @@ export default function Borrowing() {
 
             {/* List */}
             {!loading && !error && filteredBorrowings.length > 0 && (
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {filteredBorrowings.map((item) => {
                         const overdue = isOverdue(item);
                         const returned = isReturned(item);
@@ -242,57 +239,55 @@ export default function Borrowing() {
                         return (
                             <div
                                 key={item.id}
-                                className={`bg-white w-full rounded-xl border flex justify-between p-4 transition ${
-                                    returned
-                                        ? "opacity-60 border-slate-100"
-                                        : overdue
-                                        ? "border-red-200"
-                                        : "border-slate-100 hover:border-slate-200"
+                                className={`bg-white rounded-2xl border overflow-hidden flex flex-col transition shadow-sm hover:shadow-md ${
+                                    returned ? "opacity-75 grayscale-[0.5] border-slate-100" : overdue ? "border-red-200" : "border-slate-100"
                                 }`}
                             >
-                                <div className="flex gap-4 min-w-0">
+                                <div className="relative aspect-[3/4] overflow-hidden bg-slate-50">
                                     <img
                                         src={`${apiUrl}/storage/${item.borrowings_book?.cover_image}`}
                                         alt={item.borrowings_book?.title}
-                                        className="w-14 h-20 object-cover rounded-lg flex-shrink-0"
+                                        className="w-full h-full object-cover"
                                     />
-                                    <div className="min-w-0">
-                                        <h3 className="font-semibold text-slate-800 truncate">
-                                            {item.borrowings_book?.title}
-                                        </h3>
-                                        <p className="text-xs text-slate-400 mt-0.5">
-                                            {item.borrowings_book?.author}
-                                        </p>
-                                        <div className="mt-2">{getBadge(item)}</div>
-                                        {(borrowed || overdue) && (
-                                            <p className={`text-xs mt-1 font-medium ${overdue ? "text-red-500" : "text-blue-500"}`}>
-                                                {getCountdown(item.due_at)}
-                                            </p>
-                                        )}
+                                    <div className="absolute top-2 right-2">
+                                        {getBadge(item)}
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col items-end justify-between ml-4 flex-shrink-0">
-                                    <div className="text-right">
-                                        <p className="text-xs text-slate-400">Due date</p>
-                                        <p className={`text-xs font-semibold mt-0.5 ${overdue ? "text-red-500" : "text-slate-700"}`}>
-                                            {new Date(item.due_at).toLocaleDateString("en-US", {
-                                                day: "numeric",
-                                                month: "short",
-                                                year: "numeric",
-                                            })}
-                                        </p>
-                                    </div>
-                                    {(borrowed || overdue) && (
-                                        <div className="flex flex-col gap-1.5 mt-3">
-                                            <button
-                                             onClick={() => navigate(`/borrowing/${item.id}/returns`)}
-                                             className="px-4 py-1.5 rounded-lg bg-green-500 text-white text-xs font-medium hover:bg-green-600 transition flex items-center gap-1.5">
-                                                <RotateCcw size={12} /> Return
-                                            </button>
-                                            
+                                <div className="p-4 flex flex-col flex-1">
+                                    <h3 className="font-bold text-slate-800 text-sm line-clamp-2 min-h-[25px]">
+                                        {item.borrowings_book?.title}
+                                    </h3>
+                                    <p className="text-[11px] text-slate-400 mt-1 truncate">
+                                        {item.borrowings_book?.publisher}
+                                    </p>
+                                    <p className="text-[11px] text-slate-400 mt-1 truncate">
+                                        {item.borrowings_book?.author}
+                                    </p>
+
+                                    <div className="mt-4 pt-3 border-t border-slate-50 space-y-3">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Due Date</span>
+                                            <span className={`text-[11px] font-bold ${overdue ? "text-red-500" : "text-slate-700"}`}>
+                                                {new Date(item.due_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                                            </span>
                                         </div>
-                                    )}
+
+                                        {(borrowed || overdue) && (
+                                            <div className={`text-center py-1.5 rounded-lg text-[10px] font-bold ${overdue ? "bg-red-50 text-red-600" : "bg-blue-50 text-blue-600"}`}>
+                                                {getCountdown(item.due_at)}
+                                            </div>
+                                        )}
+
+                                        {(borrowed || overdue) && (
+                                            <button
+                                                onClick={() => navigate(`/borrowing/${item.id}/returns`)}
+                                                className="w-full py-2 rounded-xl bg-green-500 text-white text-xs font-bold hover:bg-green-600 transition flex items-center justify-center gap-2"
+                                            >
+                                                <RotateCcw size={14} /> Return
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         );

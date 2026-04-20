@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FineController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/borrowing/{id}', [BorrowController::class, 'show'])->where('id', '[0-9]+');
 
     Route::get('/return', [ReturnController::class, 'index']);
+
+    Route::get('/fines/stats', [FineController::class, 'getAmount']);
 
     Route::get('/books/{id}', [BookController::class, 'show']);
 

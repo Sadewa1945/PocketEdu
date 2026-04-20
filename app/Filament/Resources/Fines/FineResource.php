@@ -32,45 +32,76 @@ class FineResource extends Resource
     protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
-    {
-        return $schema->schema([
-                Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->label('Borrower')
-                    ->searchable()
-                    ->required(),
+{
+    return $schema->schema([
+        Select::make('return_book_id')
+            ->relationship('returnBook', 'id')
+            ->label('Return ID / Data Pengembalian')
+            ->getOptionLabelFromRecordUsing(fn ($record) => "ID: {$record->id} - Buku: {$record->borrowing->borrowingsBook->title} ({$record->borrowing->borrowingsUser->name})")
+            ->searchable()
+            ->required()
+            ->live()
+            ->afterStateUpdated(function ($state, callable $set) {
+                if ($state) {
+        
+                    $returnBook = \App\Models\ReturnBook::with('borrowing.borrowingsUser')->find($state);
+                    
+                    if ($returnBook && $returnBook->borrowing) {
+                        
+                        $set('user_id', $returnBook->borrowing->user_id);
+                        $set('borrower_name', $returnBook->borrowing->borrowingsUser->name);
+                    }
+                } else {
+                    $set('user_id', null);
+                    $set('borrower_name', null);
+                }
+            }),
 
-                Select::make('return_book_id')
-                    ->relationship('returnBook', 'id')
-                    ->label('Return ID')
-                    ->searchable()
-                    ->required(),
+        TextInput::make('borrower_name')
+            ->label('Nama Peminjam')
+            ->disabled() 
+            ->dehydrated(false), 
 
-                Select::make('fine_type')
-                    ->options([
-                        'late' => 'Late Fine',
-                        'damage' => 'Damage Fine',
-                        'lost' => 'Lost Fine',
-                    ])
-                    ->required(),
+        Select::make('user_id')
+            ->relationship('user', 'name')
+            ->label('User ID')
+            ->required()
+            ->disabled() 
+            ->dehydrated(), 
 
-                TextInput::make('amount')
-                    ->numeric()
-                    ->prefix('Rp')
-                    ->required(),
+        Select::make('fine_type')
+            ->options([
+                'late' => 'Late Fine',
+                'damage' => 'Damage Fine',
+                'lost' => 'Lost Fine',
+            ])
+            ->required(),
 
-                Select::make('status')
-                    ->options([
-                        'unpaid' => 'Unpaid',
-                        'paid' => 'Paid',
-                    ])
-                    ->default('unpaid')
-                    ->required(),
+        TextInput::make('amount')
+            ->numeric()
+            ->prefix('Rp')
+            ->required(),
 
-                DateTimePicker::make('paid_at')
-                    ->label('Paid At'),
-            ]);
-    }
+        Select::make('status')
+            ->options([
+                'unpaid' => 'Unpaid',
+                'paid' => 'Paid',
+            ])
+            ->default('unpaid')
+            ->required()
+            ->live()
+            ->afterStateUpdated(function ($state, callable $set) {
+                if ($state === 'paid') {
+                    $set('paid_at', now());
+                } else {
+                    $set('paid_at', null);
+                }
+            }),
+
+        DateTimePicker::make('paid_at')
+            ->label('Paid At'),
+    ]);
+}
 
     public static function table(Table $table): Table
     {
@@ -92,7 +123,7 @@ class FineResource extends Resource
 
                 TextColumn::make('amount')
                     ->label('Amount')
-                    ->money('idr') // Format rupiah otomatis
+                    ->money('idr')
                     ->sortable(),
 
                 TextColumn::make('status')
@@ -110,7 +141,6 @@ class FineResource extends Resource
                     ->sortable(),
             ])
             ->actions([
-                // TOMBOL LUNASI DENDA
                 Action::make('pay')
                     ->label('Lunasi')
                     ->icon('heroicon-o-check-circle')

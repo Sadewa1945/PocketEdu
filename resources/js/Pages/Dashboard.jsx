@@ -6,6 +6,7 @@ import {
     Library,
     ClipboardList,
     AlertCircle,
+    CircleDollarSign
 } from "lucide-react";
 
 export default function Dashboard({ user, setUser }) {
@@ -13,6 +14,7 @@ export default function Dashboard({ user, setUser }) {
     const [books, setBooks] = useState([]);
     const [borrowingsCount, setBorrowingsCount] = useState(0);
     const [overdueCount, setOverdueCount] = useState(0);
+    const [fineAmount, setFineAmount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     
@@ -20,13 +22,21 @@ export default function Dashboard({ user, setUser }) {
 
     useEffect(() => {
         const fetchAllData = async () => {
-            await Promise.all([
-                fetchBooks(),
-                fetchBorrowingsCount(),
-                fetchCategoriesCount(),
-                fetchOverdueCount(),
-            ]);
+            try {
+                await Promise.all([
+                    fetchBooks(),
+                    fetchBorrowingsCount(),
+                    fetchOverdueCount(),
+                    fetchFineAmount(),
+                ]);
+            } catch (err) {
+                console.error("Gagal mengambil data dashboard:", err);
+                setError("Gagal memuat data dashboard.");
+            } finally {
+                setLoading(false);
+            }
         };
+
         fetchAllData();
     }, []);
 
@@ -60,19 +70,21 @@ export default function Dashboard({ user, setUser }) {
         }
     };
 
-    const fetchCategoriesCount = async () => {
+    const fetchFineAmount = async () => {
         try {
-            const res = await axios.get("/api/categories");
-            const categories = Array.isArray(res.data)
-                ? res.data
-                : res.data.data || [];
-            setCategoriesCount(categories.length);
+            const res = await axios.get("/api/fines/stats");
+            console.log("Response Fine API:", res.data);
+
+            let amount = res.data?.data !== undefined ? res.data.data : res.data;
+            
+            setFineAmount(Number(amount) || 0); 
         } catch (err) {
-            console.error("Fetch categories count error", err);
-        } finally {
-            setLoading(false);
+            console.error("Fetch fine amount count error", err);
+            setFineAmount(0); 
         }
     };
+
+    
 
     const latestBooks = [...books].slice(-4).reverse();
     const allBooks = [...books].slice(0, 20).reverse();
@@ -82,13 +94,19 @@ export default function Dashboard({ user, setUser }) {
             title: "Total Borrowed",
             value: borrowingsCount,
             valueColor: "text-green-500", 
-            icon: <BookOpen size={28} className="text-green-500" />,
+            icon: <BookOpen size={28} className="text-green-500 animate-pulse" />,
         },
         {
             title: "Overdue",
             value: overdueCount,
-            valueColor: overdueCount > 0 ? "text-red-500" : "text-slate-400", 
-            icon: <AlertCircle size={28} className={overdueCount > 0 ? "text-red-500 animate-pulse" : "text-slate-400"} />,
+            valueColor: "text-red-500", 
+            icon: <AlertCircle size={28} className="text-red-500 animate-pulse"  />,
+        },
+        {
+            title: "Fine Amount",
+            value: `Rp ${Number(fineAmount).toLocaleString("id-ID")}`,
+            valueColor: "text-red-500", 
+            icon: <CircleDollarSign size={28} className="text-red-500 animate-pulse" />,
         },
         
     ];

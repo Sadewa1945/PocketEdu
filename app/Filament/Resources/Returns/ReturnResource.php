@@ -37,49 +37,49 @@ class ReturnResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $schema): Schema
+   public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-
-            Select::make('user_filter')
-                ->label('Filter User')
-                ->options(
-                    User::pluck('name', 'id')
-                )
-                ->searchable()
-                ->live()
-                ->afterStateUpdated(function ($state, callable $set) {
-                    $set('borrowing_id', null);
-                }),
-
+            
             Select::make('borrowing_id')
-                ->label('Borrowed Book')
-                ->options(function (Get $get) {
-
-                    $query = Borrowing::with('borrowingsBook', 'borrowingsUser')
-                        ->whereIn('status', ['borrowed', 'overdue']);
-
-                    if ($get('user_filter')) {
-                        $query->where('user_id', $get('user_filter'));
-                    }
-
-                    $borrowings = $query->get();
-
-                    return $borrowings->mapWithKeys(function ($item) {
-                        return [
-                            $item->id => $item->borrowingsBook->title . ' - ' . $item->borrowingsUser->name
-                        ];
-                    });
+                ->label('Select Borrowing (Book)')
+                ->options(function () {
+                    return Borrowing::with('borrowingsBook', 'borrowingsUser')
+                        ->whereIn('status', ['borrowed', 'overdue'])
+                        ->get()
+                        ->mapWithKeys(function ($item) {
+                            return [
+                                $item->id => "{$item->borrowingsBook->title} - {$item->borrowingsUser->name}"
+                            ];
+                        });
                 })
                 ->searchable()
-                ->required(),
+                ->required()
+                ->live() 
+                ->afterStateUpdated(function ($state, callable $set) {
+                    if ($state) {
+                        $borrowing = Borrowing::with('borrowingsUser')->find($state);
+                        if ($borrowing) {
+                            $set('borrower_name', $borrowing->borrowingsUser->name);
+                            $set('quantity_returned', $borrowing->quantity);
+                        }
+                    } else {
+                        $set('borrower_name', null);
+                        $set('quantity_returned', 1);
+                    }
+                }),
+
+            TextInput::make('borrower_name')
+                ->label('Borrower Name')
+                ->disabled() 
+                ->dehydrated(false), 
 
             TextInput::make('quantity_returned')
                 ->label('Quantity Returned')
                 ->numeric()
-                ->default(1)
-                ->minValue(1)
+                ->disabled()
                 ->required()
+                ->minValue(1)
                 ->rules([
                     function (Get $get, ?\Illuminate\Database\Eloquent\Model $record) {
                         return function (string $attribute, $value, \Closure $fail) use ($get, $record) {
@@ -89,24 +89,19 @@ class ReturnResource extends Resource
                             $borrowing = Borrowing::find($borrowingId);
                             if (!$borrowing) return;
 
-                            $query = ReturnBook::where('borrowing_id', $borrowingId)
-                                ->whereIn('status', ['pending', 'accepted']);
-
-                            if ($record) {
-                                $query->where('id', '!=', $record->id);
-                            }
-
-                            $alreadyReturned = $query->sum('quantity_returned');
+                            $alreadyReturned = ReturnBook::where('borrowing_id', $borrowingId)
+                                ->whereIn('status', ['pending', 'accepted'])
+                                ->when($record, fn($q) => $q->where('id', '!=', $record->id))
+                                ->sum('quantity_returned');
 
                             if (($alreadyReturned + $value) > $borrowing->quantity) {
                                 $sisa = $borrowing->quantity - $alreadyReturned;
-                                $fail("The quantity has exceeded the limit. The remaining books that have not been returned are only {$sisa} books.");
+                                $fail("Jumlah melebihi batas. Sisa buku yang belum kembali: {$sisa}.");
                             }
                         };
                     }
                 ]),
 
-            // 1. DIUBAH MENJADI SELECT (ENUM)
             Select::make('return_condition')
                 ->label('Return Condition')
                 ->options([
@@ -116,12 +111,9 @@ class ReturnResource extends Resource
                 ])
                 ->default('good')
                 ->required(),
-            
-            Textarea::make('notes')
-                ->label('Notes'),
-
-            Hidden::make('returned_at')
-                ->default(now()),
+                
+            Textarea::make('notes')->label('Notes'),
+            Hidden::make('returned_at')->default(now()),
         ]);
     }
 

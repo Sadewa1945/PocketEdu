@@ -134,15 +134,13 @@ export default function ReturnForm() {
                         {bookData?.title || "Judul Buku"}
                     </h3>
                     <p className="text-slate-500 mt-1 text-sm">
+                        {bookData?.publisher || "Publisher"}
+                    </p>
+                    <p className="text-slate-500 mt-1 text-sm">
                         {bookData?.author || "Penulis"}
                     </p>
                     
-                    <div className="mt-6 w-full p-4 bg-green-50 rounded-2xl border border-green-100">
-                        <p className="text-sm text-green-800 font-medium">Borrowed Book</p>
-                        <p className="text-2xl font-bold text-green-600 mt-1">
-                            {returnForm.quantity ?? "-"}
-                        </p>
-                    </div>
+                    
                 </div>
 
                 <div className="w-full md:w-3/5 p-6 sm:p-8">
@@ -155,24 +153,7 @@ export default function ReturnForm() {
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Number of Books
-                            </label>
-                            <div className="relative">
-                                <Hash size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                <input
-                                    type="number"
-                                    name="quantity_returned"
-                                    min="1"
-                                    max={returnForm?.quantity || 1}
-                                    value={formData.quantity_returned}
-                                    onChange={handleChange}
-                                    className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition"
-                                    required
-                                />
-                            </div>
-                        </div>
+                        
 
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">
