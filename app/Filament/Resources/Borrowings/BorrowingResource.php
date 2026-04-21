@@ -64,7 +64,8 @@ class BorrowingResource extends Resource
                 ->numeric()
                 ->default(1)
                 ->required()
-                ->disabled(),
+                ->disabled()
+                ->dehydrated(),
 
            DatePicker::make('borrowed_at')
                 ->label('Borrowed At')
@@ -98,12 +99,15 @@ class BorrowingResource extends Resource
 
                     return [
                         'pending' => 'Pending',
+                        'accepted' => 'Accepted',
                         'prepared' => 'Prepared',
                         'ready_to_pickup' => 'Ready to Pickup',
                         'borrowed' => 'Borrowed',
+                        'overdue' => 'Overdue'
                     ];
                 })
                 ->disabled(fn ($record) => $record?->status === 'returned')
+                ->default('borrowed')
                 ->required(),
 
         ]);
@@ -164,6 +168,7 @@ class BorrowingResource extends Resource
                         Select::make('status')
                             ->options([
                                 'pending' => 'Pending',
+                                'accepted' => 'Accepted',
                                 'prepared' => 'Prepared',
                                 'ready_to_pickup' => 'Ready to Pickup',
                                 'borrowed' => 'Borrowed',

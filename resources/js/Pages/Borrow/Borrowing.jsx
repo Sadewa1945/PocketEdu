@@ -39,6 +39,8 @@ export default function Borrowing() {
                 filtered = filtered.filter((item) => item.status === "borrowed");
             }else if (activeTab === "pending") {
                 filtered = filtered.filter((item) => item.status === "pending");
+            }else if (activeTab === "accepted") {
+                filtered = filtered.filter((item) => item.status === "accepted");
             }else if (activeTab === "prepared") {
                 filtered = filtered.filter((item) => item.status === "prepared");
             }else if (activeTab === "ready_to_pickup") {
@@ -92,6 +94,7 @@ export default function Borrowing() {
     const isReturned = (item) => item.status === "returned";
     const isBorrowed = (item) => item.status === "borrowed";
     const isPending = (item) => item.status === "pending";
+    const isAccepted = (item) => item.status === "accepted";
     const isPrepared = (item) => item.status === "prepared";
     const isReadytoPickup = (item) => item.status === "ready_to_pickup";
     const isWaitingToBeReturned = (item) => item.status === "waiting_to_be_returned";
@@ -115,7 +118,9 @@ export default function Borrowing() {
             case "pending":
                 return <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-600">Pending</span>;
             case "prepared":
-                return <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">Prepared</span>;
+                return <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-yellow-600">Prepared</span>;
+            case "accepted":
+                return <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">Accepted</span>;
             case "ready_to_pickup":
                 return <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-600">Ready to Pick Up</span>;
             default:
@@ -174,6 +179,7 @@ export default function Borrowing() {
                 {[
                     { key: "all", label: "All" },
                     { key: "pending", label: "Pending" },
+                    { key: "accepted", label: "Accepted" },
                     { key: "prepared", label: "Prepared" },
                     { key: "ready_to_pickup", label: "Ready to Pickup" },
                     { key: "borrowed", label: "Borrowed" },
@@ -232,6 +238,7 @@ export default function Borrowing() {
                         const returned = isReturned(item);
                         const borrowed = isBorrowed(item);
                         const pending = isPending(item);
+                        const accepted = isAccepted(item);
                         const prepare = isPrepared(item);
                         const ready_to_pickup = isReadytoPickup(item);
                         const waiting_to_be_returned = isWaitingToBeReturned(item);
