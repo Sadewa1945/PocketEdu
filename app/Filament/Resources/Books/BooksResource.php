@@ -11,7 +11,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -92,8 +91,9 @@ class BooksResource extends Resource
     {
         return $table->
             columns([
-                TextColumn::make('id')
-                ->label('ID')
+                TextColumn::make('nomor')
+                ->label('nomor')
+                ->rowIndex()
                 ->sortable(),
 
                 ImageColumn::make('cover_image')

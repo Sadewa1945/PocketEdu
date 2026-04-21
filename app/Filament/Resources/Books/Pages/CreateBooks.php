@@ -22,4 +22,28 @@ class CreateBooks extends CreateRecord
             ->color('primary')
             ->action(fn () => $this->create());
     }
+
+    protected function getFormActions(): array
+    {
+        return [
+            parent::getCreateFormAction(),
+
+            Action::make('createAndCopy')
+                ->label('Create & Next Series Input')
+                ->color('success')
+                ->action(function () {
+            
+                    $data = $this->form->getState();
+
+                    $this->create(another: true);
+
+                    $data['published_date'] = null;
+                    $data['isbn'] = null; 
+
+                    $this->form->fill($data);
+                }),
+
+            parent::getCancelFormAction(),
+        ];
+    }
 }

@@ -263,8 +263,8 @@ export default function BooksDetail() {
                                                 className="mt-2 text-green-600 hover:text-green-700 font-bold text-xs flex items-center gap-1 transition-all"
                                             >
                                                 {isExpanded
-                                                    ? "Tampilkan Sedikit"
-                                                    : "Baca Selengkapnya"}
+                                                    ? "Read Less"
+                                                    : "Read More"}
                                                 <ChevronDown
                                                     size={14}
                                                     className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
