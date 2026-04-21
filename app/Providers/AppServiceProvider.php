@@ -6,6 +6,7 @@ use App\Models\Borrowing;
 use App\Models\ReturnBook;
 use App\Observers\BorrowingObserver;
 use App\Observers\ReturnBookObserver;
+use Filament\Auth\Notifications\ResetPassword;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,5 +26,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Borrowing::observe(BorrowingObserver::class);
         ReturnBook::observe(ReturnBookObserver::class);
+
+        ResetPassword::createUrlUsing(function ($user, string $token) {
+        return 'http://localhost:8000/reset-password?token='.$token.'&email='.$user->email;
+        });
     }
 }

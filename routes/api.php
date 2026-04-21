@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\BorrowController;
@@ -20,6 +21,9 @@ Route::get('/borrowings/overdue/count', [BorrowController::class, 'overdueCount'
 Route::get('/categories', [CategoryController::class, 'category']);
 
 Route::post('/payment/notification', [PaymentController::class, 'webhook']);
+
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
     

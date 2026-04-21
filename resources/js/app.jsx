@@ -19,6 +19,7 @@ import MainLayout from './MainLayout';
 import BorrowForm from './Pages/Borrow/BorrowForm';
 import Return from './Pages/Returns/Return';
 import ReturnForm from './Pages/Returns/ReturnForm';
+import ResetPassword from './Pages/Auth/ResetPassword';
 
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
@@ -107,6 +108,8 @@ function AppLoader() {
                         }
 
                     />
+
+                    <Route path="/reset-password" element={<ResetPassword />} />
 
                     <Route element={
                         <ProtectedRoute user={user}>

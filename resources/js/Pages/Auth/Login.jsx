@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { User, Lock, Eye, EyeOff, BookOpen } from 'lucide-react';
+import { User, 
+         Lock, 
+         Eye, 
+         EyeOff, 
+         BookOpen 
+        } from 'lucide-react';
+import ForgotPassword from './ForgotPassword'; 
 
 export default function Login({ setUser }) {
     const [email, setEmail] = useState('');
@@ -9,10 +15,14 @@ export default function Login({ setUser }) {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const navigate = useNavigate();
     const currentYear = new Date().getFullYear();
     const appName = import.meta.env.VITE_APP_NAME || 'PocketEdu';
     const [remember, setRemember] = useState(false);
+
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
@@ -20,13 +30,11 @@ export default function Login({ setUser }) {
 
         try {
             await axios.get('/sanctum/csrf-cookie');
-
             const response = await axios.post('/api/login', {
                 email,
                 password,
                 remember
             });
-
             setUser(response.data.user);
             navigate('/dashboard');
         } catch (err) {
@@ -38,8 +46,13 @@ export default function Login({ setUser }) {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-100 via-white to-emerald-100 flex items-center justify-center px-4 py-8">
+            
+            <ForgotPassword 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+            />
+
             <div className="w-full h-[41rem] max-w-6xl bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
-                
                 
                 <div className="relative hidden md:block">
                     <img
@@ -47,21 +60,19 @@ export default function Login({ setUser }) {
                         alt="PocketEdu Illustration"
                         className="w-full h-full object-cover"
                     />
-
                     <div className="absolute inset-0 bg-black/20 flex flex-col justify-end p-8 text-white">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="bg-white/20 p-2.5 rounded-2xl backdrop-blur-sm">
-                                 <BookOpen size={24} />
+                                <BookOpen size={24} />
                             </div>
-                                <h1 className="text-2xl lg:text-3xl font-bold">{appName}</h1>
-                            </div>
-                                <p className="text-sm lg:text-base text-white/90 max-w-sm leading-relaxed">
-                                    Learning becomes easier, structured, and convenient in one platform.
-                                </p>
-                            </div>
+                            <h1 className="text-2xl lg:text-3xl font-bold">{appName}</h1>
+                        </div>
+                        <p className="text-sm lg:text-base text-white/90 max-w-sm leading-relaxed">
+                            Learning becomes easier, structured, and convenient in one platform.
+                        </p>
+                    </div>
                 </div>
 
-                
                 <div className="flex items-center justify-center p-8 md:p-12">
                     <div className="w-full max-w-md">
                         <div className="md:hidden text-center mb-8">
@@ -85,14 +96,9 @@ export default function Login({ setUser }) {
 
                         <form onSubmit={handleLogin} className="space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Email
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                                 <div className="relative">
-                                    <User
-                                        size={20}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                                    />
+                                    <User size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                                     <input
                                         type="text"
                                         className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"
@@ -105,15 +111,9 @@ export default function Login({ setUser }) {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Password
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
                                 <div className="relative">
-                                    <Lock
-                                        size={20}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                                    />
-
+                                    <Lock size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         className="hide-password-toggle w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"
@@ -122,10 +122,8 @@ export default function Login({ setUser }) {
                                         placeholder="Enter password"
                                         required
                                     />
-
                                     <button
                                         type="button"
-                                        onMouseDown={(e) => e.preventDefault()}
                                         onClick={() => setShowPassword(!showPassword)}
                                         className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
                                     >
@@ -145,13 +143,13 @@ export default function Login({ setUser }) {
                                     <span className="whitespace-nowrap">Remember me</span>
                                 </label>
 
-                                <a 
-                                    href="#" 
+                                <button 
+                                    type="button"
+                                    onClick={() => setIsModalOpen(true)}
                                     className="text-green-600 hover:text-green-700 font-medium transition whitespace-nowrap"
                                 >
                                     Forgot password?
-                                </a>
-
+                                </button>
                             </div>
 
                             <button
@@ -166,11 +164,12 @@ export default function Login({ setUser }) {
                                 {loading ? 'process...' : 'Login'}
                             </button>
                         </form>
+
                         <p className="text-center text-sm text-gray-500 mt-8">
                             Don't have an account? {' '}
-                            <a href="/register" className="text-green-600 hover:text-green-700 font-medium">
+                            <Link to="/register" className="text-green-600 hover:text-green-700 font-medium">
                                 Register here
-                            </a>
+                            </Link>
                         </p>
 
                         <p className="text-center text-sm text-gray-500 mt-8">
