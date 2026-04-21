@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Borrowing;
 use App\Models\FinesSettings;
+use App\Notifications\GeneralNotification;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -163,6 +164,11 @@ class BorrowController extends Controller
                 'notes' => $validated['notes'],
                 'status' => 'pending',
             ]);
+
+            $user->notify(new GeneralNotification(
+                'Request Sent!', 
+                "Request to borrow a book '{$book->title}' Submitted successfully. Please wait for Librarian approval.."
+            ));
 
             return response()->json([
                 'success' => true,

@@ -7,6 +7,8 @@ use App\Models\Fine;
 use App\Models\FinesSettings;
 use App\Models\ReturnBook;
 use App\Models\Review;
+use App\Models\User;
+use App\Notifications\GeneralNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -123,6 +125,11 @@ class ReturnController extends Controller
             'status' => 'pending'
         ]);
 
+        $borrowing->user->notify(new GeneralNotification(
+            'Return Processed', 
+            "Book return request '{$borrowing->borrowingsBook->title}' awaiting librarian verification."
+        ));
+
         $this->calculateAndCreateFines($borrowing, $return, $request->return_condition);
 
         $borrowing->update([
@@ -166,7 +173,6 @@ class ReturnController extends Controller
 
         if ($setting) {
             $amount = 0;
-
             if ($setting->type === 'percentage') {
                 $amount = ($setting->value / 100) * $bookPrice * $multiplier;
             } else {
@@ -181,8 +187,18 @@ class ReturnController extends Controller
                     'amount' => $amount,
                     'status' => 'unpaid'
                 ]);
+
+                $user = User::find($userId);
+                if ($user) {
+                    $label = str_replace('_', ' ', ucfirst($settingKey)); 
+                    $formattedAmount = number_format($amount, 0, ',', '.');
+                    
+                    $user->notify(new GeneralNotification(
+                        'New Fine Bill ⚠️', 
+                        "You are charged {$label} as big as Rp {$formattedAmount}. Please check the fine menu."
+                    ));
+                }
             }
         }
     }
-
 }

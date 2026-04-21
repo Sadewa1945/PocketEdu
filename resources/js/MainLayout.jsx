@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, Outlet } from "react-router-dom";
 import axios from "axios";
 import { 
@@ -15,6 +15,8 @@ import {
     Mail,
     Phone,
     MapPin,
+    Bell,
+    CheckCircle2
     } from "lucide-react";
 
 export default function MainLayout({ user, setUser }) {
@@ -22,9 +24,38 @@ export default function MainLayout({ user, setUser }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
 
+    const [notifModalOpen, setNotifModalOpen] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+
     const appName = import.meta.env.VITE_APP_NAME || "PocketEdu";
     const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
     const profileImage = user?.image ? `${apiUrl}/storage/${user.image}` : null;
+
+    const fetchNotifications = async () => {
+        try {
+            const res = await axios.get('/api/notifications'); 
+            setNotifications(res.data.notifications);
+            setUnreadCount(res.data.unread_count);
+        } catch (error) {
+            console.error("Failed to fetch notifications", error);
+        }
+    };
+
+    useEffect(() => {
+        if (user) {
+            fetchNotifications();
+        }
+    }, [user]);
+
+    const markAsRead = async (id) => {
+        try {
+            await axios.post(`/api/notifications/${id}/read`);
+            fetchNotifications();
+        } catch (error) {
+            console.error("Failed to mark as read", error);
+        }
+    };
 
     const handleLogout = async () => {
         try {
@@ -40,7 +71,47 @@ export default function MainLayout({ user, setUser }) {
 
     return (
         <div className="min-h-screen flex flex-col w-full bg-gradient-to-br from-green-100 via-white to-emerald-100">
-            {/* Navbar (Copy semua kode Navbar kamu ke sini) */}
+            {notifModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+                        <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                                <Bell className="text-green-600" size={20} />
+                                Notifications
+                            </h3>
+                            <button onClick={() => setNotifModalOpen(false)} className="p-2 bg-white text-slate-400 hover:text-red-500 rounded-full shadow-sm transition">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        <div className="overflow-y-auto p-4 space-y-3 flex-1 bg-white">
+                            {notifications.length === 0 ? (
+                                <div className="text-center py-10 text-slate-400">
+                                    <Bell size={40} className="mx-auto mb-3 opacity-20" />
+                                    <p>No new notifications</p>
+                                </div>
+                            ) : (
+                                notifications.map((notif) => (
+                                    <div key={notif.id} className={`p-4 rounded-2xl border transition ${notif.read_at === null ? 'bg-green-50/50 border-green-200' : 'bg-white border-slate-100'}`}>
+                                        <div className="flex justify-between items-start gap-3">
+                                            <div>
+                                                <h4 className={`text-sm font-bold ${notif.read_at === null ? 'text-slate-800' : 'text-slate-600'}`}>{notif.data.title}</h4>
+                                                <p className="text-xs text-slate-500 mt-1">{notif.data.message}</p>
+                                            </div>
+                                            {notif.read_at === null && (
+                                                <button onClick={() => markAsRead(notif.id)} className="p-1 text-green-500 hover:bg-green-100 rounded-md transition">
+                                                    <CheckCircle2 size={18} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+           
             <div className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
                     <div>
@@ -85,6 +156,16 @@ export default function MainLayout({ user, setUser }) {
                         >
                             Categories
                         </Link>
+
+                        <button 
+                            onClick={() => setNotifModalOpen(true)}
+                            className="relative p-2 text-slate-500 hover:text-green-600 transition hover:bg-slate-50 rounded-full"
+                        >
+                            <Bell size={22} />
+                            {unreadCount > 0 && (
+                                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                            )}
+                        </button>
 
                         {/* Profile Dropdown */}
                         <div className="relative">
@@ -138,6 +219,16 @@ export default function MainLayout({ user, setUser }) {
                                         <User size={18} />
                                         Profile
                                     </Link>
+
+                                    <button 
+                                        onClick={() => setNotifModalOpen(true)}
+                                        className="relative p-2 text-slate-500 hover:text-green-600 transition hover:bg-slate-50 rounded-full"
+                                    >
+                                        <Bell size={22} />
+                                        {unreadCount > 0 && (
+                                            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                                        )}
+                                    </button>
 
                                     <button
                                         onClick={handleLogout}
@@ -283,6 +374,8 @@ export default function MainLayout({ user, setUser }) {
                                     <Layers size={20} />
                                     Categories
                                 </Link>
+
+
                             </div>
                         </div>
                     </div>

@@ -40,4 +40,9 @@ class Borrowing extends Model
         return $this->hasOne(ReturnBook::class, 'borrowing_id')->latest();
     }
 
+    public function user() 
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

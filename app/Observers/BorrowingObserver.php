@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Book;
 use App\Models\Borrowing;
+use App\Notifications\GeneralNotification;
 use Carbon\Carbon;
 
 
@@ -92,6 +93,47 @@ class BorrowingObserver
             
             if (in_array($oldStatus, $stockDeductedStatuses) && $newStatus === 'rejected') {
                 $book->increment('stock', $borrowing->quantity);
+            }
+
+            $user = $borrowing->user;
+            $bookTitle = $book->title ?? 'Buku';
+            $title = '';
+            $message = '';
+            $sendNotif = true;
+
+            switch ($newStatus) {
+                case 'accepted':
+                    $title = 'Borrowing Accepted ✅';
+                    $message = "Request to borrow a book '{$bookTitle}' has been approved.";
+                    break;
+                case 'ready_to_pickup':
+                    $title = 'Books Ready to be Picked Up 📚';
+                    $message = "Books '{$bookTitle}' It's ready. Please pick it up at the library.";
+                    break;
+                case 'borrowed':
+                    $dueDate = Carbon::parse($borrowing->due_at)->format('d M Y');
+                    $title = 'Happy reading! 📖';
+                    $message = "Books '{$bookTitle}' officially you borrow. Return deadline: {$dueDate}.";
+                    break;
+                case 'rejected':
+                    $title = 'Borrowing Rejected ❌';
+                    $message = "Sorry, request to borrow a book '{$bookTitle}' rejected.";
+                    break;
+                case 'returned':
+                    $title = 'Thank You! 🎉';
+                    $message = "Books '{$bookTitle}' has been successfully returned.";
+                    break;
+                case 'overdue':
+                    $title = 'Late Warning ⚠️';
+                    $message = "Book loan deadline '{$bookTitle}' it's finished!";
+                    break;
+                default:
+                    $sendNotif = false;
+                    break;
+            }
+
+            if ($sendNotif && $user) {
+                $user->notify(new GeneralNotification($title, $message));
             }
          }
     }

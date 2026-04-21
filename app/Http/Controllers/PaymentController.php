@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Fine;
+use App\Notifications\GeneralNotification;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -75,12 +76,21 @@ class PaymentController extends Controller
 
         if ($returnId && in_array($transactionStatus, ['capture', 'settlement'])) 
         {
+            $sampleFine = Fine::where('return_book_id', $returnId)->first();
+            
             Fine::where('return_book_id', $returnId)
                 ->where('status', 'unpaid')
                 ->update([
                     'status' => 'paid',
                     'paid_at' => Carbon::now() 
                 ]);
+
+            if ($sampleFine && $sampleFine->user) {
+                $sampleFine->user->notify(new GeneralNotification(
+                    'Payment Received 🎉', 
+                    "Thank you! We have successfully verified your fine payment."
+                ));
+            }
         }
 
         return response()->json([

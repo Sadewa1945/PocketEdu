@@ -10,6 +10,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FineController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -53,4 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/payment/token/{returnId}', [PaymentController::class, 'getSnapToken']);
     
     Route::post('/reviews', [ReviewController::class, 'store']);
+
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
 });
