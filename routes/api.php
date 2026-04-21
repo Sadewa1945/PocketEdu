@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\BorrowController;
 use App\Http\Controllers\CategoryController;

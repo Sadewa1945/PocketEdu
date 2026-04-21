@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('author');
             $table->string('isbn')->unique();
             $table->date('published_date');
+            $table->decimal('book_price', 12,2);
             $table->string('publisher');
             $table->text('description')->nullable();
             $table->string('cover_image')->nullable();

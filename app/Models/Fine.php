@@ -9,7 +9,7 @@ class Fine extends Model
     protected $fillable = [
         'return_book_id',
         'user_id',
-        'fine_type',
+        'fine_type_id',
         'amount',
         'status',
         'paid_at'

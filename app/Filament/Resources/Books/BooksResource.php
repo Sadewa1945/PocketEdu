@@ -53,6 +53,10 @@ class BooksResource extends Resource
             ->required()
             ->label('Author'),
 
+            TextInput::make('book_price')
+            ->required()
+            ->label('Book Price'),
+
             TextInput::make('isbn')
             ->required()
             ->label('ISBN'),

@@ -45,7 +45,6 @@ class ReturnController extends Controller
 
     public function show($id)
     {
-    
         $borrowingsBook = Borrowing::with('borrowingsBook')->find($id);
 
         if (!$borrowingsBook) {
@@ -55,6 +54,9 @@ class ReturnController extends Controller
             ], 404);
         }
 
+        $book = $borrowingsBook->borrowingsBook;
+        $bookPrice = $book ? $book->book_price : 0; 
+
         $lateDays = 0;
         $dueDate = Carbon::parse($borrowingsBook->due_at)->startOfDay();
         $today = Carbon::now()->startOfDay();
@@ -63,17 +65,20 @@ class ReturnController extends Controller
             $lateDays = (int) $dueDate->diffInDays($today);
         }
 
-        $rates = [
-            'late_fine' => FinesSettings::getValue('late_fine', 2000),
-            'damage_fine' => FinesSettings::getValue('damage_fine', 50000),
-            'lost_fine' => FinesSettings::getValue('lost_fine', 100000),
-        ];
+        $allSettings = FinesSettings::all();
+        $rates = [];
+
+        foreach ($allSettings as $setting) {
+            $rates[$setting->key] = $setting->type === 'percentage' 
+                ? ($setting->value / 100) * $bookPrice 
+                : (int) $setting->value;
+        }
 
         return response()->json([
             'message' => true,
             'data' => $borrowingsBook,
             'late_days' => $lateDays,
-            'fine_rates' => $rates
+            'fine_rates' => $rates 
         ], 200);
     }
 
@@ -135,33 +140,48 @@ class ReturnController extends Controller
         $userId = $borrowing->user_id;
         $returnId = $return->id;
 
+        $book = $borrowing->borrowingsBook;
+        $bookPrice = $book ? $book->book_price : 0; 
+
         $dueDate = Carbon::parse($borrowing->due_at)->startOfDay();
         $returnedDate = Carbon::now()->startOfDay();
 
         if ($returnedDate->gt($dueDate)) {
             $lateDays = (int) $dueDate->diffInDays($returnedDate);
-            $rateLateFine = FinesSettings::getValue('late_fine', 2000);
-            
-            Fine::create([
-                'return_book_id' => $returnId,
-                'user_id' => $userId,
-                'fine_type' => 'late',
-                'amount' => $lateDays * $rateLateFine, 
-                'status' => 'unpaid'
-            ]);
+    
+            $this->applyDynamicFine('late_fine', $returnId, $userId, $bookPrice, $lateDays);
         }
 
-        if ($condition === 'damaged' || $condition === 'lost') {
-            $fineType = $condition === 'damaged' ? 'damage' : 'lost';
-            $rateConditionFine = FinesSettings::getValue($fineType . '_fine', $condition === 'damaged' ? 50000 : 100000);
+        if ($condition !== 'good') {
+    
+            $settingKey = $condition === 'damaged' ? 'damage_fine' : $condition . '_fine';
+            
+            $this->applyDynamicFine($settingKey, $returnId, $userId, $bookPrice, 1);
+        }
+    }
 
-            Fine::create([
-                'return_book_id' => $returnId,
-                'user_id' => $userId,
-                'fine_type' => $fineType,
-                'amount' => $rateConditionFine,
-                'status' => 'unpaid'
-            ]);
+    private function applyDynamicFine($settingKey, $returnId, $userId, $bookPrice, $multiplier = 1)
+    {
+        $setting = FinesSettings::where('key', $settingKey)->first();
+
+        if ($setting) {
+            $amount = 0;
+
+            if ($setting->type === 'percentage') {
+                $amount = ($setting->value / 100) * $bookPrice * $multiplier;
+            } else {
+                $amount = $setting->value * $multiplier;
+            }
+
+            if ($amount > 0) {
+                Fine::create([
+                    'return_book_id' => $returnId,
+                    'user_id' => $userId,
+                    'fine_type_id' => $setting->id, 
+                    'amount' => $amount,
+                    'status' => 'unpaid'
+                ]);
+            }
         }
     }
 

@@ -11,7 +11,8 @@ class FinesSettings extends Model
     protected $fillable = [
         'key',
         'label',
-        'value'
+        'value',
+        'type'
     ];
 
     public static function getValue($key, $default = 0)

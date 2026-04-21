@@ -12,10 +12,12 @@ use BackedEnum;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -39,12 +41,20 @@ class FinesSettingsResource extends Resource
             TextInput::make('key')  
                 ->required(),
                 
-            TextInput::make('value')
-                ->label('Nominal (Rp)')
-                ->numeric()
+            Select::make('type')
+                ->label('Tipe Denda')
+                ->options([
+                    'fixed' => 'Fix Amount (Rp)',
+                    'percentage' => 'Persentage (%)',
+                ])
                 ->required()
-                ->prefix('Rp')
-                ->columnSpanFull(),
+                ->default('fixed'), 
+
+            TextInput::make('value')
+                ->required()
+                ->numeric()
+                ->label('Fine Value')
+                ->helperText('Just enter a number. The unit (Rp or %) will follow the type selection above.'),
         ]);
     }
 
@@ -54,13 +64,27 @@ class FinesSettingsResource extends Resource
             TextColumn::make('id')
                 ->label('Id')
                 ->sortable(),
+
             TextColumn::make('key')
-                ->label('Key'),
-            TextColumn::make('label')
+                ->label('Key')
                 ->searchable(),
+
+            TextColumn::make('label')
+                ->label('Label')
+                ->searchable(),
+
             TextColumn::make('value')
-                ->money('idr')
+                ->label('Value')
                 ->sortable(),
+
+            BadgeColumn::make('type')
+                    ->label('Type')
+                    ->formatStateUsing(fn (string $state): string => match ($state){
+                        'fixed' => 'Fixed',
+                        'percentage' => 'Percentage',
+                        default => $state,
+                    })
+
         ])->actions([
                 ActionGroup::make([
                 EditAction::make(),

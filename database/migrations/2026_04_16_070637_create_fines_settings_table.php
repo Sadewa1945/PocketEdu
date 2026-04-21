@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('key')->unique();
             $table->string('label');
             $table->integer('value');
+            $table->enum('type', ['fixed', 'percentage'])->default('fixed');
             $table->timestamps();
         });
     }

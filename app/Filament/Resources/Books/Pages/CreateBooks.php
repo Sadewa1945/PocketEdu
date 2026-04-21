@@ -39,6 +39,7 @@ class CreateBooks extends CreateRecord
 
                     $data['published_date'] = null;
                     $data['isbn'] = null; 
+                    $data['book_price'] = null;
 
                     $this->form->fill($data);
                 }),
