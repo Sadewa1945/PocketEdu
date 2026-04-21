@@ -8,7 +8,8 @@ import {
     Clock,
     XCircle,
     Info,
-    Receipt
+    Receipt,
+    Star
 } from "lucide-react";
 
 export default function Returns() {
@@ -87,7 +88,6 @@ export default function Returns() {
         rejected: returns.filter((b) => b.status === "rejected").length,
     };
 
-    // Helper untuk badge estetik di pojok gambar
     const getBadge = (status) => {
         switch (status) {
             case "accepted":
@@ -98,6 +98,32 @@ export default function Returns() {
                 return <span className="text-[10px] px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-600 font-bold border border-yellow-200 shadow-sm flex items-center gap-1"><Clock size={10} /> Pending</span>;
             default:
                 return null;
+        }
+    };
+
+    const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+    const [selectedBookForRating, setSelectedBookForRating] = useState(null);
+    const [ratingForm, setRatingForm] = useState({ rating: 5, comment: "" });
+
+    const handleSubmitRating = async (e) => {
+        e.preventDefault();
+        try {
+            const token = localStorage.getItem("token"); 
+            
+            await axios.post("/api/reviews", {
+                book_id: selectedBookForRating.borrowing.borrowings_book.id,
+                rating: ratingForm.rating,
+                comment: ratingForm.comment
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            alert("Terima kasih atas ulasan Anda!");
+            setIsRatingModalOpen(false);
+            setRatingForm({ rating: 5, comment: "" });
+        } catch (err) {
+            console.error("Payment error:", err);
+            alert(err.response?.data?.message || "Gagal mengirim ulasan.");
         }
     };
 
@@ -195,7 +221,6 @@ export default function Returns() {
                                     isRejected ? "opacity-75 grayscale-[0.5] border-slate-100" : "border-slate-100"
                                 }`}
                             >
-                                {/* Thumbnail */}
                                 <div className="relative aspect-[3/4] overflow-hidden bg-slate-50">
                                     <img
                                         src={`${apiUrl}/storage/${item.borrowing?.borrowings_book?.cover_image}`}
@@ -207,7 +232,6 @@ export default function Returns() {
                                     </div>
                                 </div>
 
-                                {/* Detail Content */}
                                 <div className="p-4 flex flex-col flex-1">
                                     <h3 className="font-bold text-slate-800 text-sm line-clamp-2 min-h-[25px]">
                                         {item.borrowing?.borrowings_book?.title || "Unknown Book"}
@@ -225,8 +249,6 @@ export default function Returns() {
                                                 {item.returned_at ? new Date(item.returned_at).toLocaleDateString("id-ID", { day: 'numeric', month: 'short' }) : "-"}
                                             </p>
                                     </div>
-                                    
-                                    
 
                                     <div className="mt-4 pt-3 border-t border-slate-50 space-y-3">
                                         {/* Fines Area */}
@@ -267,12 +289,88 @@ export default function Returns() {
                                             </button>
                                         )}
                                     </div>
+
+                                    {item.status === 'accepted' && (
+                                        item.is_reviewed ? (
+                                            <div className="w-full mt-2 py-2 bg-slate-100 text-slate-500 text-xs font-bold rounded-xl text-center border border-slate-200 cursor-not-allowed flex items-center justify-center gap-1">
+                                                <CheckCircle2 size={14} className="text-green-500" />
+                                                Already Reviewed
+                                            </div>
+                                        ) : (
+                                            <button 
+                                                onClick={() => {
+                                                    setSelectedBookForRating(item);
+                                                    setIsRatingModalOpen(true);
+                                                }}
+                                                className="w-full mt-2 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-xl transition shadow-sm"
+                                            >
+                                                Rate & Review Book
+                                            </button>
+                                        )
+                                    )}
                                 </div>
                             </div>
                         );
                     })}
                 </div>
             )}
+            
+                {isRatingModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                        <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl">
+                            <h3 className="text-xl font-bold text-slate-800 mb-4">
+                                Give a Review for {selectedBookForRating?.borrowing?.borrowings_book?.title}
+                            </h3>
+                            
+                            <form onSubmit={handleSubmitRating}>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Rating</label>
+                                    <div className="flex gap-2">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                type="button"
+                                                key={star}
+                                                onClick={() => setRatingForm({...ratingForm, rating: star})}
+                                                className={`transition-transform hover:scale-110 ${
+                                                    star <= ratingForm.rating ? "text-yellow-400" : "text-slate-200"
+                                                }`}
+                                            >
+                                                <Star fill={star <= ratingForm.rating ? "currentColor" : "none"} size={32} />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="mb-6">
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Comment (Opsional)</label>
+                                    <textarea
+                                        rows="3"
+                                        value={ratingForm.comment}
+                                        onChange={(e) => setRatingForm({...ratingForm, comment: e.target.value})}
+                                        className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                        placeholder="What do you think about this book?"
+                                    ></textarea>
+                                </div>
+
+                                <div className="flex gap-3 justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsRatingModalOpen(false)}
+                                        className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-medium"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white font-medium shadow-sm"
+                                    >
+                                        Send Review
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
         </div>
     );
 }

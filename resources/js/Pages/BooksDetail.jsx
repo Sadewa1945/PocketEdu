@@ -108,19 +108,53 @@ export default function BooksDetail() {
                                                     alt={books.title}
                                                     className="w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-105"
                                                     />
-                                            </div>
-                                        
-                                        <div className="flex items-center justify-between mt-4">
-                                            <div className="flex items-center gap-2">
-                                                <div className="text-yellow-400 text-lg">★★★★☆</div>
-                                                <span className="text-sm text-gray-500">(120)</span>
-                                            </div>
 
-                                            <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-all duration-300 hover:scale-105">
-                                                <MessageCircle size={18} />
-                                                Comment
-                                            </button>
-                                        </div>
+                                            </div>
+                                                <div className="flex items-center justify-between mt-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="text-yellow-400 text-lg flex">
+                                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                                    <span key={star} className={star <= Math.round(books.reviews_avg_rating || 0) ? "text-yellow-400" : "text-slate-200"}>
+                                                                        ★
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                            <span className="text-sm font-bold text-slate-700">
+                                                                {books.reviews_avg_rating ? Number(books.reviews_avg_rating).toFixed(1) : "0.0"}
+                                                            </span>
+                                                            <span className="text-sm text-gray-500">
+                                                                ({books.reviews_count || 0} Ulasan)
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {books.reviews && books.reviews.length > 0 && (
+                                                    <div className="mt-8 pt-6 border-t border-slate-100 col-span-1 md:col-span-2">
+                                                        <h4 className="text-lg font-bold text-slate-800 mb-4">Ulasan Pembaca</h4>
+                                                        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                                                            {books.reviews.map((review) => (
+                                                                <div key={review.id} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                                                                    <div className="flex items-center justify-between mb-2">
+                                                                        {/* Menyesuaikan dengan logika username yang kamu miliki */}
+                                                                        <span className="text-sm font-bold text-slate-700">
+                                                                            {review.user?.username || review.user?.name || "Anonim"}
+                                                                        </span>
+                                                                        <div className="text-yellow-400 text-xs flex">
+                                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                                <span key={star}>{star <= review.rating ? "★" : "☆"}</span>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                    {review.comment && (
+                                                                        <p className="text-slate-600 text-sm mt-1">{review.comment}</p>
+                                                                    )}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
                                     </div>
 
                                     <div className="flex flex-col">

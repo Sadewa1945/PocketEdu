@@ -6,6 +6,7 @@ use App\Models\Borrowing;
 use App\Models\Fine;
 use App\Models\FinesSettings;
 use App\Models\ReturnBook;
+use App\Models\Review;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,20 @@ class ReturnController extends Controller
                 $query->where('user_id', $user->id);
             })
             ->get();
+
+        $data->map(function ($return) use ($user) {
+            $bookId = $return->borrowing->borrowingsBook->id ?? null;
+            
+            if ($bookId) {
+                $return->is_reviewed = Review::where('user_id', $user->id)
+                    ->where('book_id', $bookId)
+                    ->exists();
+            } else {
+                $return->is_reviewed = false;
+            }
+            
+            return $return;
+        });
 
         return response()->json([
             'success' => true,

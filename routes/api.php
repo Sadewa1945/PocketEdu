@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
@@ -51,4 +52,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/payment/token/{returnId}', [PaymentController::class, 'getSnapToken']);
     
+    Route::post('/reviews', [ReviewController::class, 'store']);
 });

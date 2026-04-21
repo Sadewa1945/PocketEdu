@@ -18,7 +18,10 @@ class BookController extends Controller
     }
 
     public function show($id){
-        $book = Book::with('category')->find($id);
+        $book = Book::with(['category', 'reviews.user'])
+                ->withAvg('reviews', 'rating')
+                ->withCount('reviews')
+                ->findOrFail($id);
 
         if(!$book){
             return response()->json([
