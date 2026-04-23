@@ -94,10 +94,14 @@ export default function BooksDetail() {
                                             src={
                                                 books.cover_image
                                                     ? `${apiUrl}/storage/${books.cover_image}`
-                                                    : "https://placehold.co/300x400?text=No+Cover"
+                                                    : "/images/pocketedu.png"
                                             }
                                             alt={books.title}
                                             className="w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-105"
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src = "/images/pocketedu.png";
+                                            }}
                                         />
                                     </div>
                                     <div className="flex items-center justify-between mt-4">
@@ -206,7 +210,7 @@ export default function BooksDetail() {
                                         {books.title}
                                     </h4>
                                     <p className="text-slate-500 mt-1 text-sm">
-                                        {books.category.name}
+                                        {books.bookshelf.name}
                                     </p>
                                     <p className="text-slate-500 mt-1 text-sm">
                                         {books.author}

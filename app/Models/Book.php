@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -15,15 +17,16 @@ class Book extends Model
         'isbn',
         'published_date',
         'publisher',
+        'book_price',
         'description',
         'cover_image',
-        'category_id',
+        'bookshelf_id',
         'stock'
     ];
 
-    public function category(): BelongsTo
+    public function bookshelf(): BelongsTo
     {
-        return $this->belongsTo(Category::class, 'category_id');
+        return $this->belongsTo(Bookshelf::class, 'bookshelf_id');
     }
 
     public function borrowings()
@@ -34,5 +37,12 @@ class Book extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    protected function image(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Storage::url($value) : asset('images/pocketedu.png')
+        );
     }
 }

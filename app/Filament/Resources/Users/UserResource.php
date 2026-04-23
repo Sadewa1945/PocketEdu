@@ -60,12 +60,6 @@ class UserResource extends Resource
             ->email()
             ->label('Email'),
 
-            TextInput::make('phone')
-            ->required()
-            ->minLength(10)
-            ->label('Phone')
-            ->numeric(),
-
             Select::make('role')
             ->options([
                 'admin' => 'Admin',
@@ -99,10 +93,6 @@ class UserResource extends Resource
 
             TextColumn::make('email')
             ->label('Email')
-            ->searchable(),
-
-            TextColumn::make('phone')
-            ->label('Phone')
             ->searchable(),
 
             TextColumn::make('role')

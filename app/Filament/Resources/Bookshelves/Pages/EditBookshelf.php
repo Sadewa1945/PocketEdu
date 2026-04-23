@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Categories\Pages;
+namespace App\Filament\Resources\Bookshelves\Pages;
 
-use App\Filament\Resources\Categories\CategoriesResource;
+use App\Filament\Resources\Bookshelves\BookshelfResource;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditCategories extends EditRecord
+class EditBookshelf extends EditRecord
 {
-    protected static string $resource = CategoriesResource::class;
+    protected static string $resource = BookshelfResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -31,4 +31,5 @@ class EditCategories extends EditRecord
             ->color('primary')
             ->action(fn () => $this->save());
     }
+
 }

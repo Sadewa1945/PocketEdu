@@ -35,11 +35,20 @@ class FinesSettingsResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            TextInput::make('label')
+            TextInput::make('fine_name')
+                ->label('Fine Name')
                 ->required(),
             
             TextInput::make('key')  
                 ->required(),
+
+            Select::make('fine_categories')
+                ->label('Fine Category')
+                ->options([
+                    'late' => 'Late',
+                    'damaged_or_lost' => 'Damaged or Lost',
+                ])
+                ->required(), 
                 
             Select::make('type')
                 ->label('Tipe Denda')
@@ -69,13 +78,21 @@ class FinesSettingsResource extends Resource
                 ->label('Key')
                 ->searchable(),
 
-            TextColumn::make('label')
-                ->label('Label')
+            TextColumn::make('fine_name')
+                ->label('Fine Name')
                 ->searchable(),
 
             TextColumn::make('value')
                 ->label('Value')
                 ->sortable(),
+
+            BadgeColumn::make('fine_categories')
+                    ->label('Fine Categories')
+                    ->formatStateUsing(fn (string $state): string => match ($state){
+                        'late' => 'Late',
+                        'damaged_or_lost' => 'Damaged or Lost',
+                        default => $state,
+                    }),
 
             BadgeColumn::make('type')
                     ->label('Type')

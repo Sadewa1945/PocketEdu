@@ -40,28 +40,42 @@ class FineResource extends Resource
     public static function form(Schema $schema): Schema
 {
     return $schema->schema([
-        Select::make('return_book_id')
-            ->relationship('returnBook', 'id')
-            ->label('Return ID')
-            ->getOptionLabelFromRecordUsing(fn ($record) => "ID: {$record->id} - Buku: {$record->borrowing->borrowingsBook->title} ({$record->borrowing->borrowingsUser->name})")
-            ->searchable()
-            ->required()
-            ->live()
-            ->afterStateUpdated(function ($state, callable $set) {
-                if ($state) {
-        
-                    $returnBook = ReturnBook::with('borrowing.borrowingsUser')->find($state);
-                    
-                    if ($returnBook && $returnBook->borrowing) {
-                        
-                        $set('user_id', $returnBook->borrowing->user_id);
-                        $set('borrower_name', $returnBook->borrowing->borrowingsUser->name);
-                    }
-                } else {
-                    $set('user_id', null);
-                    $set('borrower_name', null);
+       Select::make('return_book_id')
+        ->relationship('returnBook', 'id')
+        ->label('Return ID')
+        ->getOptionLabelFromRecordUsing(fn ($record) => "ID: {$record->id} - Buku: {$record->borrowing->borrowingsBook->title} ({$record->borrowing->borrowingsUser->name})")
+        ->getSearchResultsUsing(function (string $search): array {
+            return ReturnBook::whereHas('borrowing.borrowingsUser', function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->orWhereHas('borrowing.borrowingsBook', function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%");
+            })
+            ->limit(50)
+            ->get()
+            ->mapWithKeys(fn ($record) => [
+                $record->id => "ID: {$record->id} - Buku: {$record->borrowing->borrowingsBook->title} ({$record->borrowing->borrowingsUser->name})"
+            ])
+            ->toArray();
+        })
+        ->searchable()
+        ->required()
+        ->live()
+        ->afterStateUpdated(function ($state, callable $set) {
+            if ($state) {
+                $returnBook = ReturnBook::with(['borrowing.borrowingsUser', 'borrowing.borrowingsBook'])->find($state);
+                
+                if ($returnBook && $returnBook->borrowing) {
+                    $set('user_id', $returnBook->borrowing->user_id);
+                    $set('fine_id', null);
+                    $set('amount', 0);
                 }
-            }),
+            } else {
+                $set('user_id', null);
+                $set('fine_id', null);
+                $set('amount', 0);
+            }
+        }),
 
         Select::make('user_id')
             ->relationship('user', 'name')
@@ -70,21 +84,54 @@ class FineResource extends Resource
             ->disabled() 
             ->dehydrated(), 
 
-        Select::make('fine_type')
-            ->label('Fine Type')
-            ->options(FinesSettings::all()->pluck('label', 'id')) 
-            ->required()
-            ->live() 
-            ->afterStateUpdated(function ($state, callable $set) {
-                if ($state) {
-                    $setting = FinesSettings::find($state);
-                    if ($setting) {
-                        $set('amount', $setting->value);
+        Select::make('fine_id')
+        ->label('Fine Name')
+        ->options(FinesSettings::all()->pluck('fine_name', 'id'))
+        ->required()
+        ->live()
+        ->afterStateUpdated(function ($state, callable $set, callable $get) {
+            $fineSetting = FinesSettings::find($state);
+            $returnBookId = $get('return_book_id');
+
+            if ($fineSetting && $returnBookId) {
+                // Ambil data pengembalian, peminjaman, dan buku
+                $returnBook = ReturnBook::with(['borrowing.borrowingsBook'])->find($returnBookId);
+                $calculatedAmount = 0;
+                $value = $fineSetting->value;
+
+                // --- 1. Logika Kategori LATE ---
+                if ($fineSetting->fine_categories === 'late') {
+                    $returnedAt = \Carbon\Carbon::parse($returnBook->returned_at);
+                    $dueAt = \Carbon\Carbon::parse($returnBook->borrowing->due_at);
+
+                    if ($returnedAt->gt($dueAt)) {
+                        /**
+                         * diffInDays($dueAt, true) 
+                         * Parameter 'true' di sini berfungsi untuk memaksa hasilnya ABSOLUT (selalu positif)
+                         */
+                        $diffDays = (int) $returnedAt->diffInDays($dueAt, true);
+                        
+                        $calculatedAmount = $value * $diffDays;
+                    } else {
+                        // Jika kembali sebelum atau tepat pada waktunya
+                        $calculatedAmount = 0;
                     }
-                } else {
-                    $set('amount', null);
                 }
-            }),
+                
+                // --- 2. Logika Kategori DAMAGED_OR_LOST ---
+                else if ($fineSetting->fine_categories === 'damaged_or_lost') {
+                    if ($fineSetting->type === 'percentage') {
+                        $bookPrice = $returnBook->borrowing->borrowingsBook->book_price;
+                        $calculatedAmount = ($value / 100) * $bookPrice;
+                    } else {
+                        $calculatedAmount = $value;
+                    }
+                }
+                $set('amount', $calculatedAmount);
+            } else {
+                $set('amount', 0);
+            }
+        }),
 
         TextInput::make('amount')
             ->numeric()
@@ -106,9 +153,6 @@ class FineResource extends Resource
                     $set('paid_at', null);
                 }
             }),
-
-        DateTimePicker::make('paid_at')
-            ->label('Paid At'),
     ]);
 }
 
@@ -119,10 +163,6 @@ class FineResource extends Resource
                 TextColumn::make('user.name')
                     ->label('Borrower')
                     ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('fineSetting.label') 
-                    ->label('Fine Type')
                     ->sortable(),
 
                 TextColumn::make('amount')
@@ -166,11 +206,7 @@ class FineResource extends Resource
                     ->modalHeading('Delete Fine')
                     ->modalDescription('This action cannot be undone. Are you sure?'),
             ])
-            ->filters([
-                SelectFilter::make('fine_type_id')
-                    ->label('Fine Type')
-                    ->relationship('fineSetting', 'label'),
-            ])
+            
             ->headerActions([
             ExportAction::make()->label('Export Excel'),
         ]);

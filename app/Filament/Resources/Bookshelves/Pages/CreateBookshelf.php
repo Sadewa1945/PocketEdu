@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\Categories\Pages;
+namespace App\Filament\Resources\Bookshelves\Pages;
 
-use App\Filament\Resources\Categories\CategoriesResource;
+use App\Filament\Resources\Bookshelves\BookshelfResource;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 
-class CreateCategories extends CreateRecord
+class CreateBookshelf extends CreateRecord
 {
-    protected static string $resource = CategoriesResource::class;
+    protected static string $resource = BookshelfResource::class;
 
-    protected function getCreateFormAction(): Action
+     protected function getCreateFormAction(): Action
     {
         return Action::make('create')
             ->label(__('filament-panels::resources/pages/create-record.form.actions.create.label'))

@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class BookController extends Controller
 {
     public function index(){
-        $books = Book::with('category')->latest()->get();
+        $books = Book::with('bookshelf')->latest()->get();
 
         return response()->json([
             'message' => true,
@@ -18,7 +18,7 @@ class BookController extends Controller
     }
 
     public function show($id){
-        $book = Book::with(['category', 'reviews.user'])
+        $book = Book::with(['bookshelf', 'reviews.user'])
                 ->withAvg('reviews', 'rating')
                 ->withCount('reviews')
                 ->findOrFail($id);

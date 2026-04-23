@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('fines_settings', function (Blueprint $table) {
             $table->id();
             $table->string('key')->unique();
-            $table->string('label');
+            $table->string('fine_name');
             $table->integer('value');
+            $table->enum('fine_categories', ['late', 'damaged_or_lost']);
             $table->enum('type', ['fixed', 'percentage'])->default('fixed');
             $table->timestamps();
         });

@@ -9,7 +9,7 @@ class Fine extends Model
     protected $fillable = [
         'return_book_id',
         'user_id',
-        'fine_type_id',
+        'fine_id',
         'amount',
         'status',
         'paid_at'
@@ -27,6 +27,7 @@ class Fine extends Model
 
     public function fineSetting()
     {
-        return $this->belongsTo(FinesSettings::class, 'fine_type_id');
+        return $this->belongsTo(FinesSettings::class, 'fine_id');
     }
+
 }

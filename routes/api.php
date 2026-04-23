@@ -5,7 +5,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\BorrowController;
-use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\BookshelfController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\UserController;
@@ -18,9 +18,10 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/books', [BookController::class, 'index']);
+Route::get('/fines-settings', [FineController::class, 'getLabelFine']);
 Route::get('/borrowings/count', [BorrowController::class, 'borrowingsCount']);
 Route::get('/borrowings/overdue/count', [BorrowController::class, 'overdueCount']);
-Route::get('/categories', [CategoryController::class, 'category']);
+Route::get('/categories', [BookshelfController::class, 'bookshelf']);
 
 Route::post('/payment/notification', [PaymentController::class, 'webhook']);
 

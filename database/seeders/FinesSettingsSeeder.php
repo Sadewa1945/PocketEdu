@@ -13,8 +13,8 @@ class FinesSettingsSeeder extends Seeder
      */
     public function run(): void
     {
-        FinesSettings::create(['key' => 'late_fine', 'label' => 'Denda Keterlambatan (Per Hari)', 'value' => 2000]);
-        FinesSettings::create(['key' => 'damage_fine', 'label' => 'Denda Buku Rusak', 'value' => 50000]);
-        FinesSettings::create(['key' => 'lost_fine', 'label' => 'Denda Buku Hilang', 'value' => 100000]);
+        FinesSettings::create(['key' => 'late_fine', 'fine_categories' => 'late', 'fine_name' => 'Denda Keterlambatan (Per Hari)', 'value' => 2000]);
+        FinesSettings::create(['key' => 'damage_fine', 'fine_categories' => 'damaged_or_lost', 'fine_name' => 'Denda Buku Rusak', 'value' => 50000]);
+        FinesSettings::create(['key' => 'lost_fine', 'fine_categories' => 'damaged_or_lost', 'fine_name' => 'Denda Buku Hilang', 'value' => 100000]);
     }
 }

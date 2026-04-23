@@ -9,6 +9,7 @@ import {
 export default function Profile() {
     const { user, setUser } = useOutletContext();
     const navigate = useNavigate();
+    const [books, setBooks] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");

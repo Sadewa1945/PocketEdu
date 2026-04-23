@@ -70,7 +70,7 @@ class BorrowingResource extends Resource
            DatePicker::make('borrowed_at')
                 ->label('Borrowed At')
                 ->default(Carbon::today()) 
-                ->minDate(Carbon::today()) 
+                // ->minDate(Carbon::today()) 
                 ->live()
                 ->afterStateUpdated(function ($set, $state) {
                     if ($state) {
@@ -81,8 +81,8 @@ class BorrowingResource extends Resource
 
             DatePicker::make('due_at')
                 ->label('Due At')
-                ->minDate(fn ($get) => $get('borrowed_at') ? Carbon::parse($get('borrowed_at'))->toDateString() : Carbon::now()) 
-                ->maxDate(fn ($get) => $get('borrowed_at') ? Carbon::parse($get('borrowed_at'))->addWeek()->toDateString() : null)
+                // ->minDate(fn ($get) => $get('borrowed_at') ? Carbon::parse($get('borrowed_at'))->toDateString() : Carbon::now()) 
+                // ->maxDate(fn ($get) => $get('borrowed_at') ? Carbon::parse($get('borrowed_at'))->addWeek()->toDateString() : null)
                 ->required(),
 
             Textarea::make('notes')

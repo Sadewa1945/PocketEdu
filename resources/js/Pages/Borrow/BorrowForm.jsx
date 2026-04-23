@@ -121,10 +121,14 @@ export default function BorrowForm() {
                             src={
                                 bookDetail?.cover_image
                                     ? `${apiUrl}/storage/${bookDetail.cover_image}`
-                                    : "https://placehold.co/300x400?text=No+Cover"
+                                    : "/images/pocketedu.png"
                             }
                             alt="Book Cover"
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src = "/images/pocketedu.png";
+                                            }}
                         />
                     </div>
                     <h3 className="font-bold text-lg text-slate-800 line-clamp-2">

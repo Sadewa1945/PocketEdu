@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Categories\Tables;
+namespace App\Filament\Resources\Bookshelves\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 
-class CategoriesTable
+class BookshelvesTable
 {
     public static function configure(Table $table): Table
     {

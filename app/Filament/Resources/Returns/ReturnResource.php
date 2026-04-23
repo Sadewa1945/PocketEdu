@@ -104,18 +104,9 @@ class ReturnResource extends Resource
                         };
                     }
                 ]),
-
-            Select::make('return_condition')
-                ->label('Return Condition')
-                ->options([
-                    'good' => 'Good / Normal',
-                    'damaged' => 'Damaged',
-                    'lost' => 'Lost'
-                ])
-                ->default('good')
-                ->required(),
                 
             Textarea::make('notes')->label('Notes'),
+            
             Hidden::make('returned_at')->default(now()),
         ]);
     }

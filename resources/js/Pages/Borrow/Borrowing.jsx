@@ -252,9 +252,17 @@ export default function Borrowing() {
                             >
                                 <div className="relative aspect-[3/4] overflow-hidden bg-slate-50">
                                     <img
-                                        src={`${apiUrl}/storage/${item.borrowings_book?.cover_image}`}
-                                        alt={item.borrowings_book?.title}
+                                        src={
+                                            item.borrowings_book?.cover_image
+                                                ? `${apiUrl}/storage/${item.borrowings_book.cover_image}`
+                                                : "/images/pocketedu.png"
+                                        }
+                                        alt={item.borrowings_book?.title || "Book Cover"}
                                         className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            e.target.onerror = null; 
+                                            e.target.src = "/images/pocketedu.png"; 
+                                        }}
                                     />
                                     <div className="absolute top-2 right-2">
                                         {getBadge(item)}

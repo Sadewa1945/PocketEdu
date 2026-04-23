@@ -14,7 +14,7 @@ export default function BooksOverview() {
     const [filteredBooks, setFilteredBooks] = useState([]);
     const [search, setSearch] = useState("");
 
-    const [selectedCategory, setSelectedCategory] = useState(location.state?.categoryFromNav || "All");
+    const [selectedBookshelf, setSelectedBookshelf] = useState(location.state?.BookshelfFromNav || "All");
     const [categories, setCategories] = useState(["All"]);
 
     const [loading, setLoading] = useState(true);
@@ -22,10 +22,10 @@ export default function BooksOverview() {
 
     const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
-    const getCategoryName = (category) => {
-        if (!category) return "Uncategorized";
-        if (typeof category === "object") return category.name || "Uncategorized";
-        if (typeof category === "string") return category;
+    const getBookshelfName = (bookshelf) => {
+        if (!bookshelf) return "Uncategorized";
+        if (typeof bookshelf === "object") return bookshelf.name || "Uncategorized";
+        if (typeof bookshelf === "string") return bookshelf;
         return "Uncategorized";
     };
 
@@ -38,13 +38,13 @@ export default function BooksOverview() {
             const searchString = `${book.title || ''} ${book.author || ''} ${book.publisher || ''}`.toLowerCase();
             const matchesSearch = searchString.includes(search.toLowerCase());
 
-            const bookCategory = getCategoryName(book.category);
-            const matchesCategory = selectedCategory === "All" || bookCategory === selectedCategory;
+            const bookBookshelf = getBookshelfName(book.bookshelf);
+            const matchesBookshelf = selectedBookshelf === "All" || bookBookshelf === selectedBookshelf;
 
-            return matchesSearch && matchesCategory;
+            return matchesSearch && matchesBookshelf;
         });
         setFilteredBooks(filtered);
-    }, [search, selectedCategory, books]);
+    }, [search, selectedBookshelf, books]);
 
     const fetchAllData = async () => {
         try {
@@ -87,7 +87,7 @@ export default function BooksOverview() {
     const extractCategoriesFromBooks = (dataBuku) => {
         const uniqueCategories = [
             "All",
-            ...new Set(dataBuku.map(book => getCategoryName(book.category)))
+            ...new Set(dataBuku.map(book => getBookshelfName(book.bookshelf)))
         ];
         setCategories(uniqueCategories);
     };
@@ -109,8 +109,8 @@ export default function BooksOverview() {
                         {/* Dropdown Filter */}
                         <div className="relative w-full sm:w-48 text-slate-700">
                             <select
-                                value={selectedCategory}
-                                onChange={(e) => setSelectedCategory(e.target.value)}
+                                value={selectedBookshelf}
+                                onChange={(e) => setSelectedBookshelf(e.target.value)}
                                 className="w-full appearance-none pl-4 pr-10 py-3 rounded-2xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
                             >
                                 {categories.map((cat, index) => (
@@ -192,14 +192,14 @@ export default function BooksOverview() {
                                             src={
                                                 book.cover_image
                                                     ? `${apiUrl}/storage/${book.cover_image}`
-                                                    : "https://placehold.co/300x400?text=No+Cover"
+                                                    : "/images/pocketedu.png"
                                             }
                                             alt={book.title}
                                             className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
-                                            onError={(e) =>
-                                                (e.target.src =
-                                                    "https://placehold.co/300x400?text=No+Cover")
-                                            }
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src = "/images/pocketedu.png";
+                                            }}
                                         />
                                     </div>
                                     

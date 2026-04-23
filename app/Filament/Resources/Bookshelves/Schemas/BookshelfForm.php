@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\Categories\Schemas;
+namespace App\Filament\Resources\Bookshelves\Schemas;
 
 use Filament\Schemas\Schema;
 
-class CategoriesForm
+class BookshelfForm
 {
     public static function configure(Schema $schema): Schema
     {

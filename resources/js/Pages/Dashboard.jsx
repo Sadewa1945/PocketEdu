@@ -84,8 +84,6 @@ export default function Dashboard({ user, setUser }) {
         }
     };
 
-    
-
     const latestBooks = [...books].slice(-4).reverse();
     const allBooks = [...books].slice(0, 20).reverse();
 
@@ -195,14 +193,14 @@ export default function Dashboard({ user, setUser }) {
                                             src={
                                                 book.cover_image
                                                     ? `${apiUrl}/storage/${book.cover_image}`
-                                                    : "https://placehold.co/300x400?text=No+Cover"
+                                                    : "/images/pocketedu.png"
                                             }
                                             alt={book.title}
                                             className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
-                                            onError={(e) =>
-                                                (e.target.src =
-                                                    "https://placehold.co/300x400?text=No+Cover")
-                                            }
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src = "/images/pocketedu.png";
+                                            }}
                                         />
                                     </div>
                                     
@@ -268,14 +266,14 @@ export default function Dashboard({ user, setUser }) {
                                             src={
                                                 book.cover_image
                                                     ? `${apiUrl}/storage/${book.cover_image}`
-                                                    : "https://placehold.co/300x400?text=No+Cover"
+                                                    : "/images/pocketedu.png"
                                             }
                                             alt={book.title}
                                             className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
-                                            onError={(e) =>
-                                                (e.target.src =
-                                                    "https://placehold.co/300x400?text=No+Cover")
-                                            }
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src = "/images/pocketedu.png";
+                                            }}
                                         />
                                     </div>
                                     

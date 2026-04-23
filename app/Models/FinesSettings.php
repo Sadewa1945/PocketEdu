@@ -10,7 +10,8 @@ class FinesSettings extends Model
 
     protected $fillable = [
         'key',
-        'label',
+        'fine_name',
+        'fine_categories',
         'value',
         'type'
     ];
@@ -19,6 +20,11 @@ class FinesSettings extends Model
     {
         $setting = self::where('key', $key)->first();
         return $setting ? (int) $setting->value : $default;
+    }
+
+    public function getFine()
+    {
+        return $this->hasMany(Fine::class);
     }
 
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Fine;
+use App\Models\FinesSettings;
 use Illuminate\Http\Request;
 
 class FineController extends Controller
@@ -27,6 +28,15 @@ class FineController extends Controller
                 'semua_denda'   => $semuaDendaUser 
             ],
             'data' => (int) $totalUnpaid, 
+        ], 200);
+    }
+
+    public function getLabelFine () {
+        $fineType = FinesSettings::all();
+        
+        return response()->json([
+            'message' => true,
+            'data' => $fineType
         ], 200);
     }
 }

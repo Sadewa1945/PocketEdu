@@ -5,19 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Category extends Model
+class Bookshelf extends Model
 {
-    protected $table = 'categories';
+    protected $table = 'bookshelves';
 
     protected $fillable = [
         'name',
     ];
 
     /**
-     * Get all books in this category.
+     * Get all books in this bookshelf.
      */
     public function books(): HasMany
     {
-        return $this->hasMany(Book::class, 'category_id');
+        return $this->hasMany(Book::class, 'bookshelf_id');
     }
 }

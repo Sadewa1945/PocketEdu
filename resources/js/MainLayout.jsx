@@ -154,7 +154,7 @@ export default function MainLayout({ user, setUser }) {
                             to="/categories"
                             className="text-slate-600 hover:text-green-700 transition-colors duration-300"
                         >
-                            Categories
+                            Bookshelves
                         </Link>
 
                         <button 
@@ -219,16 +219,6 @@ export default function MainLayout({ user, setUser }) {
                                         <User size={18} />
                                         Profile
                                     </Link>
-
-                                    <button 
-                                        onClick={() => setNotifModalOpen(true)}
-                                        className="relative p-2 text-slate-500 hover:text-green-600 transition hover:bg-slate-50 rounded-full"
-                                    >
-                                        <Bell size={22} />
-                                        {unreadCount > 0 && (
-                                            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-                                        )}
-                                    </button>
 
                                     <button
                                         onClick={handleLogout}
@@ -298,6 +288,16 @@ export default function MainLayout({ user, setUser }) {
                                         {user?.username || user?.email || "No info"}
                                     </p>
                                 </div>
+
+                                <button 
+                                        onClick={() => setNotifModalOpen(true)}
+                                        className="relative p-2 text-slate-500 hover:text-green-600 transition hover:bg-slate-50 rounded-full"
+                                    >
+                                        <Bell size={22} />
+                                        {unreadCount > 0 && (
+                                            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                                        )}
+                                    </button>
                             </div>
 
                             <div className="mt-4 grid grid-cols-2 gap-3">
@@ -372,7 +372,7 @@ export default function MainLayout({ user, setUser }) {
                                     className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-700 hover:bg-slate-50 hover:text-green-700 transition"
                                 >
                                     <Layers size={20} />
-                                    Categories
+                                    Bookshelves
                                 </Link>
 
 

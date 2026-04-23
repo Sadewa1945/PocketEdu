@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('books', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained()->restrictOnDelete();
+            $table->foreignId('bookshelf_id')->constrained('bookshelves')->restrictOnDelete();
             $table->string('title');
             $table->string('author');
             $table->string('isbn')->unique();
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('book_price', 12,2);
             $table->string('publisher');
             $table->text('description')->nullable();
-            $table->string('cover_image')->nullable();
+            $table->string('cover_image')->nullable()->default('pocketedu.png');
             $table->integer('stock')->default(1);
             $table->timestamps();
         });

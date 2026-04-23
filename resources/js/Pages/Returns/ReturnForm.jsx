@@ -124,10 +124,14 @@ export default function ReturnForm() {
                             src={
                                 bookData?.cover_image
                                     ? `${apiUrl}/storage/${bookData.cover_image}`
-                                    : "https://placehold.co/300x400?text=No+Cover"
+                                    : "/images/pocketedu.png"
                             }
                             alt="Book Cover"
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = "/images/pocketedu.png";
+                            }}
                         />
                     </div>
                     <h3 className="font-bold text-lg text-slate-800 line-clamp-2">
@@ -153,8 +157,6 @@ export default function ReturnForm() {
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         
-                        
-
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">
                                 Return Conditions

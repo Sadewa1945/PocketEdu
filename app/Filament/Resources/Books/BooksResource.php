@@ -46,47 +46,50 @@ class BooksResource extends Resource
     {
         return $schema->schema([
             TextInput::make('title')
-            ->required()
-            ->label('Title'),
+                ->required()
+                ->label('Title'),
 
             TextInput::make('author')
-            ->required()
-            ->label('Author'),
+                ->required()
+                ->label('Author'),
 
             TextInput::make('book_price')
-            ->required()
-            ->label('Book Price'),
+                ->label('Book Price')
+                ->required()
+                ->numeric()
+                ->prefix('Rp'),
 
             TextInput::make('isbn')
-            ->required()
-            ->label('ISBN'),
+                ->required()
+                ->label('ISBN'),
 
             DatePicker::make('published_date')
-            ->label('Published Date'),
+                ->label('Published Date'),
 
             TextInput::make('publisher')
-            ->label('Publisher'),
+                ->label('Publisher'),
             
             Textarea::make('description')
-            ->label('Description'),
+                ->label('Description'),
             
             FileUpload::make('cover_image')
-            ->label('Cover Image')
-            ->image()
-            ->directory('books')
-            ->disk('public')
-            ->visibility('public')
-            ->maxSize(2048)
-            ->helperText('Upload profile photo (Max. 2MB)'),
+                ->label('Cover Image')
+                ->image()
+                ->directory('books')
+                ->default('pocketedu.png')
+                ->disk('public')
+                ->visibility('public')
+                ->maxSize(2048)
+                ->helperText('Upload profile photo (Max. 2MB)'),
 
-            Select::make('category_id')
-            ->relationship('category', 'name')
-            ->required()
-            ->label('Category'),
+            Select::make('bookshelf_id')
+                ->relationship('bookshelf', 'name')
+                ->required()
+                ->label('Bookshelf'),
 
             TextInput::make('stock')
-            ->label('Stock')
-            ->numeric()
+                ->label('Stock')
+                ->numeric()
 
         ]);
     }
@@ -95,69 +98,74 @@ class BooksResource extends Resource
     {
         return $table->
             columns([
-                TextColumn::make('nomor')
-                ->label('nomor')
-                ->rowIndex()
-                ->sortable(),
+                TextColumn::make('id')
+                    ->label('Id')
+                    ->sortable(),
 
                 ImageColumn::make('cover_image')
-                ->label('Cover')
-                ->disk('public'),
+                    ->defaultImageUrl(url ('/images/pocketedu.png'))
+                    ->label('Cover')
+                    ->disk('public'),
 
                 TextColumn::make('title')
-                ->label('Book Title')
-                ->sortable()
-                ->searchable(),
+                    ->label('Book Title')
+                    ->sortable()
+                    ->searchable(),
 
-                TextColumn::make('category.name')
-                ->label('Category')
-                ->sortable()
-                ->searchable(),
+                TextColumn::make('bookshelf.name')
+                    ->label('Bookshelf')
+                    ->sortable()
+                    ->searchable(),
 
                 TextColumn::make('author')
-                ->label('Author')
-                ->sortable()
-                ->searchable(),
+                    ->label('Author')
+                    ->sortable()
+                    ->searchable(),
 
                 TextColumn::make('isbn')
-                ->label('ISBN')
-                ->sortable()
-                ->searchable(),
+                    ->label('ISBN')
+                    ->sortable()
+                    ->searchable(),
 
                 TextColumn::make('publisher')
-                ->label('Publisher')
-                ->sortable()
-                ->searchable(),
+                    ->label('Publisher')
+                    ->sortable()
+                    ->searchable(),
+
+                TextColumn::make('book_price')
+                    ->label('Price')
+                    ->money('IDR', locale: 'id')
+                    ->sortable(),
 
                 TextColumn::make('stock')
-                ->label('Stock'),
+                    ->label('Stock'),
 
                 TextColumn::make('published_date')
-                ->label('Published Date')
-                ->date(),
+                    ->label('Published Date')
+                    ->date(),
 
                 BadgeColumn::make('status')
-                ->label('Status')
-                ->getStateUsing(fn (Book $record): string => $record->stock > 0 ? 'Available' : 'Out of Stock')
-                ->colors([
-                    'success' => 'Available',
-                    'danger' => 'Out of Stock' 
-                ])
+                    ->label('Status')
+                    ->getStateUsing(fn (Book $record): string => $record->stock > 0 ? 'Available' : 'Out of Stock')
+                    ->colors([
+                        'success' => 'Available',
+                        'danger' => 'Out of Stock' 
+                    ])
 
             ])->actions([
-            EditAction::make(),
-            DeleteAction::make()
-            ->modalHeading('Delete Book')
-            ->modalDescription('This action cannot be undone. Are you sure?'),
-            ])
-        ->filters([
-                SelectFilter::make('category_id')
-                    ->label('Category')
-                    ->relationship('category', 'name'),
-            ])
-        ->headerActions([
-            ExportAction::make()->label('Export Excel'),
-        ]);
+                EditAction::make(),
+                DeleteAction::make()
+                    ->modalHeading('Delete Book')
+                    ->modalDescription('This action cannot be undone. Are you sure?'),
+                ])
+            ->filters([
+                    SelectFilter::make('bookshelf_id')
+                        ->label('Bookshelf')
+                        ->relationship('bookshelf', 'name'),
+                ])
+            ->headerActions([
+                ExportAction::make()->label('Export Excel'),
+            ]);
     }
 
     public static function getRelations(): array

@@ -8,7 +8,7 @@ import {
     Search,
 } from "lucide-react"; 
 
-export default function Category({ user, setUser }) {
+export default function Bookshelf({ user, setUser }) {
     const navigate = useNavigate();
     const [search, setSearch] = useState("");
     const [categories, setCategories] = useState([]);
@@ -34,8 +34,8 @@ export default function Category({ user, setUser }) {
     };
 
     useEffect(() => {
-        const filtered = categories.filter((category) =>
-            `${category.name}`
+        const filtered = categories.filter((bookshelf) =>
+            `${bookshelf.name}`
                 .toLowerCase()
                 .includes(search.toLowerCase())
         );
@@ -46,16 +46,16 @@ export default function Category({ user, setUser }) {
         fetchCategories();
     }, []);
 
-    const handleCategoryClick = (categoryData) => {
-        const categoryName = categoryData.name || categoryData.category_name;
-        navigate('/books', { state: { categoryFromNav: categoryName } });
+    const handleBookshelfClick = (bookshelfData) => {
+        const bookshelfName = bookshelfData.name || bookshelfData.bookshelf_name;
+        navigate('/books', { state: { bookshelfFromNav: bookshelfName } });
     };
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <h2 className="text-2xl sm:text-3xl font-bold text-slate-800">
-                    Categories
+                    Bookshelf
                 </h2>
 
                 <div className="flex items-center gap-5">
@@ -108,10 +108,10 @@ export default function Category({ user, setUser }) {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {filteredCategories.map((category, index) => (
+                    {filteredCategories.map((bookshelf, index) => (
                         <div
-                            key={category.id || index}
-                            onClick={() => handleCategoryClick(category)}
+                            key={bookshelf.id || index}
+                            onClick={() => handleBookshelfClick(bookshelf)}
                             className="cursor-pointer bg-white rounded-3xl border border-slate-200 shadow-sm p-6 hover:shadow-lg hover:border-green-300 transition-all duration-300 transform hover:-translate-y-1" // <-- Tambah cursor-pointer dan efek hover
                         >
                             <div className="flex items-center justify-between mb-4">
@@ -120,12 +120,12 @@ export default function Category({ user, setUser }) {
                                 </div>
 
                                 <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-600">
-                                    #{category.id || index + 1}
+                                    #{bookshelf.id || index + 1}
                                 </span>
                             </div>
 
                             <h3 className="text-xl font-bold text-slate-800 mb-2">
-                                {category.name || category.category_name || "Unnamed Category"}
+                                {bookshelf.name || bookshelf.bookshelf_name || "Unnamed Bookshelf"}
                             </h3>
                         </div>
                     ))}

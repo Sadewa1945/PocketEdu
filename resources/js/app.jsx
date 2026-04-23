@@ -12,7 +12,7 @@ import Register from './Pages/Auth/Register';
 import Dashboard from './Pages/Dashboard';
 import BooksOverview from './Pages/BooksOverview';
 import Profile from './Pages/Profile';
-import Category from './Pages/Categories';
+import Bookshelf from './Pages/Bookshelf';
 import BooksDetail from './Pages/BooksDetail';
 import Borrowing from './Pages/Borrow/Borrowing';
 import MainLayout from './MainLayout';
@@ -20,6 +20,7 @@ import BorrowForm from './Pages/Borrow/BorrowForm';
 import Return from './Pages/Returns/Return';
 import ReturnForm from './Pages/Returns/ReturnForm';
 import ResetPassword from './Pages/Auth/ResetPassword';
+import LandingPage from './Pages/LandingPage';
 
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
@@ -109,6 +110,16 @@ function AppLoader() {
 
                     />
 
+                    <Route
+                        path="/pocketedu"
+                        element={
+                            <GuestRoute user={user}>
+                                <LandingPage setUser={setUser} />
+                            </GuestRoute>
+                        }
+
+                    />
+
                     <Route path="/reset-password" element={<ResetPassword />} />
 
                     <Route element={
@@ -121,7 +132,7 @@ function AppLoader() {
                         <Route path="/books/:id" element={<BooksDetail />} />
                         <Route path="/borrowing" element={<Borrowing />} />
                         <Route path="/user/profile" element={<Profile />} />
-                        <Route path="/categories" element={<Category />} />
+                        <Route path="/categories" element={<Bookshelf />} />
                         <Route path="/books/:id/borrow" element={<BorrowForm />} />
                         <Route path="/borrowing/:id/returns" element={<ReturnForm />} />
                         <Route path="/return" element={<Return />} />

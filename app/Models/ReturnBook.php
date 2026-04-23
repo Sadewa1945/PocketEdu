@@ -11,7 +11,6 @@ class ReturnBook extends Model
     protected $fillable = [
         'borrowing_id',
         'returned_at',
-        'return_condition',
         'quantity_returned',
         'notes',
         'status'
