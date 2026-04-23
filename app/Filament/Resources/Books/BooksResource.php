@@ -86,6 +86,13 @@ class BooksResource extends Resource
                 ->relationship('bookshelf', 'name')
                 ->required()
                 ->label('Bookshelf'),
+            
+            Select::make('genres')
+                ->relationship('genres', 'name') 
+                ->multiple() 
+                ->preload()
+                ->searchable()
+                ->required(),
 
             TextInput::make('stock')
                 ->label('Stock')

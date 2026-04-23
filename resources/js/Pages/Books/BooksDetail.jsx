@@ -59,6 +59,11 @@ export default function BooksDetail() {
                                     <div className="h-4 bg-slate-200 rounded w-1/2 mb-2"></div>
                                     <div className="h-4 bg-slate-200 rounded w-1/3 mb-4"></div>
 
+                                    <div className="flex gap-2 mb-4">
+                                        <div className="w-16 h-6 bg-slate-200 rounded-md"></div>
+                                        <div className="w-16 h-6 bg-slate-200 rounded-md"></div>
+                                    </div>
+
                                     <div className="flex gap-3 mb-4">
                                         <div className="w-20 h-6 bg-slate-200 rounded-full"></div>
                                         <div className="w-24 h-6 bg-slate-200 rounded-full"></div>
@@ -218,6 +223,21 @@ export default function BooksDetail() {
                                     <p className="text-slate-500 mt-1 text-sm">
                                         {books.publisher}
                                     </p>
+
+                                    <div className="flex flex-wrap gap-2 mt-3">
+                                        {books.genres && books.genres.length > 0 ? (
+                                            books.genres.map((genre) => (
+                                                <span 
+                                                    key={genre.id} 
+                                                    className="px-3 py-1 bg-slate-100 text-slate-600 text-[11px] font-bold uppercase tracking-wider rounded-md border border-slate-200"
+                                                >
+                                                    {genre.name}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <span className="text-slate-400 text-xs italic">No genres</span>
+                                        )}
+                                    </div>
 
                                     <div className="flex gap-3 mt-3">
                                         <span

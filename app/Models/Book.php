@@ -39,6 +39,11 @@ class Book extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class, 'book_genre');
+    }
+
     protected function image(): Attribute
     {
         return Attribute::make(

@@ -10,6 +10,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FineController;
+use App\Http\Controllers\GenreController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +22,8 @@ Route::get('/books', [BookController::class, 'index']);
 Route::get('/fines-settings', [FineController::class, 'getLabelFine']);
 Route::get('/borrowings/count', [BorrowController::class, 'borrowingsCount']);
 Route::get('/borrowings/overdue/count', [BorrowController::class, 'overdueCount']);
-Route::get('/categories', [BookshelfController::class, 'bookshelf']);
+Route::get('/bookshelf', [BookshelfController::class, 'bookshelf']);
+Route::get('/genres', [GenreController::class, 'getGenre']);
 
 Route::post('/payment/notification', [PaymentController::class, 'webhook']);
 

@@ -85,53 +85,46 @@ class FineResource extends Resource
             ->dehydrated(), 
 
         Select::make('fine_id')
-        ->label('Fine Name')
-        ->options(FinesSettings::all()->pluck('fine_name', 'id'))
-        ->required()
-        ->live()
-        ->afterStateUpdated(function ($state, callable $set, callable $get) {
-            $fineSetting = FinesSettings::find($state);
-            $returnBookId = $get('return_book_id');
+            ->label('Fine Name')
+            ->options(FinesSettings::all()->pluck('fine_name', 'id'))
+            ->required()
+            ->live()
+            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                $fineSetting = FinesSettings::find($state);
+                $returnBookId = $get('return_book_id');
 
-            if ($fineSetting && $returnBookId) {
-                // Ambil data pengembalian, peminjaman, dan buku
-                $returnBook = ReturnBook::with(['borrowing.borrowingsBook'])->find($returnBookId);
-                $calculatedAmount = 0;
-                $value = $fineSetting->value;
-
-                // --- 1. Logika Kategori LATE ---
-                if ($fineSetting->fine_categories === 'late') {
-                    $returnedAt = \Carbon\Carbon::parse($returnBook->returned_at);
-                    $dueAt = \Carbon\Carbon::parse($returnBook->borrowing->due_at);
-
-                    if ($returnedAt->gt($dueAt)) {
-                        /**
-                         * diffInDays($dueAt, true) 
-                         * Parameter 'true' di sini berfungsi untuk memaksa hasilnya ABSOLUT (selalu positif)
-                         */
-                        $diffDays = (int) $returnedAt->diffInDays($dueAt, true);
-                        
-                        $calculatedAmount = $value * $diffDays;
-                    } else {
-                        // Jika kembali sebelum atau tepat pada waktunya
-                        $calculatedAmount = 0;
-                    }
-                }
+                if ($fineSetting && $returnBookId) {
                 
-                // --- 2. Logika Kategori DAMAGED_OR_LOST ---
-                else if ($fineSetting->fine_categories === 'damaged_or_lost') {
-                    if ($fineSetting->type === 'percentage') {
-                        $bookPrice = $returnBook->borrowing->borrowingsBook->book_price;
-                        $calculatedAmount = ($value / 100) * $bookPrice;
-                    } else {
-                        $calculatedAmount = $value;
+                    $returnBook = ReturnBook::with(['borrowing.borrowingsBook'])->find($returnBookId);
+                    $calculatedAmount = 0;
+                    $value = $fineSetting->value;
+
+                    if ($fineSetting->fine_categories === 'late') {
+                        $returnedAt = \Carbon\Carbon::parse($returnBook->returned_at);
+                        $dueAt = \Carbon\Carbon::parse($returnBook->borrowing->due_at);
+
+                        if ($returnedAt->gt($dueAt)) {
+                            $diffDays = (int) $returnedAt->diffInDays($dueAt, true);
+                            
+                            $calculatedAmount = $value * $diffDays;
+                        } else {
+                            $calculatedAmount = 0;
+                        }
                     }
+                    
+                    else if ($fineSetting->fine_categories === 'damaged_or_lost') {
+                        if ($fineSetting->type === 'percentage') {
+                            $bookPrice = $returnBook->borrowing->borrowingsBook->book_price;
+                            $calculatedAmount = ($value / 100) * $bookPrice;
+                        } else {
+                            $calculatedAmount = $value;
+                        }
+                    }
+                    $set('amount', $calculatedAmount);
+                } else {
+                    $set('amount', 0);
                 }
-                $set('amount', $calculatedAmount);
-            } else {
-                $set('amount', 0);
-            }
-        }),
+            }),
 
         TextInput::make('amount')
             ->numeric()
