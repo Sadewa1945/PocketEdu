@@ -16,7 +16,7 @@ use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -198,6 +198,14 @@ class FineResource extends Resource
                 DeleteAction::make()
                     ->modalHeading('Delete Fine')
                     ->modalDescription('This action cannot be undone. Are you sure?'),
+            ])->filters([
+                DateRangeFilter::make('created_at'),
+
+                SelectFilter::make('fine_id')
+                    ->label('Fine')
+                    ->options(fn () => FinesSettings::pluck('fine_name', 'id')->toArray())
+                    ->searchable()
+                    ->preload(),
             ])
             
             ->headerActions([

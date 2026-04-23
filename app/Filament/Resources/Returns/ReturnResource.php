@@ -80,7 +80,6 @@ class ReturnResource extends Resource
             TextInput::make('quantity_returned')
                 ->label('Quantity Returned')
                 ->numeric()
-                ->disabled()
                 ->required()
                 ->minValue(1)
                 ->rules([
@@ -104,10 +103,22 @@ class ReturnResource extends Resource
                         };
                     }
                 ]),
-                
-            Textarea::make('notes')->label('Notes'),
             
-            Hidden::make('returned_at')->default(now()),
+            Select::make('status')
+                ->label('Status')
+                ->options([
+                    'pending' => 'Pending',
+                    'accepted' => 'Accepted',
+                    'rejected' => 'Rejected'
+                ])
+                ->default('accepted'),
+                
+            Textarea::make('notes')
+                ->label('Notes')
+                ->default('Buku sudah diterima.'),
+            
+            Hidden::make('returned_at')
+                ->default(now()),
         ]);
     }
 

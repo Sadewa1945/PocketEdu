@@ -294,14 +294,14 @@ export default function Borrowing() {
                                             </div>
                                         )}
 
-                                        {(borrowed || overdue) && (
+                                        {/* {(borrowed || overdue) && (
                                             <button
                                                 onClick={() => navigate(`/borrowing/${item.id}/returns`)}
                                                 className="w-full py-2 rounded-xl bg-green-500 text-white text-xs font-bold hover:bg-green-600 transition flex items-center justify-center gap-2"
                                             >
                                                 <RotateCcw size={14} /> Return
                                             </button>
-                                        )}
+                                        )} */}
                                     </div>
                                 </div>
                             </div>

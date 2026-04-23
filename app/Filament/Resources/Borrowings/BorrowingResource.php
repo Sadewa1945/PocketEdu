@@ -86,7 +86,8 @@ class BorrowingResource extends Resource
                 ->required(),
 
             Textarea::make('notes')
-                ->label('Notes'),
+                ->label('Notes')
+                ->default('Mohon dijaga ya bukunya, jangan sampai rusak atau hilang.'),
 
             Select::make('status')
                 ->options(function ($record) {
