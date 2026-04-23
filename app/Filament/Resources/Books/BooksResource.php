@@ -6,6 +6,10 @@ use App\Filament\Resources\Books\Pages\CreateBooks;
 use App\Filament\Resources\Books\Pages\EditBooks;
 use App\Filament\Resources\Books\Pages\ListBooks;
 use App\Models\Book;
+use App\Imports\BooksImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -172,6 +176,39 @@ class BooksResource extends Resource
                 ])
             ->headerActions([
                 ExportAction::make()->label('Export Excel'),
+
+                Action::make('import')
+                ->label('Import Excel')
+                ->icon('heroicon-o-arrow-up-tray')
+                ->color('success')
+                ->form([
+                    FileUpload::make('file')
+                        ->label('Pilih File Excel (.xlsx)')
+                        ->disk('public')
+                        ->required(),
+                ])
+                ->action(function (array $data) {
+                    try {
+                        // Ambil path file yang baru diupload
+                        $filePath = storage_path('app/public/' . $data['file']);
+                        
+                        // Jalankan proses import
+                        Excel::import(new BooksImport, $filePath);
+
+                        Notification::make()
+                            ->title('Berhasil!')
+                            ->body('Data buku, rak, dan genre telah diimport.')
+                            ->success()
+                            ->send();
+                            
+                    } catch (\Exception $e) {
+                        Notification::make()
+                            ->title('Terjadi Kesalahan')
+                            ->body($e->getMessage())
+                            ->danger()
+                            ->send();
+                    }
+                }),
             ]);
     }
 
