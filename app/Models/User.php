@@ -22,8 +22,8 @@ class User extends Authenticatable
         'image',
         'email',
         'role',
-        'phone',
-        'address',
+        'otp_code',       
+        'otp_expires_at',
         'password',
     ];
 
@@ -47,6 +47,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'otp_expires_at' => 'datetime',
         ];
     }
 

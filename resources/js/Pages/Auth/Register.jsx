@@ -9,6 +9,7 @@ import {
     BookOpen,
     CheckCircle2,
     X,
+    MailCheck,
 } from "lucide-react";
 
 export default function Register({ setUser }) {
@@ -18,10 +19,16 @@ export default function Register({ setUser }) {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
     const [isRedirecting, setIsRedirecting] = useState(false);
+
+    const [showOtpPopup, setShowOtpPopup] = useState(false);
+    const [otp, setOtp] = useState("");
+    const [otpError, setOtpError] = useState("");
+    const [verifying, setVerifying] = useState(false);
 
     const navigate = useNavigate();
     const currentYear = new Date().getFullYear();
@@ -48,8 +55,8 @@ export default function Register({ setUser }) {
                 password_confirmation: confirmPassword,
             });
 
-            setUser(response.data.user);
-            setShowSuccessPopup(true);
+            // setUser(response.data.user);
+            setShowOtpPopup(true);
         } catch (err) {
             if (err.response?.data?.errors) {
                 const errors = err.response.data.errors;
@@ -63,12 +70,31 @@ export default function Register({ setUser }) {
         }
     };
 
-    const handleClosePopup = () => {
-        setIsRedirecting(true);
-        setTimeout(() => {
-            setShowSuccessPopup(false);
-            navigate("/dashboard");
-        }, 500);
+    const handleVerifyOtp = async (e) => {
+        e.preventDefault();
+        setOtpError("");
+        setVerifying(true);
+
+        try {
+            const response = await axios.post("/api/verify-otp", {
+                email: email,
+                otp_code: otp,
+            });
+
+            if (response.data.user) {
+                setUser(response.data.user);
+            }
+            
+            setIsRedirecting(true);
+            setTimeout(() => {
+                setShowOtpPopup(false);
+                navigate("/dashboard");
+            }, 1000);
+        } catch (err) {
+            setOtpError(err.response?.data?.message || "Kode OTP salah atau kadaluarsa.");
+        } finally {
+            setVerifying(false);
+        }
     };
 
     return (
@@ -297,61 +323,68 @@ export default function Register({ setUser }) {
                 </div>
             </div>
 
-            {showSuccessPopup && (
+            {showOtpPopup && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-                    <div className="relative w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl animate-[fadeIn_.25s_ease-out]">
-                        <button
-                            onClick={handleClosePopup}
-                            disabled={isRedirecting}
-                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition disabled:opacity-50"
-                        >
-                            <X size={20} />
-                        </button>
-
+                    <div className="relative w-full max-w-sm rounded-3xl bg-white p-6 md:p-8 shadow-2xl animate-[fadeIn_.25s_ease-out]">
+                        
                         <div className="flex flex-col items-center text-center">
-                            <div
-                                className={`mb-4 flex h-16 w-16 items-center justify-center rounded-full transition ${
-                                    isRedirecting
-                                        ? "bg-green-600 text-white"
-                                        : "bg-green-100 text-green-600"
-                                }`}
-                            >
+                            <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-full transition duration-300 ${isRedirecting ? 'bg-green-600 text-white' : 'bg-green-100 text-green-600'}`}>
                                 {isRedirecting ? (
-                                    <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    <CheckCircle2 size={32} />
                                 ) : (
-                                    <CheckCircle2 size={34} />
+                                    <MailCheck size={32} />
                                 )}
                             </div>
 
                             <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                                {isRedirecting
-                                    ? "Redirecting..."
-                                    : "Register Successful!"}
+                                {isRedirecting ? "Verified!" : "Cek Email Kamu"}
                             </h3>
 
                             <p className="text-sm text-gray-500 leading-relaxed mb-6">
-                                {isRedirecting
-                                    ? "Taking you to your dashboard..."
-                                    : `Your account has been created successfully. You can now log in and start using ${appName}.`}
+                                {isRedirecting 
+                                    ? "Mengarahkan ke Dashboard..." 
+                                    : `Kami telah mengirimkan 6 digit kode OTP ke ${email}. Masukkan kode tersebut di bawah ini.`
+                                }
                             </p>
 
-                            <button
-                                onClick={handleClosePopup}
-                                disabled={isRedirecting}
-                                className={`w-full rounded-xl py-3 text-sm font-semibold text-white transition active:scale-[0.98] ${
-                                    isRedirecting
-                                        ? "bg-green-400 cursor-not-allowed"
-                                        : "bg-green-600 hover:bg-green-700"
-                                }`}
-                            >
-                                {isRedirecting
-                                    ? "Loading..."
-                                    : "Continue to Dashboard"}
-                            </button>
+                            {!isRedirecting && (
+                                <form onSubmit={handleVerifyOtp} className="w-full space-y-4">
+                                    {otpError && (
+                                        <div className="p-2.5 bg-red-100 border border-red-200 text-red-700 text-xs rounded-lg mb-2">
+                                            {otpError}
+                                        </div>
+                                    )}
+                                    
+                                    <div>
+                                        <input
+                                            type="text"
+                                            maxLength="6"
+                                            className="w-full text-center tracking-[0.5em] font-bold text-xl py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"
+                                            value={otp}
+                                            onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                                            placeholder="••••••"
+                                            required
+                                        />
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={verifying || otp.length < 6}
+                                        className={`w-full rounded-xl py-3 text-sm font-semibold text-white transition active:scale-[0.98] ${
+                                            verifying || otp.length < 6
+                                                ? "bg-green-400 cursor-not-allowed"
+                                                : "bg-green-600 hover:bg-green-700"
+                                        }`}
+                                    >
+                                        {verifying ? "Memverifikasi..." : "Verifikasi OTP"}
+                                    </button>
+                                </form>
+                            )}
                         </div>
                     </div>
                 </div>
             )}
+
         </div>
     );
 }

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 
 Route::get('/books', [BookController::class, 'index']);
 Route::get('/fines-settings', [FineController::class, 'getLabelFine']);
