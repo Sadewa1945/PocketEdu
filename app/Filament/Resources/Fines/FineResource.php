@@ -21,10 +21,11 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
+use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use UnitEnum;
 
 class FineResource extends Resource
@@ -42,7 +43,7 @@ class FineResource extends Resource
     return $schema->schema([
        Select::make('return_book_id')
         ->relationship('returnBook', 'id')
-        ->label('Return ID')
+        ->label('Borrowers Name')
         ->getOptionLabelFromRecordUsing(fn ($record) => "ID: {$record->id} - Buku: {$record->borrowing->borrowingsBook->title} ({$record->borrowing->borrowingsUser->name})")
         ->getSearchResultsUsing(function (string $search): array {
             return ReturnBook::whereHas('borrowing.borrowingsUser', function ($query) use ($search) {
@@ -209,8 +210,27 @@ class FineResource extends Resource
             ])
             
             ->headerActions([
-            ExportAction::make()->label('Export Excel'),
-        ]);
+                ExportAction::make()->label('Export Excel')
+                    ->exports([
+                        ExcelExport::make()
+                            ->withColumns([
+                                ExcelColumn::make('returnBook.borrowing.borrowingsUser.name')
+                                    ->heading('Borrowers Name'),
+                                
+                                ExcelColumn::make('fineSetting.fine_name')
+                                    ->heading('Fine Name'),
+                                
+                                ExcelColumn::make('amount')
+                                    ->heading('Amount'),
+                                
+                                ExcelColumn::make('status')
+                                    ->heading('Status'),
+                                
+                                ExcelColumn::make('paid_at')
+                                    ->heading('Paid At'),
+                            ]),
+                    ]),
+            ]);
     }
 
     public static function getRelations(): array

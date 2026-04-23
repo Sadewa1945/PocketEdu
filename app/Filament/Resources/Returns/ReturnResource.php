@@ -20,6 +20,8 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
@@ -28,6 +30,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
 use Carbon\Carbon;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class ReturnResource extends Resource
 {
@@ -81,6 +84,8 @@ class ReturnResource extends Resource
                 ->label('Quantity Returned')
                 ->numeric()
                 ->required()
+                ->disabled() 
+                ->dehydrated()
                 ->minValue(1)
                 ->rules([
                     function (Get $get, ?\Illuminate\Database\Eloquent\Model $record) {
@@ -208,7 +213,28 @@ class ReturnResource extends Resource
                 ->color('gray'),
             ])
             ->headerActions([
-                ExportAction::make()->label('Export Excel'),
+               ExportAction::make()->label('Export Excel')
+                    ->exports([
+                        ExcelExport::make()
+                            ->withColumns([
+                                ExcelColumn::make('borrowing.borrowingsBook.title')
+                                    ->heading('Book Title'),
+
+                                ExcelColumn::make('borrowing.borrowingsUser.name')
+                                    ->heading('Borrower Name'),
+
+                                ExcelColumn::make('returned_at')
+                                    ->heading('Returned Date'),
+
+                                ExcelColumn::make('quantity_returned')
+                                    ->heading('Qty Returned'),
+
+                                ExcelColumn::make('status')
+                                    ->heading('Status'),
+                            ]),
+                    ]),
+        ])->filters([
+            DateRangeFilter::make('created_at'),
         ]);
     }
 

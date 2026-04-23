@@ -8,6 +8,8 @@ use App\Filament\Resources\Borrowings\Pages\ListBorrowings;
 use App\Filament\Resources\Borrowings\Schemas\BorrowingForm;
 use App\Filament\Resources\Borrowings\Tables\BorrowingsTable;
 use App\Models\Book;
+use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use App\Models\Borrowing;
 use App\Models\User;
 use BackedEnum;
@@ -196,7 +198,32 @@ class BorrowingResource extends Resource
             ])
 
             ->headerActions([
-            ExportAction::make()->label('Export Excel'),
+                ExportAction::make()->label('Export Excel')
+                    ->exports([
+                        ExcelExport::make()
+                            ->withColumns([
+                                ExcelColumn::make('borrowingsUser.name')
+                                    ->heading('Borrower Name'),
+
+                                ExcelColumn::make('borrowingsBook.title')
+                                    ->heading('Book Title'),
+
+                                ExcelColumn::make('quantity')
+                                    ->heading('Qty'),
+
+                                ExcelColumn::make('borrowed_at')
+                                    ->heading('Borrowed Date'),
+
+                                ExcelColumn::make('notes')
+                                    ->heading('notes'),
+
+                                ExcelColumn::make('due_at')
+                                    ->heading('Due Date'),
+
+                                ExcelColumn::make('status')
+                                    ->heading('Status'),
+                            ]),
+                    ]),
         ]);
     }
 
