@@ -132,7 +132,8 @@ function AppLoader() {
                         <Route path="/books/:id" element={<BooksDetail />} />
                         <Route path="/borrowing" element={<Borrowing />} />
                         <Route path="/user/profile" element={<Profile />} />
-                        <Route path="/categories" element={<Bookshelf />} />
+                        <Route path="/bookshelf" element={<Bookshelf />} />
+                        <Route path="/cart-checkout" element={<BorrowForm />} />
                         <Route path="/books/:id/borrow" element={<BorrowForm />} />
                         <Route path="/borrowing/:id/returns" element={<ReturnForm />} />
                         <Route path="/return" element={<Return />} />

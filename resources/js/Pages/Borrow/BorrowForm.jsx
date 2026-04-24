@@ -1,44 +1,51 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation, useOutletContext } from "react-router-dom";
 import axios from "axios";
-import { useOutletContext } from "react-router-dom";
-import { Calendar, 
-         CalendarClock, 
-         BookOpen, 
-         AlertCircle, 
-         Loader2, 
-         StickyNote,
-         Hash 
-        } from "lucide-react";
+import { 
+    Calendar, 
+    CalendarClock, 
+    BookOpen, 
+    AlertCircle, 
+    Loader2, 
+    StickyNote 
+} from "lucide-react";
 
 export default function BorrowForm() {
     const { id } = useParams(); 
     const navigate = useNavigate();
-    const { user } = useOutletContext();
+    const location = useLocation();
+    
+    // Ambil fungsi setWishlist dari MainLayout
+    const { user, wishlist, setWishlist } = useOutletContext() || {};
+
+    // Deteksi apakah data dikirim dari keranjang
+    const selectedFromCart = location.state?.selectedBooks || [];
+    const isMultiBorrow = selectedFromCart.length > 0;
 
     const formatDateLocal = (dateObj) => {
         const offset = dateObj.getTimezoneOffset() * 60000;
-        const localISOTime = (new Date(dateObj - offset)).toISOString().slice('T')[0];
-        return localISOTime;
+        return (new Date(dateObj - offset)).toISOString().slice('T')[0];
     };
 
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
 
     const [formData, setFormData] = useState({
-    borrowed_at: todayStr,
-    due_at: "", 
-    notes: "",
+        borrowed_at: todayStr,
+        due_at: "", 
+        notes: "",
     });
 
     const getMaxDueDate = (startDate) => {
-    if (!startDate) return "";
-    const date = new Date(startDate);
-    date.setDate(date.getDate() + 7);
-    return date.toISOString().split('T')[0];
+        if (!startDate) return "";
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + 7);
+        return date.toISOString().split('T')[0];
     };
 
     const [bookDetail, setBookDetail] = useState(null);
+    const [booksToBorrow, setBooksToBorrow] = useState(isMultiBorrow ? selectedFromCart : []);
+    
     const [loading, setLoading] = useState(false);
     const [pageLoading, setPageLoading] = useState(true);
     const [error, setError] = useState("");
@@ -46,18 +53,25 @@ export default function BorrowForm() {
     const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
     useEffect(() => {
-        const fetchBook = async () => {
-            try {
-                const res = await axios.get(`/api/books/${id}`);
-                setBookDetail(res.data.data || res.data);
-            } catch (err) {
-                setError("Failed to load book data. Make sure the book is available.");
-            } finally {
-                setPageLoading(false);
-            }
-        };
-        fetchBook();
-    }, [id]);
+        if (isMultiBorrow) {
+            setPageLoading(false);
+            return;
+        }
+
+        if (id) {
+            const fetchBook = async () => {
+                try {
+                    const res = await axios.get(`/api/books/${id}`);
+                    setBookDetail(res.data.data || res.data);
+                } catch (err) {
+                    setError("Failed to load book data. Make sure the book is available.");
+                } finally {
+                    setPageLoading(false);
+                }
+            };
+            fetchBook();
+        }
+    }, [id, isMultiBorrow]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -70,26 +84,42 @@ export default function BorrowForm() {
         setError("");
 
         try {
-            const response = await axios.post("/api/borrow", {
-                book_id: id,
-                borrowed_at: formData.borrowed_at,
-                due_at: formData.due_at,
-                notes: formData.notes,
-            });
+            if (isMultiBorrow) {
+            
+                const bookIds = booksToBorrow.map(book => book.id);
 
-            if (response.data.success) {
-                navigate("/borrowing"); 
+                
+                await axios.post("/api/borrow", {
+                    book_ids: bookIds, 
+                    borrowed_at: formData.borrowed_at,
+                    due_at: formData.due_at,
+                    notes: formData.notes,
+                });
+
+                if (setWishlist && wishlist) {
+                    const updatedWishlist = wishlist.filter(w => !bookIds.includes(w.id));
+                    setWishlist(updatedWishlist);
+                }
+
+            } else {
+        
+                await axios.post("/api/borrow", {
+                    book_id: id,
+                    borrowed_at: formData.borrowed_at,
+                    due_at: formData.due_at,
+                    notes: formData.notes,
+                });
             }
+
+            navigate("/borrowing"); 
         } catch (err) {
             console.error("Borrow error:", err);
             if (err.response?.data?.message) {
                 let errorMsg = err.response.data.message;
-                
                 if (err.response.data.errors) {
                     const firstError = Object.values(err.response.data.errors)[0][0];
                     errorMsg = `${errorMsg}: ${firstError}`;
                 }
-                
                 setError(errorMsg);
             } else {
                 setError("An error occurred while processing the borrow.");
@@ -110,43 +140,59 @@ export default function BorrowForm() {
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-8">
-                Borrow Form
+                {isMultiBorrow ? "Checkout Peminjaman" : "Borrow Form"}
             </h2>
 
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col md:flex-row">
                 
-                <div className="w-full md:w-2/5 bg-slate-50 p-6 sm:p-8 border-b md:border-b-0 md:border-r border-slate-200 flex flex-col items-center text-center">
-                    <div className="w-40 h-56 bg-white rounded-xl shadow-sm overflow-hidden mb-5 border border-slate-100">
-                        <img
-                            src={
-                                bookDetail?.cover_image
-                                    ? `${apiUrl}/storage/${bookDetail.cover_image}`
-                                    : "/images/pocketedu.png"
-                            }
-                            alt="Book Cover"
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                                                e.target.onerror = null;
-                                                e.target.src = "/images/pocketedu.png";
-                                            }}
-                        />
-                    </div>
-                    <h3 className="font-bold text-lg text-slate-800 line-clamp-2">
-                        {bookDetail?.title || "Judul Buku"}
-                    </h3>
-                    <p className="text-slate-500 mt-1 text-sm">
-                        {bookDetail?.publisher || "Publisher"}
-                    </p>
-                    <p className="text-slate-500 mt-1 text-sm">
-                        {bookDetail?.author || "Penulis"}
-                    </p>
+                <div className="w-full md:w-2/5 bg-slate-50 p-6 sm:p-8 border-b md:border-b-0 md:border-r border-slate-200 flex flex-col items-center">
                     
-                    <div className="mt-6 w-full p-4 bg-green-50 rounded-2xl border border-green-100">
-                        <p className="text-sm text-green-800 font-medium">Available Stock</p>
-                        <p className="text-2xl font-bold text-green-600 mt-1">
-                            {bookDetail.stock ?? "-"}
-                        </p>
-                    </div>
+                    {isMultiBorrow ? (
+                        <div className="w-full flex flex-col gap-4 text-left">
+                            <h3 className="font-bold text-slate-800 border-b border-slate-200 pb-2">
+                                Buku yang dipinjam ({booksToBorrow.length})
+                            </h3>
+                            <div className="flex flex-col gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                                {booksToBorrow.map((book, idx) => (
+                                    <div key={idx} className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
+                                        <div className="w-12 h-16 bg-slate-100 rounded-lg overflow-hidden shrink-0">
+                                            <img
+                                                src={book.cover_image ? `${apiUrl}/storage/${book.cover_image}` : "/images/pocketedu.png"}
+                                                alt={book.title}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => { e.target.src = "/images/pocketedu.png"; }}
+                                            />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="text-sm font-bold text-slate-800 line-clamp-2">{book.title}</h4>
+                                            <p className="text-xs text-slate-500 mt-1 truncate">{book.author}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center text-center w-full">
+                            <div className="w-40 h-56 bg-white rounded-xl shadow-sm overflow-hidden mb-5 border border-slate-100">
+                                <img
+                                    src={bookDetail?.cover_image ? `${apiUrl}/storage/${bookDetail.cover_image}` : "/images/pocketedu.png"}
+                                    alt="Book Cover"
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => { e.target.src = "/images/pocketedu.png"; }}
+                                />
+                            </div>
+                            <h3 className="font-bold text-lg text-slate-800 line-clamp-2">
+                                {bookDetail?.title || "Judul Buku"}
+                            </h3>
+                            <p className="text-slate-500 mt-1 text-sm">{bookDetail?.publisher || "Publisher"}</p>
+                            <p className="text-slate-500 mt-1 text-sm">{bookDetail?.author || "Penulis"}</p>
+                            
+                            <div className="mt-6 w-full p-4 bg-green-50 rounded-2xl border border-green-100">
+                                <p className="text-sm text-green-800 font-medium">Available Stock</p>
+                                <p className="text-2xl font-bold text-green-600 mt-1">{bookDetail?.stock ?? "-"}</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="w-full md:w-3/5 p-6 sm:p-8">
@@ -158,12 +204,9 @@ export default function BorrowForm() {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-5">
-
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Borrowing Time
-                                </label>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Borrowing Time</label>
                                 <div className="relative">
                                     <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                                     <input
@@ -173,11 +216,7 @@ export default function BorrowForm() {
                                         value={formData.borrowed_at}
                                         onChange={(e) => {
                                             const newBorrowedAt = e.target.value;
-                                            setFormData({
-                                                ...formData,
-                                                borrowed_at: newBorrowedAt,
-                                                due_at: ""
-                                            });
+                                            setFormData({ ...formData, borrowed_at: newBorrowedAt, due_at: "" });
                                         }}
                                         className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition"
                                         required
@@ -185,9 +224,7 @@ export default function BorrowForm() {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Book return time
-                                </label>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Book return time</label>
                                 <div className="relative">
                                     <CalendarClock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                                     <input
@@ -206,9 +243,7 @@ export default function BorrowForm() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Notes (Optional)
-                            </label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Notes (Optional)</label>
                             <div className="relative">
                                 <StickyNote size={18} className="absolute left-4 top-4 text-slate-400" />
                                 <textarea
@@ -217,7 +252,7 @@ export default function BorrowForm() {
                                     maxLength="500"
                                     value={formData.notes}
                                     onChange={handleChange}
-                                    placeholder="Any special notes for librarians?"
+                                    placeholder={isMultiBorrow ? "Catatan untuk pustakawan (berlaku untuk semua buku)..." : "Any special notes for librarians?"}
                                     className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition resize-none"
                                 ></textarea>
                             </div>
@@ -244,7 +279,7 @@ export default function BorrowForm() {
                                 ) : (
                                     <>
                                         <BookOpen size={18} />
-                                        Borrow Now
+                                        {isMultiBorrow ? `Borrow ${booksToBorrow.length} Books` : "Borrow Now"}
                                     </>
                                 )}
                             </button>

@@ -1,11 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useOutletContext } from "react-router-dom";
 import axios from "axios";
-import { BookOpen, Search, Filter, ChevronDown } from "lucide-react";
+import { BookOpen,
+         Search,
+         Filter,
+         ChevronDown,
+         BookHeart
+        } from "lucide-react";
 
 export default function BooksOverview() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { wishlist, setWishlist } = useOutletContext();
+
+    const handleAddToCart = (book) => {
+        if (wishlist.some(item => item.id === book.id)) {
+            alert("The book is already in the Wishlist!");
+            return;
+        }
+        setWishlist([...wishlist, book]);
+    };
     const [books, setBooks] = useState([]);
     const [filteredBooks, setFilteredBooks] = useState([]);
     const [search, setSearch] = useState("");
@@ -345,14 +359,20 @@ export default function BooksOverview() {
                             </div>
 
                             {book.stock > 0 ? (
-                                <button
-                                    onClick={() =>
-                                        navigate(`/books/${book.id}`)
-                                    }
-                                    className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300"
-                                >
-                                    Borrow
-                                </button>
+                                <div className="mt-auto flex gap-2">
+                                    <button 
+                                        onClick={() => handleAddToCart(book)} 
+                                        className="flex-1 py-2 flex justify-center items-center gap-2 rounded-xl bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 transition-colors duration-300 font-semibold text-sm"
+                                    >
+                                        <BookHeart size={16} /> Cart
+                                    </button>
+                                    <button 
+                                        onClick={() => navigate(`/books/${book.id}`)} 
+                                        className="flex-1 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300 font-semibold text-sm"
+                                    >
+                                        View
+                                    </button>
+                                </div>
                             ) : (
                                 <button
                                     disabled

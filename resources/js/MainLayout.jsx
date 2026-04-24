@@ -16,7 +16,9 @@ import {
     Phone,
     MapPin,
     Bell,
-    CheckCircle2
+    CheckCircle2,
+    BookHeart,
+    Trash2
     } from "lucide-react";
 
 export default function MainLayout({ user, setUser }) {
@@ -31,6 +33,44 @@ export default function MainLayout({ user, setUser }) {
     const appName = import.meta.env.VITE_APP_NAME || "PocketEdu";
     const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
     const profileImage = user?.image ? `${apiUrl}/storage/${user.image}` : null;
+
+    const [cartModalOpen, setCartModalOpen] = useState(false);
+    const [wishlist, setWishlist] = useState(() => {
+        const saved = localStorage.getItem("pocketedu_wishlist");
+        return saved ? JSON.parse(saved) : [];
+    });
+    const [selectedToBorrow, setSelectedToBorrow] = useState([]);
+
+    useEffect(() => {
+        localStorage.setItem("pocketedu_wishlist", JSON.stringify(wishlist));
+    }, [wishlist]);
+
+    const removeFromWishlist = (bookId) => {
+        setWishlist(wishlist.filter(book => book.id !== bookId));
+        setSelectedToBorrow(selectedToBorrow.filter(id => id !== bookId));
+    };
+
+    const handleSelectBook = (bookId) => {
+        if (selectedToBorrow.includes(bookId)) {
+            setSelectedToBorrow(selectedToBorrow.filter(id => id !== bookId));
+        } else {
+            if (selectedToBorrow.length >= 3) {
+                alert("Maksimal peminjaman sekaligus adalah 3 buku!");
+                return;
+            }
+            setSelectedToBorrow([...selectedToBorrow, bookId]);
+        }
+    };
+
+    const handleProceedToBorrow = () => {
+        if (selectedToBorrow.length === 0) return;
+        
+        const booksToBorrow = wishlist.filter(book => selectedToBorrow.includes(book.id));
+        
+        setCartModalOpen(false);
+        
+        navigate("/cart-checkout", { state: { selectedBooks: booksToBorrow } });
+    };
 
     const fetchNotifications = async () => {
         try {
@@ -111,6 +151,84 @@ export default function MainLayout({ user, setUser }) {
                     </div>
                 </div>
             )}
+
+            {cartModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+                        <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                                <BookHeart className="text-green-600" size={20} />
+                                Wishlist Books
+                            </h3>
+                            <button onClick={() => setCartModalOpen(false)} className="p-2 bg-white text-slate-400 hover:text-red-500 rounded-full shadow-sm transition">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        <div className="overflow-y-auto p-4 space-y-3 flex-1 bg-white">
+                            <p className="text-sm text-slate-500 mb-2">
+                                Select maximum <span className="font-bold text-green-600">3 books</span> that wants to be borrowed all at once today.
+                            </p>
+                            
+                            {wishlist.length === 0 ? (
+                                <div className="text-center py-10 text-slate-400">
+                                    <BookHeart size={40} className="mx-auto mb-3 opacity-20" />
+                                    <p>Wishlist is empty</p>
+                                </div>
+                            ) : (
+                                wishlist.map((book) => {
+                                    const isSelected = selectedToBorrow.includes(book.id);
+                                    const isDisabled = selectedToBorrow.length >= 3 && !isSelected;
+                                    
+                                    return (
+                                        <div key={book.id} className={`p-3 rounded-2xl border transition flex items-center gap-4 ${isSelected ? 'border-green-500 bg-green-50/30' : 'border-slate-200'}`}>
+                                            <input 
+                                                type="checkbox" 
+                                                className="w-5 h-5 text-green-600 rounded border-slate-300 focus:ring-green-500 cursor-pointer disabled:opacity-50"
+                                                checked={isSelected}
+                                                onChange={() => handleSelectBook(book.id)}
+                                                disabled={isDisabled}
+                                            />
+                                            <div className="w-12 h-16 bg-slate-100 rounded-lg overflow-hidden shrink-0">
+                                                <img 
+                                                    src={book.cover_image ? `${apiUrl}/storage/${book.cover_image}` : "/images/pocketedu.png"} 
+                                                    alt={book.title}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => { e.target.src = "/images/pocketedu.png"; }}
+                                                />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="text-sm font-bold text-slate-800 truncate">{book.title}</h4>
+                                                <p className="text-xs text-slate-500 truncate">{book.author}</p>
+                                            </div>
+                                            <button 
+                                                onClick={() => removeFromWishlist(book.id)} 
+                                                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition shrink-0"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+
+                        <div className="p-5 border-t border-slate-100 bg-slate-50">
+                            <div className="flex justify-between items-center mb-4">
+                                <span className="text-slate-600 font-medium">Buku dipilih:</span>
+                                <span className="font-bold text-lg text-green-600">{selectedToBorrow.length} / 3</span>
+                            </div>
+                            <button 
+                                onClick={handleProceedToBorrow}
+                                disabled={selectedToBorrow.length === 0}
+                                className="w-full py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Proses Peminjaman ({selectedToBorrow.length})
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
            
             <div className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
@@ -151,7 +269,7 @@ export default function MainLayout({ user, setUser }) {
                         </Link>
 
                         <Link
-                            to="/categories"
+                            to="/bookshelf"
                             className="text-slate-600 hover:text-green-700 transition-colors duration-300"
                         >
                             Bookshelves
@@ -164,6 +282,18 @@ export default function MainLayout({ user, setUser }) {
                             <Bell size={22} />
                             {unreadCount > 0 && (
                                 <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                            )}
+                        </button>
+
+                        <button 
+                            onClick={() => setCartModalOpen(true)}
+                            className="relative p-2 text-slate-500 hover:text-green-600 transition hover:bg-slate-50 rounded-full"
+                        >
+                            <BookHeart size={22} />
+                            {wishlist.length > 0 && (
+                                <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold text-white bg-green-500 rounded-full border-2 border-white">
+                                    {wishlist.length}
+                                </span>
                             )}
                         </button>
 
@@ -297,7 +427,19 @@ export default function MainLayout({ user, setUser }) {
                                         {unreadCount > 0 && (
                                             <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
                                         )}
-                                    </button>
+                                </button>
+
+                                <button 
+                                    onClick={() => setCartModalOpen(true)}
+                                    className="relative p-2.5 text-slate-500 hover:text-green-600 mr-2"
+                                >
+                                    <BookHeart size={22} />
+                                    {wishlist.length > 0 && (
+                                        <span className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center text-[9px] font-bold text-white bg-green-500 rounded-full border border-white">
+                                            {wishlist.length}
+                                        </span>
+                                    )}
+                                </button>
                             </div>
 
                             <div className="mt-4 grid grid-cols-2 gap-3">
@@ -383,7 +525,7 @@ export default function MainLayout({ user, setUser }) {
             </div>
 
             <main className="flex-grow">
-                <Outlet context={{ user, setUser }} /> 
+                <Outlet context={{ user, setUser, wishlist, setWishlist }} />
             </main>
 
             <footer className="bg-white border-t border-slate-200 mt-auto">

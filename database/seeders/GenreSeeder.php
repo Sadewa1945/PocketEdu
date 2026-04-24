@@ -11,8 +11,8 @@ class GenreSeeder extends Seeder
     public function run(): void
     {
         $genres = [
-            'Fiction', 'Mystery', 'Romance', 'Fantasy', 
-            'Biography', 'Education', 'Thriller', 'Horror','slice of life'
+            'Fiction', 'Mystery', 'Romance', 'Fantasy', 'History',
+            'Biography', 'Education', 'Thriller', 'Horror','Slice of Life'
         ];
 
         foreach ($genres as $genre) {

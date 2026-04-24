@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import axios from "axios";
 import {
     BookOpen,
     Library,
     ClipboardList,
     AlertCircle,
-    CircleDollarSign
+    CircleDollarSign,
+    BookHeart
 } from "lucide-react";
 
 export default function Dashboard({ user, setUser }) {
@@ -39,6 +40,16 @@ export default function Dashboard({ user, setUser }) {
 
         fetchAllData();
     }, []);
+
+    const { wishlist, setWishlist } = useOutletContext();
+
+    const handleAddToCart = (book) => {
+        if (wishlist.some(item => item.id === book.id)) {
+            alert("Buku sudah ada di keranjang!");
+            return;
+        }
+        setWishlist([...wishlist, book]);
+    };
 
     const fetchBooks = async () => {
         try {
@@ -219,12 +230,21 @@ export default function Dashboard({ user, setUser }) {
                                         </p>
                                     </div>
 
-                                    {book.stock > 0 ?(
-                                        <button 
-                                            onClick={() => navigate(`/books/${book.id}`)} 
-                                            className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
-                                        Borrow
-                                    </button>
+                                    {book.stock > 0 ? (
+                                        <div className="mt-auto flex gap-2">
+                                            <button 
+                                                onClick={() => handleAddToCart(book)} 
+                                                className="flex-1 py-2 flex justify-center items-center gap-2 rounded-xl bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 transition-colors duration-300 font-semibold text-sm"
+                                            >
+                                                <BookHeart size={16} /> Cart
+                                            </button>
+                                            <button 
+                                                onClick={() => navigate(`/books/${book.id}`)} 
+                                                className="flex-1 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300 font-semibold text-sm"
+                                            >
+                                                View
+                                            </button>
+                                        </div>
                                     ):(
                                         <button 
                                             disabled
@@ -292,12 +312,21 @@ export default function Dashboard({ user, setUser }) {
                                         </p>
                                     </div>
 
-                                    {book.stock > 0 ?(
-                                        <button 
-                                            onClick={() => navigate(`/books/${book.id}`)} 
-                                            className="mt-auto w-full py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
-                                        Borrow
-                                    </button>
+                                    {book.stock > 0 ? (
+                                        <div className="mt-auto flex gap-2">
+                                            <button 
+                                                onClick={() => handleAddToCart(book)} 
+                                                className="flex-1 py-2 flex justify-center items-center gap-2 rounded-xl bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 transition-colors duration-300 font-semibold text-sm"
+                                            >
+                                                <BookHeart size={16} /> Cart
+                                            </button>
+                                            <button 
+                                                onClick={() => navigate(`/books/${book.id}`)} 
+                                                className="flex-1 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300 font-semibold text-sm"
+                                            >
+                                                View
+                                            </button>
+                                        </div>
                                     ) : (
                                         <button 
                                             disabled

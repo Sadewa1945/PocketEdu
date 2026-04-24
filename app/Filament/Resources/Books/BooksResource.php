@@ -29,6 +29,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Nette\Utils\ImageColor;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
 use UnitEnum;
 
 class BooksResource extends Resource
@@ -175,7 +177,45 @@ class BooksResource extends Resource
                         ->relationship('bookshelf', 'name'),
                 ])
             ->headerActions([
-                ExportAction::make()->label('Export Excel'),
+                ExportAction::make()->label('Export Excel')
+                    ->exports([
+                        ExcelExport::make()
+                            ->withColumns([
+                                ExcelColumn::make('title')
+                                    ->heading('Title'),
+
+                                ExcelColumn::make('author')
+                                    ->heading('Author'),
+
+                                ExcelColumn::make('book_price')
+                                    ->heading('Book Price'),
+
+                                ExcelColumn::make('isbn')
+                                    ->heading('ISBN'),
+
+                                ExcelColumn::make('published_date')
+                                    ->heading('Published Date'),
+
+                                ExcelColumn::make('publisher')
+                                    ->heading('Publisher'),
+
+                                ExcelColumn::make('description')
+                                    ->heading('Description'),
+
+                                ExcelColumn::make('cover_image')
+                                    ->heading('Cover Image'),
+
+                                ExcelColumn::make('bookshelf.name')
+                                    ->heading('Bookshelf'),
+
+                                ExcelColumn::make('genres')
+                                    ->heading('Genre')
+                                    ->getStateUsing(fn (Book $record) => $record->genres->pluck('name')->join(', ')),
+
+                                ExcelColumn::make('stock')
+                                    ->heading('Stock'),
+                            ]),
+                    ]),
 
                 Action::make('import')
                 ->label('Import Excel')
@@ -189,21 +229,19 @@ class BooksResource extends Resource
                 ])
                 ->action(function (array $data) {
                     try {
-                        // Ambil path file yang baru diupload
                         $filePath = storage_path('app/public/' . $data['file']);
                         
-                        // Jalankan proses import
                         Excel::import(new BooksImport, $filePath);
 
                         Notification::make()
-                            ->title('Berhasil!')
-                            ->body('Data buku, rak, dan genre telah diimport.')
+                            ->title('Succeed!')
+                            ->body('Book, shelf, and genre data has been imported.')
                             ->success()
                             ->send();
                             
                     } catch (\Exception $e) {
                         Notification::make()
-                            ->title('Terjadi Kesalahan')
+                            ->title('There is an error')
                             ->body($e->getMessage())
                             ->danger()
                             ->send();
