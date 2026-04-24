@@ -337,13 +337,13 @@ export default function Register({ setUser }) {
                             </div>
 
                             <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                                {isRedirecting ? "Verified!" : "Cek Email Kamu"}
+                                {isRedirecting ? "Verified!" : "Check Your Email"}
                             </h3>
 
                             <p className="text-sm text-gray-500 leading-relaxed mb-6">
                                 {isRedirecting 
-                                    ? "Mengarahkan ke Dashboard..." 
-                                    : `Kami telah mengirimkan 6 digit kode OTP ke ${email}. Masukkan kode tersebut di bawah ini.`
+                                    ? "Navigate to Dashboard..." 
+                                    : `We have sent a 6 digit OTP code to ${email}. Enter the code below.`
                                 }
                             </p>
 
@@ -376,7 +376,7 @@ export default function Register({ setUser }) {
                                                 : "bg-green-600 hover:bg-green-700"
                                         }`}
                                     >
-                                        {verifying ? "Memverifikasi..." : "Verifikasi OTP"}
+                                        {verifying ? "Verifying..." : "OTP Verification"}
                                     </button>
                                 </form>
                             )}

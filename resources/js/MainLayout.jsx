@@ -215,7 +215,7 @@ export default function MainLayout({ user, setUser }) {
 
                         <div className="p-5 border-t border-slate-100 bg-slate-50">
                             <div className="flex justify-between items-center mb-4">
-                                <span className="text-slate-600 font-medium">Buku dipilih:</span>
+                                <span className="text-slate-600 font-medium">Book selected:</span>
                                 <span className="font-bold text-lg text-green-600">{selectedToBorrow.length} / 3</span>
                             </div>
                             <button 
@@ -223,7 +223,7 @@ export default function MainLayout({ user, setUser }) {
                                 disabled={selectedToBorrow.length === 0}
                                 className="w-full py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Proses Peminjaman ({selectedToBorrow.length})
+                                Borrowing ({selectedToBorrow.length})
                             </button>
                         </div>
                     </div>

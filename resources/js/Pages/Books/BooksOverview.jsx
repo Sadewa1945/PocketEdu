@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation, useOutletContext } from "react-router-dom";
 import axios from "axios";
-import { BookOpen,
-         Search,
-         Filter,
-         ChevronDown,
-         BookHeart
-        } from "lucide-react";
+import { BookOpen, Search, Filter, ChevronDown, BookHeart } from "lucide-react";
 
 export default function BooksOverview() {
     const navigate = useNavigate();
     const location = useLocation();
     const { wishlist, setWishlist } = useOutletContext();
 
-    const handleAddToCart = (book) => {
-        if (wishlist.some(item => item.id === book.id)) {
+    const handleAddToWishlist = (book) => {
+        if (wishlist.some((item) => item.id === book.id)) {
             alert("The book is already in the Wishlist!");
             return;
         }
@@ -25,7 +20,7 @@ export default function BooksOverview() {
     const [search, setSearch] = useState("");
 
     const [selectedBookshelf, setSelectedBookshelf] = useState(
-        location.state?.BookshelfFromNav || "All",
+        location.state?.bookshelfFromNav || "All",
     );
     const [selectedGenre, setSelectedGenre] = useState("All");
     const [bookshelf, setBookshelf] = useState(["All"]);
@@ -161,7 +156,6 @@ export default function BooksOverview() {
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                     <div className="relative w-full sm:w-72 text-slate-700">
-                        
                         <button
                             onClick={() => setIsOpen(!isOpen)}
                             className="w-full flex items-center justify-between px-5 py-3.5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:border-green-500 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-500/10"
@@ -188,10 +182,9 @@ export default function BooksOverview() {
                                 className={`text-slate-400 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
                             />
                         </button>
-                        
+
                         {isOpen && (
                             <>
-                               
                                 <div
                                     className="fixed inset-0 z-10"
                                     onClick={() => setIsOpen(false)}
@@ -360,14 +353,18 @@ export default function BooksOverview() {
 
                             {book.stock > 0 ? (
                                 <div className="mt-auto flex gap-2">
-                                    <button 
-                                        onClick={() => handleAddToCart(book)} 
+                                    <button
+                                        onClick={() =>
+                                            handleAddToWishlist(book)
+                                        }
                                         className="flex-1 py-2 flex justify-center items-center gap-2 rounded-xl bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 transition-colors duration-300 font-semibold text-sm"
                                     >
-                                        <BookHeart size={16} /> Cart
+                                        <BookHeart size={16} /> Wishlist
                                     </button>
-                                    <button 
-                                        onClick={() => navigate(`/books/${book.id}`)} 
+                                    <button
+                                        onClick={() =>
+                                            navigate(`/books/${book.id}`)
+                                        }
                                         className="flex-1 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors duration-300 font-semibold text-sm"
                                     >
                                         View

@@ -11,39 +11,39 @@ import {
 export default function Bookshelf({ user, setUser }) {
     const navigate = useNavigate();
     const [search, setSearch] = useState("");
-    const [categories, setCategories] = useState([]);
+    const [bookshelves, setBookshelves] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [filteredCategories, setFilteredCategories] = useState([]);
+    const [filteredBookshelves, setFilteredBookshelves] = useState([]);
     const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
-    const fetchCategories = async () => {
+    const fetchBookshelves = async () => {
         try {
             setLoading(true);
             setError("");
 
-            const response = await axios.get("/api/categories");
+            const response = await axios.get("/api/bookshelf");
 
-            setCategories(response.data.data || response.data || []);
+            setBookshelves(response.data.data || response.data || []);
         } catch (error) {
-            console.error("Error fetching categories:", error);
-            setError("Failed to load categories. Please try again.");
+            console.error("Error fetching bookshelf:", error);
+            setError("Failed to load bookshelf. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        const filtered = categories.filter((bookshelf) =>
+        const filtered = bookshelves.filter((bookshelf) =>
             `${bookshelf.name}`
                 .toLowerCase()
                 .includes(search.toLowerCase())
         );
-        setFilteredCategories(filtered);
-    }, [search, categories]); 
+        setFilteredBookshelves(filtered);
+    }, [search, bookshelves]); 
 
     useEffect(() => {
-        fetchCategories();
+        fetchBookshelves();
     }, []);
 
     const handleBookshelfClick = (bookshelfData) => {
@@ -63,7 +63,7 @@ export default function Bookshelf({ user, setUser }) {
                         <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
                             type="text"
-                            placeholder="Search categories..."
+                            placeholder="Search bookshelves..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -71,7 +71,7 @@ export default function Bookshelf({ user, setUser }) {
                     </div>
 
                     <button
-                        onClick={fetchCategories}
+                        onClick={fetchBookshelves}
                         className="inline-flex items-center gap-2 rounded-2xl bg-green-600 px-5 py-3 text-white font-medium hover:bg-green-700 transition w-fit"
                     >
                         <RotateCw size={18} />
@@ -98,17 +98,17 @@ export default function Bookshelf({ user, setUser }) {
                 <div className="bg-red-50 border border-red-200 text-red-600 rounded-3xl p-6 shadow-sm">
                     {error}
                 </div>
-            ) : filteredCategories.length === 0 ? (
+            ) : filteredBookshelves.length === 0 ? (
                 <div className="bg-white rounded-3xl border border-slate-200 p-10 shadow-sm flex flex-col items-center justify-center text-slate-500">
                     <FolderOpen size={42} className="mb-3 text-slate-400" />
-                    <p className="text-lg font-medium">No categories found</p>
+                    <p className="text-lg font-medium">No bookshelves found</p>
                     <p className="text-sm text-slate-400 mt-1">
                         Looks like nobody has organized anything. Shocking.
                     </p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {filteredCategories.map((bookshelf, index) => (
+                    {filteredBookshelves.map((bookshelf, index) => (
                         <div
                             key={bookshelf.id || index}
                             onClick={() => handleBookshelfClick(bookshelf)}

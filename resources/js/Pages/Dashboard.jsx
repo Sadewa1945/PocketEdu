@@ -43,9 +43,9 @@ export default function Dashboard({ user, setUser }) {
 
     const { wishlist, setWishlist } = useOutletContext();
 
-    const handleAddToCart = (book) => {
+    const handleAddToWishlist = (book) => {
         if (wishlist.some(item => item.id === book.id)) {
-            alert("Buku sudah ada di keranjang!");
+            alert("The book is already on the wishlist!");
             return;
         }
         setWishlist([...wishlist, book]);
@@ -233,10 +233,10 @@ export default function Dashboard({ user, setUser }) {
                                     {book.stock > 0 ? (
                                         <div className="mt-auto flex gap-2">
                                             <button 
-                                                onClick={() => handleAddToCart(book)} 
+                                                onClick={() => handleAddToWishlist(book)} 
                                                 className="flex-1 py-2 flex justify-center items-center gap-2 rounded-xl bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 transition-colors duration-300 font-semibold text-sm"
                                             >
-                                                <BookHeart size={16} /> Cart
+                                                <BookHeart size={16} /> Wishlist
                                             </button>
                                             <button 
                                                 onClick={() => navigate(`/books/${book.id}`)} 
@@ -315,10 +315,10 @@ export default function Dashboard({ user, setUser }) {
                                     {book.stock > 0 ? (
                                         <div className="mt-auto flex gap-2">
                                             <button 
-                                                onClick={() => handleAddToCart(book)} 
+                                                onClick={() => handleAddToWishlist(book)} 
                                                 className="flex-1 py-2 flex justify-center items-center gap-2 rounded-xl bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 transition-colors duration-300 font-semibold text-sm"
                                             >
-                                                <BookHeart size={16} /> Cart
+                                                <BookHeart size={16} /> Wishlist
                                             </button>
                                             <button 
                                                 onClick={() => navigate(`/books/${book.id}`)} 
