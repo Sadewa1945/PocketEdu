@@ -56,3 +56,18 @@ php artisan migrate --seed
 ### 6. Run the project
 php artisan serve and
 npm run dev
+
+
+## 📸 Preview
+
+### Dashboard
+![Dashboard](./screenshots/dashboard.png)
+
+### Books Page
+![Books](./screenshots/books.png)
+
+### Borrow System
+![Borrow](./screenshots/borrow.png)
+
+### Admin Panel
+![Admin](./screenshots/admin.png)
