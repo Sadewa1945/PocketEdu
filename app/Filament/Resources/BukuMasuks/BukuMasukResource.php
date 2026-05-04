@@ -18,12 +18,17 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class BukuMasukResource extends Resource
 {
     protected static ?string $model = BukuMasuk::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
+   
+    protected static string|UnitEnum|null $navigationGroup = 'Books';
+
+    protected static ?int $navigationSort = 4;
 
     public static function getNavigationLabel(): string
     {

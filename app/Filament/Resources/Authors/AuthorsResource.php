@@ -11,6 +11,8 @@ use App\Models\Author;
 use App\Models\Authors;
 use BackedEnum;
 use Dom\Text;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -49,7 +51,12 @@ class AuthorsResource extends Resource
                 ->label('Author Name')
                 ->sortable()
                 ->searchable(),
-        ]);
+        ])->actions([
+                EditAction::make(),
+                DeleteAction::make()
+                    ->modalHeading('Delete Author')
+                    ->modalDescription('This action cannot be undone. Are you sure?'),
+                ]);
     }
 
     public static function getRelations(): array
