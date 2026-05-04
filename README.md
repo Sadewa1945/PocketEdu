@@ -57,6 +57,7 @@ php artisan migrate --seed
 php artisan serve and
 npm run dev
 
+---
 
 ## 📸 Preview
 
