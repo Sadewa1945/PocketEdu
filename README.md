@@ -61,13 +61,13 @@ npm run dev
 ## 📸 Preview
 
 ### Dashboard
-![Dashboard](./screenshots/dashboard.png)
+![Dashboard](./screenshots/Dashboard.png)
 
 ### Books Page
-![Books](./screenshots/books.png)
+![Books](./screenshots/Books.png)
 
 ### Borrow System
-![Borrow](./screenshots/borrow.png)
+![Borrow](./screenshots/Borrow.png)
 
 ### Admin Panel
-![Admin](./screenshots/admin.png)
+![Admin](./screenshots/Admin.png)
