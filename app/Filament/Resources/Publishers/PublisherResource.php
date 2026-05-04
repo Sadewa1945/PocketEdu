@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\Authors;
+namespace App\Filament\Resources\Publishers;
 
-use App\Filament\Resources\Authors\Pages\CreateAuthors;
-use App\Filament\Resources\Authors\Pages\EditAuthors;
-use App\Filament\Resources\Authors\Pages\ListAuthors;
-use App\Filament\Resources\Authors\Schemas\AuthorsForm;
-use App\Filament\Resources\Authors\Tables\AuthorsTable;
-use App\Models\Author;
-use App\Models\Authors;
+use App\Filament\Resources\Publishers\Pages\CreatePublisher;
+use App\Filament\Resources\Publishers\Pages\EditPublisher;
+use App\Filament\Resources\Publishers\Pages\ListPublishers;
+use App\Filament\Resources\Publishers\Schemas\PublisherForm;
+use App\Filament\Resources\Publishers\Tables\PublishersTable;
+use App\Models\Publisher;
 use BackedEnum;
-use Dom\Text;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
@@ -21,22 +19,22 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
 
-class AuthorsResource extends Resource
+class PublisherResource extends Resource
 {
-    protected static ?string $model = Author::class;
+    protected static ?string $model = Publisher::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-circle';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office';
    
     protected static string|UnitEnum|null $navigationGroup = 'Books';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            TextInput::make('author_name')
+            TextInput::make('publisher_name')
                 ->required()
-                ->label('Author Name'),
+                ->label('Publisher Name'),
         ]);
     }
 
@@ -47,22 +45,23 @@ class AuthorsResource extends Resource
                 ->label('Id')
                 ->sortable(),
 
-            TextColumn::make('author_name')
-                ->label('Author Name')
+            TextColumn::make('publisher_name')
+                ->label('Publisher Name')
                 ->sortable()
                 ->searchable(),
 
             TextColumn::make('total_books')
                 ->label('Total Books')
-                ->state(fn ($record) => $record->authorBooks()->count())
+                ->state(fn ($record) => $record->publisherBooks()->count())
                 ->sortable(),
-
-        ])->actions([
+        ])
+            ->actions([
                 EditAction::make(),
                 DeleteAction::make()
-                    ->modalHeading('Delete Author')
+                    ->modalHeading('Delete Book')
                     ->modalDescription('This action cannot be undone. Are you sure?'),
-                ]);
+                
+        ]);
     }
 
     public static function getRelations(): array
@@ -75,9 +74,9 @@ class AuthorsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListAuthors::route('/'),
-            'create' => CreateAuthors::route('/create'),
-            'edit' => EditAuthors::route('/{record}/edit'),
+            'index' => ListPublishers::route('/'),
+            'create' => CreatePublisher::route('/create'),
+            'edit' => EditPublisher::route('/{record}/edit'),
         ];
     }
 }

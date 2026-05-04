@@ -19,7 +19,7 @@ class BookSeeder extends Seeder
                 'data' => [
                     'title' => 'Alternate',
                     'authors_id' => 1,
-                    'publisher' => 'Haru',
+                    'publisher_id' => 1,
                     'published_date' => '2023-06-05',
                     'book_price' => 145000,
                     'isbn' => '9786235467115',
@@ -37,7 +37,7 @@ class BookSeeder extends Seeder
                 'data' => [
                     'title' => 'Your Name',
                     'authors_id' => 2,
-                    'publisher' => 'Haru',
+                    'publisher_id' => 1,
                     'published_date' => '2020-02-20',
                     'book_price' => 98100,
                     'isbn' => '9786237351207',
@@ -51,7 +51,7 @@ class BookSeeder extends Seeder
                 'data' => [
                     'title' => 'Everything Becomes F: The Perfect Insider',
                     'authors_id' => 3,
-                    'publisher' => 'Haru',
+                    'publisher_id' => 1,
                     'published_date' => '2025-07-27',
                     'book_price' => 135900,
                     'isbn' => '9786235467351',
@@ -65,7 +65,7 @@ class BookSeeder extends Seeder
                 'data' => [
                     'title' => 'Weathering With You',
                     'authors_id' => 2,
-                    'publisher' => 'Haru',
+                    'publisher_id' => 1,
                     'published_date' => '2021-02-22',
                     'book_price' => 98100,
                     'isbn' => '9786237351627',
@@ -79,7 +79,7 @@ class BookSeeder extends Seeder
                 'data' => [
                     'title' => 'Girls In The Dark',
                     'authors_id' => 4,
-                    'publisher' => 'Haru',
+                    'publisher_id' => 1,
                     'published_date' => '2019-02-20',
                     'book_price' => 94500,
                     'isbn' => '9786025297281',
@@ -93,7 +93,7 @@ class BookSeeder extends Seeder
                 'data' => [
                     'title' => 'Sukarno: Biografi Lengkap Negarawan Sejati',
                     'authors_id' => 5,
-                    'publisher' => 'C-Klik Media',
+                    'publisher_id' => 2,
                     'published_date' => '2018-11-26',
                     'book_price' => 67500,
                     'isbn' => '9786025448942',
@@ -107,7 +107,7 @@ class BookSeeder extends Seeder
                 'data' => [
                     'title' => 'Mohammad Hatta : Biografi Singkat 1902 - 1980',
                     'authors_id' => 6,
-                    'publisher' => 'Garasi',
+                    'publisher_id' => 3,
                     'published_date' => '2020-10-30',
                     'book_price' => 67500,
                     'isbn' => '9786237219637',
@@ -121,7 +121,7 @@ class BookSeeder extends Seeder
                 'data' => [
                     'title' => 'Matematika Terapan',
                     'authors_id' => 7,
-                    'publisher' => 'Penerbit Andi',
+                    'publisher_id' => 4,
                     'published_date' => '2019-10-23',
                     'book_price' => 121500,
                     'isbn' => '9786230102325',

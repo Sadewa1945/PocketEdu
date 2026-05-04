@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('isbn')->unique();
             $table->date('published_date');
             $table->decimal('book_price', 12,2);
-            $table->string('publisher');
+            $table->foreignId('publisher_id')->constrained('publishers')->restrictOnDelete();
             $table->text('description')->nullable();
             $table->string('cover_image')->nullable()->default('pocketedu.png');
             $table->integer('stock')->default(1);

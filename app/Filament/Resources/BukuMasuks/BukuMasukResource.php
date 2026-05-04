@@ -32,7 +32,7 @@ class BukuMasukResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return 'Guestbook';
+        return 'Incoming Book Stock';
     }
 
     public static function form(Schema $schema): Schema

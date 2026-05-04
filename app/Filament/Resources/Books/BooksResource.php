@@ -73,7 +73,9 @@ class BooksResource extends Resource
             DatePicker::make('published_date')
                 ->label('Published Date'),
 
-            TextInput::make('publisher')
+            Select::make('publisher_id')
+                ->relationship('publisher', 'publisher_name')
+                ->required()
                 ->label('Publisher'),
             
             Textarea::make('description')
@@ -140,7 +142,7 @@ class BooksResource extends Resource
                     ->sortable()
                     ->searchable(),
 
-                TextColumn::make('publisher')
+                TextColumn::make('publisher.publisher_name')
                     ->label('Publisher')
                     ->sortable()
                     ->searchable(),
