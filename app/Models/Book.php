@@ -13,7 +13,7 @@ class Book extends Model
 
     protected $fillable = [
         'title',
-        'author',
+        'authors_id',
         'isbn',
         'published_date',
         'publisher',
@@ -49,5 +49,15 @@ class Book extends Model
         return Attribute::make(
             get: fn ($value) => $value ? Storage::url($value) : asset('images/pocketedu.png')
         );
+    }
+
+    public function authors()
+    {
+        return $this->belongsTo(Author::class, 'authors_id');
+    }
+
+    public function bookMasuks()
+    {
+        return $this->hasMany(BukuMasuk::class, 'book_id');
     }
 }

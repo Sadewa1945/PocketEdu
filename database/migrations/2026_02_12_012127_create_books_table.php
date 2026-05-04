@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('bookshelf_id')->constrained('bookshelves')->restrictOnDelete();
             $table->string('title');
-            $table->string('author');
+            $table->foreignId('authors_id')->constrained('authors')->restrictOnDelete();
             $table->string('isbn')->unique();
             $table->date('published_date');
             $table->decimal('book_price', 12,2);

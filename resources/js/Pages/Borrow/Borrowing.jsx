@@ -93,6 +93,7 @@ export default function Borrowing() {
     const isOverdue = (item) => item.status === "overdue";
     const isReturned = (item) => item.status === "returned";
     const isBorrowed = (item) => item.status === "borrowed";
+    const isExpired = (item) => item.status === "expired";
     const isPending = (item) => item.status === "pending";
     const isAccepted = (item) => item.status === "accepted";
     const isPrepared = (item) => item.status === "prepared";
@@ -117,6 +118,8 @@ export default function Borrowing() {
                 return <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">Waiting to be Returned</span>;
             case "pending":
                 return <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-600">Pending</span>;
+            case "expired":
+                return <span className="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-600">Expired</span>;
             case "prepared":
                 return <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-yellow-600">Prepared</span>;
             case "accepted":
@@ -238,6 +241,7 @@ export default function Borrowing() {
                         const returned = isReturned(item);
                         const borrowed = isBorrowed(item);
                         const pending = isPending(item);
+                        const expired = isExpired(item);
                         const accepted = isAccepted(item);
                         const prepare = isPrepared(item);
                         const ready_to_pickup = isReadytoPickup(item);
@@ -247,7 +251,12 @@ export default function Borrowing() {
                             <div
                                 key={item.id}
                                 className={`bg-white rounded-2xl border overflow-hidden flex flex-col transition shadow-sm hover:shadow-md ${
-                                    returned ? "opacity-75 grayscale-[0.5] border-slate-100" : overdue ? "border-red-200" : "border-slate-100"
+                                    
+                                    (returned || expired) 
+                                        ? "opacity-60 grayscale-[0.3] border-slate-100 bg-slate-50" 
+                                        : overdue 
+                                            ? "border-red-200" 
+                                            : "border-slate-100"
                                 }`}
                             >
                                 <div className="relative aspect-[3/4] overflow-hidden bg-slate-50">
@@ -291,6 +300,12 @@ export default function Borrowing() {
                                         {(borrowed || overdue) && (
                                             <div className={`text-center py-1.5 rounded-lg text-[10px] font-bold ${overdue ? "bg-red-50 text-red-600" : "bg-blue-50 text-blue-600"}`}>
                                                 {getCountdown(item.due_at)}
+                                            </div>
+                                        )}
+
+                                        {expired && (
+                                            <div className="text-center py-1.5 rounded-lg text-[10px] font-bold bg-gray-100 text-gray-500">
+                                                Order Expired
                                             </div>
                                         )}
 

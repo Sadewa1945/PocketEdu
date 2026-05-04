@@ -11,7 +11,7 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('borrowings:update-overdue')->everyMinute();
+Schedule::command('borrowings:update-status')->everyMinute();
 
 Schedule::call(function () {
     $tomorrow = Carbon::tomorrow('Asia/Jakarta')->toDateString();

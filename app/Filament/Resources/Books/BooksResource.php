@@ -55,9 +55,10 @@ class BooksResource extends Resource
                 ->required()
                 ->label('Title'),
 
-            TextInput::make('author')
+            Select::make('authors_id')
+                ->relationship('authors', 'author_name')
                 ->required()
-                ->label('Author'),
+                ->label('Authors'),
 
             TextInput::make('book_price')
                 ->label('Book Price')
@@ -130,9 +131,8 @@ class BooksResource extends Resource
                     ->sortable()
                     ->searchable(),
 
-                TextColumn::make('author')
+                TextColumn::make('authors.author_name')
                     ->label('Author')
-                    ->sortable()
                     ->searchable(),
 
                 TextColumn::make('isbn')

@@ -30,9 +30,9 @@ class AuthController extends Controller
             'otp_expires_at' => now()->addMinutes(10),
         ]);
 
-        Mail::raw("Hallo {$user->name}, kode OTP registrasi PocketEdu kamu adalah: {$otp_code}. Kode ini berlaku selama 10 menit.", function ($message) use ($user) {
+        Mail::raw("Hallo {$user->name}, Your PocketEdu registration OTP code is: {$otp_code}. This code is valid for 10 minutes.", function ($message) use ($user) {
             $message->to($user->email)
-                    ->subject('Kode Verifikasi Email PocketEdu');
+                    ->subject('PocketEdu Email Verification Code');
         });
 
         // Auth::login($user);
@@ -93,12 +93,12 @@ class AuthController extends Controller
 
         if ((string) $user->otp_code !== (string) $request->otp_code){
             return response()->json([
-                'message' => 'Kode OTP tidak valid.'
+                'message' => 'Invalid OTP code.'
             ], 400);
         }
 
         if (now()->greaterThan($user->otp_expires_at)) {
-            return response()->json(['message' => 'Kode OTP sudah kadaluarsa. Silakan minta ulang.'], 400);
+            return response()->json(['message' => 'The OTP code has expired. Please request a new one.'], 400);
         }
 
         $user->update([
@@ -111,7 +111,7 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         return response()->json([
-            'message' => 'Email berhasil diverifikasi.',
+            'message' => 'Email successfully verified.',
             'user' => $user
         ], 200);
     }

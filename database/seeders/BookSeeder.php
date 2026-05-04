@@ -18,7 +18,7 @@ class BookSeeder extends Seeder
             [
                 'data' => [
                     'title' => 'Alternate',
-                    'author' => 'Shigeaki Kato',
+                    'authors_id' => 1,
                     'publisher' => 'Haru',
                     'published_date' => '2023-06-05',
                     'book_price' => 145000,
@@ -36,7 +36,7 @@ class BookSeeder extends Seeder
             [
                 'data' => [
                     'title' => 'Your Name',
-                    'author' => 'Makoto Shinkai',
+                    'authors_id' => 2,
                     'publisher' => 'Haru',
                     'published_date' => '2020-02-20',
                     'book_price' => 98100,
@@ -50,7 +50,7 @@ class BookSeeder extends Seeder
             [
                 'data' => [
                     'title' => 'Everything Becomes F: The Perfect Insider',
-                    'author' => 'Mori Hiroshi',
+                    'authors_id' => 3,
                     'publisher' => 'Haru',
                     'published_date' => '2025-07-27',
                     'book_price' => 135900,
@@ -64,7 +64,7 @@ class BookSeeder extends Seeder
             [
                 'data' => [
                     'title' => 'Weathering With You',
-                    'author' => 'Makoto Shinkai',
+                    'authors_id' => 2,
                     'publisher' => 'Haru',
                     'published_date' => '2021-02-22',
                     'book_price' => 98100,
@@ -78,7 +78,7 @@ class BookSeeder extends Seeder
             [
                 'data' => [
                     'title' => 'Girls In The Dark',
-                    'author' => 'Akiyoshi Rikako',
+                    'authors_id' => 4,
                     'publisher' => 'Haru',
                     'published_date' => '2019-02-20',
                     'book_price' => 94500,
@@ -92,7 +92,7 @@ class BookSeeder extends Seeder
             [
                 'data' => [
                     'title' => 'Sukarno: Biografi Lengkap Negarawan Sejati',
-                    'author' => 'Anom Whani Wicaksono',
+                    'authors_id' => 5,
                     'publisher' => 'C-Klik Media',
                     'published_date' => '2018-11-26',
                     'book_price' => 67500,
@@ -106,7 +106,7 @@ class BookSeeder extends Seeder
             [
                 'data' => [
                     'title' => 'Mohammad Hatta : Biografi Singkat 1902 - 1980',
-                    'author' => 'Salman Alfarizi',
+                    'authors_id' => 6,
                     'publisher' => 'Garasi',
                     'published_date' => '2020-10-30',
                     'book_price' => 67500,
@@ -120,7 +120,7 @@ class BookSeeder extends Seeder
             [
                 'data' => [
                     'title' => 'Matematika Terapan',
-                    'author' => 'Cekmas Cekdin',
+                    'authors_id' => 7,
                     'publisher' => 'Penerbit Andi',
                     'published_date' => '2019-10-23',
                     'book_price' => 121500,
