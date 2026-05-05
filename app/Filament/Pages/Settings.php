@@ -11,12 +11,17 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Concerns\InteractsWithForms;
+use UnitEnum;
 
 class Settings extends Page implements HasForms
 {
     use InteractsWithForms;
 
-     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+
+    protected static string|UnitEnum|null $navigationGroup = 'System';
+
+    protected static ?int $navigationSort = 2;
     
     protected static ?string $title = 'Settings';
     protected string $view = 'filament.pages.settings';

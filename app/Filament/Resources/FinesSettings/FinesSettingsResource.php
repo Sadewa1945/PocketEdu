@@ -30,7 +30,7 @@ class FinesSettingsResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'System';
 
-    protected static ?int $navigationSort = 999;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {

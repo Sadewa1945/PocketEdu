@@ -177,6 +177,18 @@ class BooksResource extends Resource
                     SelectFilter::make('bookshelf_id')
                         ->label('Bookshelf')
                         ->relationship('bookshelf', 'name'),
+
+                    SelectFilter::make('genres')
+                        ->label('Genre')
+                        ->relationship('genres', 'name'),
+
+                    SelectFilter::make('authors_id')
+                        ->label('Author')
+                        ->relationship('authors', 'author_name'),
+
+                    SelectFilter::make('publisher_id')
+                        ->label('Publisher')
+                        ->relationship('publisher', 'publisher_name'),
                 ])
             ->headerActions([
                 ExportAction::make()->label('Export Excel')
