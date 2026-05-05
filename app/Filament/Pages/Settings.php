@@ -21,7 +21,7 @@ class Settings extends Page implements HasForms
 
     protected static string|UnitEnum|null $navigationGroup = 'System';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 999;
     
     protected static ?string $title = 'Settings';
     protected string $view = 'filament.pages.settings';
