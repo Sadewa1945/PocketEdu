@@ -10,6 +10,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages\Dashboard;
+use App\Models\Setting;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -25,9 +26,11 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        $setting = Setting::first();
         return $panel
             ->id('admin')
             ->path('admin')
+            ->brandName($setting?->app_name ?? config('app.name'))
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login(Login::class)
             
@@ -39,7 +42,11 @@ class AdminPanelProvider extends PanelProvider
                 ->formPanelPosition('left')
                 ->mobileFormPanelPosition('bottom') 
                 ->formPanelWidth('40%')
-                ->emptyPanelBackgroundImageUrl(asset('images/image.jpg'))
+                ->emptyPanelBackgroundImageUrl(
+                    $setting?->login_image
+                        ? asset('storage/' . $setting->login_image)
+                        : asset('images/image.jpg')
+                )
                 ->emptyPanelBackgroundImageOpacity('70%')
             ])
             
